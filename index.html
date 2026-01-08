@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="description" content="maude churchill">
+  <title>Maude Churchill</title>
+  <meta name="description" content="Maude Churchill is a creative director based in London."/>
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+ <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Helvetica, Arial, sans-serif;
+      font-size: 12px; 
+      line-height: 1.4;
+      color: black;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      justify-content: space-between; 
+    }
+    .header a {
+      text-decoration: none;
+      color: black;
+      transition: color 0.2s ease;
+      cursor: pointer;
+    }
+    .header a:hover {
+      color: red; 
+    }
+    .header {
+      padding: 20px; 
+      text-align: left;
+    }
+    .content {
+      padding-left: 20px; 
+      padding-right: 40px; 
+      max-width: 700px; 
+      margin-bottom: 20px; 
+      text-align: left;
+
+    }
+    .image-text-container {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      flex-direction: column;
+
+    }
+    .image-text-container img {
+      max-width: 500px; 
+      height: auto;
+
+    }
+    .image-text-container .text {
+      max-width: 500px; 
+    }
+  </style>
+  <script>
+    // Store your various content blocks in an array
+    const contentBlocks = [
+      // Block 1
+      Maude Churchill is a creative director with over a decade of experience in cultural marketing, specialising in fashion, music and lifestyle brands.
+      `,
+      // Block 2
+      `
+        <div class="image-text-container">
+          <img src="https://shorturl.at/bCAz7" alt="giorgio armani">
+          <div class="text">
+       Her projects involve tapping into a brand's core values and communicating them to an audience by connecting with the cultural zeitgeist through creative talent.
+            <br> 
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            Agencies + Brands<br>
+          </div>
+        </div>
+      `,
+      // Block 3
+      `
+        <div class="image-text-container">
+          <img src="https://media.muckrack.com/profile/images/3244084/maudechurchill.jpeg.256x256_q100_crop-smart.jpg" alt="placeholder">
+          <div class="text">
+            "main character"
+          </div>
+        </div>
+      `
+    ];
+
+    // Keep track of the current index
+    let currentIndex = 0;
+
+    function toggleContent() {
+      // Select the content container
+      const contentDiv = document.querySelector('.content');
+      // Update to the next content block
+      currentIndex = (currentIndex + 1) % contentBlocks.length;
+      // Set the new content
+      contentDiv.innerHTML = contentBlocks[currentIndex];
+    }
+  </script>
+</head>
+<body>
+  <div class="header">
+    <a onclick="toggleContent()">maudechurchill</a>
+  </div>
+  <div class="content">
+    MC - Creative Director
+  </div>
+</body>
+</html>
