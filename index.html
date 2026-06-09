@@ -49,6 +49,7 @@
 
         html {
             scroll-behavior: smooth;
+            scroll-padding-top: 0;
         }
 
         body {
@@ -67,6 +68,19 @@
 
         body.page-fade {
             opacity: 0;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+
+            *,
+            *::before,
+            *::after {
+                transition-duration: 0.001ms !important;
+                animation-duration: 0.001ms !important;
+            }
         }
 
         /* --- STRUCTURAL LAYOUT --- */
@@ -254,6 +268,11 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+        }
+
+        .image-slot--photo {
+            padding: 0;
+            line-height: 0;
         }
 
         .image-slot--highlight {
@@ -450,6 +469,11 @@
                 backdrop-filter: blur(var(--blur-strength));
             }
 
+            .brand-name {
+                font-size: inherit;
+                line-height: inherit;
+            }
+
             .header-utilities {
                 display: flex;
                 flex-direction: column;
@@ -525,26 +549,34 @@
             .info-grid {
                 grid-template-columns: 1fr;
                 gap: 20px;
-                font-size: 16px;
             }
         }
 
         @media (max-width: 1199px) {
+            #image-space {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            #image-space .section-title {
+                display: none;
+            }
+
             .image-layout {
-                width: min(100%, calc((100vh - 240px - 20px) * 16 / 27));
-                height: auto;
-                aspect-ratio: auto;
+                width: min(100%, calc((100vh - 200px) * 16 / 9));
+                aspect-ratio: 16 / 9;
                 cursor: default;
             }
 
             .image-track {
-                flex-direction: column;
-                gap: clamp(6px, 2vw, 10px);
+                flex-direction: row;
+                gap: 0;
                 transform: none !important;
             }
 
             .image-slot {
-                flex: 0 0 auto;
+                flex: 0 0 100%;
                 width: 100%;
             }
         }
@@ -601,13 +633,14 @@
         <div class="section-title"></div>
         <div class="image-layout">
             <div class="image-track" id="image-track">
-                <div class="image-slot">
+                <div class="image-slot image-slot--photo">
                     <img src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/prada%20mode%20ldn%20screenshot.png" alt="Prada Mode London" />
                 </div>
                 <div class="image-slot image-slot--highlight">Image</div>
                 <div class="image-slot image-slot--cyan">Image</div>
             </div>
         </div>
+        <div class="mobile-meta-slot" id="mobile-meta-slot"></div>
     </section>
 
     <section id="selected-works">
@@ -659,7 +692,6 @@
                 </div>
             </div>
         </div>
-        <div class="mobile-meta-slot" id="mobile-meta-slot"></div>
     </section>
 
     <section id="information">
@@ -701,7 +733,7 @@
             applyTheme(current === 'dark' ? 'light' : 'dark');
         });
 
-        // Move utility controls to the floating mobile slot on small screens.
+        // Keep nav in the header on mobile while placing theme/time at bottom right.
         const headerUtilities = document.querySelector('.header-utilities');
         const headerMeta = document.getElementById('header-meta');
         const mobileMetaSlot = document.getElementById('mobile-meta-slot');
@@ -710,9 +742,7 @@
         function placeHeaderMeta(event) {
             if (!headerMeta || !headerUtilities || !mobileMetaSlot) return;
 
-            const isMobile = event.matches;
-            const target = isMobile ? mobileMetaSlot : headerUtilities;
-
+            const target = event.matches ? mobileMetaSlot : headerUtilities;
             if (headerMeta.parentElement !== target) {
                 target.appendChild(headerMeta);
             }
@@ -721,7 +751,7 @@
         placeHeaderMeta(mobileMetaQuery);
         mobileMetaQuery.addEventListener('change', placeHeaderMeta);
 
-        // Large desktop image carousel; smaller screens show all panels stacked.
+        // Large desktop image carousel; smaller screens keep one centered panel.
         const imageLayout = document.querySelector('.image-layout');
         const imageTrack = document.getElementById('image-track');
         const desktopCarouselQuery = window.matchMedia('(min-width: 1200px)');
@@ -830,7 +860,7 @@
             window.addEventListener('resize', setExpandedHeight);
         });
 
-        // 3. Navigation Page Transitions (Fade out slowly -> Snap quickly)
+        // 3. Smooth section navigation
         const navLinks = document.querySelectorAll('.nav-link');
         const sectionOrder = ['image-space', 'selected-works', 'information']
             .map(id => document.getElementById(id))
@@ -874,15 +904,7 @@
             if (!targetSection) return;
 
             setActiveNav(targetSection.id);
-            document.body.style.transition = "opacity 0.25s cubic-bezier(0.5, 0, 0.7, 0.2)";
-            document.body.classList.add('page-fade');
-
-            setTimeout(() => {
-                targetSection.scrollIntoView({ behavior: 'auto' });
-
-                document.body.style.transition = "opacity 0.075s ease-out";
-                document.body.classList.remove('page-fade');
-            }, 250);
+            targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
         
         navLinks.forEach(link => {
