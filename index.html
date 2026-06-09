@@ -466,24 +466,6 @@
                 margin-bottom: 4px;
             }
 
-            .image-layout {
-                width: min(100%, calc((100vh - 240px - 20px) * 16 / 27));
-                height: auto;
-                aspect-ratio: auto;
-                cursor: default;
-            }
-
-            .image-track {
-                flex-direction: column;
-                gap: clamp(6px, 2vw, 10px);
-                transform: none !important;
-            }
-
-            .image-slot {
-                flex: 0 0 auto;
-                width: 100%;
-            }
-
             .info-right {
                 grid-column: unset;
                 grid-row: unset;
@@ -539,9 +521,23 @@
             }
         }
 
-        @media (min-width: 600px) and (max-width: 868px) {
+        @media (max-width: 1199px) {
             .image-layout {
-                height: clamp(320px, calc(100vh - 220px), 560px);
+                width: min(100%, calc((100vh - 240px - 20px) * 16 / 27));
+                height: auto;
+                aspect-ratio: auto;
+                cursor: default;
+            }
+
+            .image-track {
+                flex-direction: column;
+                gap: clamp(6px, 2vw, 10px);
+                transform: none !important;
+            }
+
+            .image-slot {
+                flex: 0 0 auto;
+                width: 100%;
             }
         }
 
@@ -715,10 +711,10 @@
         placeHeaderMeta(mobileMetaQuery);
         mobileMetaQuery.addEventListener('change', placeHeaderMeta);
 
-        // Desktop image carousel; mobile shows all panels stacked.
+        // Large desktop image carousel; smaller screens show all panels stacked.
         const imageLayout = document.querySelector('.image-layout');
         const imageTrack = document.getElementById('image-track');
-        const desktopCarouselQuery = window.matchMedia('(min-width: 869px)');
+        const desktopCarouselQuery = window.matchMedia('(min-width: 1200px)');
         let imageIndex = 0;
 
         function updateImageCarousel() {
@@ -921,4 +917,3 @@
     </script>
 </body>
 </html>
-
