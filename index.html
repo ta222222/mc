@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="light dark" />
-    <title>Maude Churchill</title>
+    <title>Maude Churchill — Creative Director</title>
     <script>
         (function () {
             var theme = localStorage.getItem('theme');
@@ -148,7 +148,7 @@
             display: flex;
             flex-direction: column;
             align-items: flex-end;
-            gap: 12px;
+            gap: 8px;
         }
 
         .theme-toggle {
@@ -258,8 +258,6 @@
             font-weight: 700;
             text-transform: uppercase;
             border-bottom: 2px solid var(--border-color);
-            position: sticky;
-            top: 0;
             background-color: var(--bg-color);
             z-index: 10;
         }
@@ -513,14 +511,10 @@
             }
         }
 
-        /* Prevent expanded rows from overlapping the sticky header row on desktop */
+        /* Keep expanded rows layered above the archive table */
         .archive-table {
             position: relative;
             z-index: 1;
-        }
-
-        .archive-row.header-row {
-            z-index: 20;
         }
 
         @media (min-width: 869px) {
