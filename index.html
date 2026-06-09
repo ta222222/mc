@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="light dark">
-    <title>Maude Churchill</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Maude Churchill — Creative Director</title>
     <script>
         (function () {
             var theme = localStorage.getItem('theme');
@@ -20,14 +20,13 @@
             --border-color: #000000;
             --translucent-bg: rgba(244, 244, 244, 0.85);
             --muted-text: rgba(0, 0, 0, 0.4);
-            --section-border: rgba(0, 0, 0, 0.1);
             --hover-bg: rgba(0, 0, 0, 0.03);
             --row-expand-bg: rgba(0, 0, 0, 0.01);
             --expansion-border: rgba(0, 0, 0, 0.15);
             --preview-bg: rgba(0, 0, 0, 0.05);
             --blur-strength: 15px;
-            --swiss-transition: all 0.5s cubic-bezier(0.3, 0, 0.1, 1);
-            --theme-transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+            --swiss-transition: all 0.25s cubic-bezier(0.3, 0, 0.1, 1);
+            --theme-transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
         }
 
         [data-theme="dark"] {
@@ -36,7 +35,6 @@
             --border-color: #f4f4f4;
             --translucent-bg: rgba(10, 10, 10, 0.88);
             --muted-text: rgba(244, 244, 244, 0.4);
-            --section-border: rgba(255, 255, 255, 0.1);
             --hover-bg: rgba(255, 255, 255, 0.05);
             --row-expand-bg: rgba(255, 255, 255, 0.02);
             --expansion-border: rgba(255, 255, 255, 0.15);
@@ -63,7 +61,7 @@
             font-size: 14px;
             line-height: 1.2;
             letter-spacing: -0.02em;
-            transition: opacity 0.4s ease-in-out, var(--theme-transition);
+            transition: opacity 0.2s ease-in-out, var(--theme-transition);
             opacity: 1;
         }
 
@@ -95,9 +93,14 @@
 
         .brand-name {
             color: var(--text-color);
+            font-family: inherit;
             font-weight: 500;
             font-size: 18px;
             letter-spacing: -0.01em;
+            background: none;
+            border: 0;
+            padding: 0;
+            cursor: pointer;
             display: inline-block;
             grid-column: 1;
             grid-row: 1;
@@ -184,7 +187,7 @@
         .ticker-frame {
             display: flex;
             flex-direction: column;
-            transition: transform 0.6s cubic-bezier(0.3, 0, 0.1, 1);
+            transition: transform 0.3s cubic-bezier(0.3, 0, 0.1, 1);
         }
 
         .ticker-item {
@@ -199,11 +202,9 @@
             z-index: 1;
             min-height: 100vh;
             padding: 180px 24px 80px 24px;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
         }
 
         section:last-of-type {
-            border-bottom: none;
             margin-bottom: 10vh;
         }
 
@@ -214,6 +215,27 @@
             margin-bottom: 40px;
             letter-spacing: 0.05em;
             color: var(--muted-text);
+        }
+
+        /* --- INTRO IMAGE SPACE --- */
+        .image-layout {
+            min-height: calc(100vh - 180px - 74px - 8rem);
+            display: flex;
+        }
+
+        .image-slot {
+            border: 1px solid var(--border-color);
+            background: var(--preview-bg);
+            color: var(--muted-text);
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-start;
+            width: 100%;
+            min-height: 160px;
+            padding: 12px;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.05em;
         }
 
         /* --- ARCHIVE SYSTEM (EXPANDABLE) --- */
@@ -244,13 +266,13 @@
 
         .row-trigger {
             display: grid;
-            grid-template-columns: minmax(5rem, 1.1fr) minmax(0, 2.4fr) minmax(7rem, 1.5fr) minmax(2.5rem, 0.55fr);
+            grid-template-columns: minmax(5rem, 1.1fr) minmax(0, 2.4fr) minmax(7rem, 1.5fr);
             column-gap: clamp(1rem, 2.5vw, 2.5rem);
             row-gap: 0.35rem;
             padding: clamp(14px, 2vw, 20px) 0;
             cursor: pointer;
             align-items: baseline;
-            transition: background-color 0.2s ease;
+            transition: background-color 0.1s ease;
         }
 
         .header-row .row-trigger {
@@ -264,22 +286,25 @@
         .col-index {
             font-variant-numeric: tabular-nums;
             min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .col-title {
             font-weight: 500;
             text-transform: uppercase;
             min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .col-type {
             min-width: 0;
             line-height: 1.35;
-        }
-
-        .col-year {
-            text-align: right;
-            font-variant-numeric: tabular-nums;
+            overflow: hidden;
+            text-overflow: ellipsis;
             white-space: nowrap;
         }
 
@@ -287,7 +312,7 @@
         .row-expandable {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.6s cubic-bezier(0.3, 0, 0.1, 1);
+            transition: max-height 0.3s cubic-bezier(0.3, 0, 0.1, 1);
             background-color: var(--row-expand-bg);
         }
 
@@ -358,7 +383,7 @@
             aspect-ratio: 1600 / 1778;
         }
 
-        .project-description {
+        .only-description {
             margin-top: clamp(14px, 3vw, 20px);
             width: 100%;
             max-width: min(37.5rem, 100%);
@@ -369,7 +394,8 @@
         /* --- INFO SECTION LAYOUT --- */
         .info-grid {
             display: grid;
-            grid-template-columns: 1.2fr 3fr;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: clamp(24px, 5vw, 80px);
             font-size: 14px;
             line-height: 1.4;
             letter-spacing: -0.02em;
@@ -378,6 +404,10 @@
         .info-body p {
             margin-bottom: 24px;
             max-width: 700px;
+        }
+
+        .mobile-meta-slot {
+            display: none;
         }
 
         /* --- RESPONSIVE OPTIMIZATIONS --- */
@@ -418,11 +448,32 @@
                 margin-bottom: 4px;
             }
 
+            .image-layout {
+                min-height: clamp(180px, 58vw, 340px);
+            }
+
             .info-right {
                 grid-column: unset;
                 grid-row: unset;
                 align-self: auto;
                 justify-self: auto;
+            }
+
+            .mobile-meta-slot {
+                display: flex;
+                justify-content: flex-end;
+                position: fixed;
+                right: 16px;
+                bottom: 16px;
+                z-index: 100;
+                pointer-events: none;
+            }
+
+            .mobile-meta-slot .info-right {
+                align-items: flex-end;
+                gap: 4px;
+                text-align: right;
+                pointer-events: auto;
             }
 
             section {
@@ -432,7 +483,7 @@
             }
 
             .row-trigger {
-                grid-template-columns: 0.5fr 2fr 1fr;
+                grid-template-columns: 0.7fr 2fr;
             }
 
             .col-type {
@@ -455,33 +506,71 @@
                 font-size: 16px;
             }
         }
+
+        @media (min-width: 600px) and (max-width: 868px) {
+            .image-layout {
+                min-height: clamp(340px, 62vw, 520px);
+            }
+        }
+
+        /* Prevent expanded rows from overlapping the sticky header row on desktop */
+        .archive-table {
+            position: relative;
+            z-index: 1;
+        }
+
+        .archive-row.header-row {
+            z-index: 20;
+        }
+
+        @media (min-width: 869px) {
+            .archive-row.expanded {
+                z-index: 10;
+            }
+
+            .archive-row.expanded .row-expandable {
+                padding-top: 16px;
+                overflow-y: auto;
+            }
+
+            .archive-row:not(.header-row) {
+                z-index: 1;
+            }
+        }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="brand-name">Maude Churchill</div>
+        <button type="button" class="brand-name" aria-label="Scroll to top">Maude Churchill</button>
         <div class="header-utilities">
             <nav class="site-nav">
                 <ul>
-                    <li><a href="#selected-works" class="nav-link active">Selected Work</a></li>
+                    <li><a href="#selected-works" class="nav-link">Selected Work</a></li>
                     <li><a href="#information" class="nav-link">Information</a></li>
                 </ul>
             </nav>
-            <div class="info-right">
+        <div class="info-right" id="header-meta">
                 <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" aria-pressed="false">
                     <span class="theme-toggle-label">Dark</span>
                 </button>
                 <div class="meta-text ticker-wrap">
                     <div class="ticker-frame" id="ticker-frame">
                         <div class="ticker-item" data-city="LONDON">00:00:00 LON</div>
-                        <div class="ticker-item" data-city="NEW YORK">00:00:00 NYC</div>
-                        <div class="ticker-item" data-city="PARIS">00:00:00 PAR</div>
+                        <div class="ticker-item" data-city="BERLIN">00:00:00 BER</div>
+                        <div class="ticker-item" data-city="LEEDS">00:00:00 LDS</div>
                     </div>
                 </div>
             </div>
         </div>
     </header>
+
+    <section id="image-space" aria-label="Image and photo space">
+        <div class="section-title"></div>
+        <div class="image-layout">
+            <div class="image-slot">Image</div>
+        </div>
+    </section>
 
     <section id="selected-works">
         <div class="section-title"></div>
@@ -489,9 +578,8 @@
             <div class="archive-row header-row">
                 <div class="row-trigger">
                     <div class="col-index">Agency</div>
-                    <div class="col-title">Project Title</div>
+                    <div class="col-title">Project</div>
                     <div class="col-type">Role</div>
-                    <div class="col-year">Year</div>
                 </div>
             </div>
 
@@ -500,14 +588,13 @@
                     <div class="col-index">Hypebeast</div>
                     <div class="col-title">GUCCI</div>
                     <div class="col-type">Associate Creative Director</div>
-                    <div class="col-year">2023</div>
                 </div>
                 <div class="row-expandable">
                     <div class="expansion-content">
                         <div class="expansion-meta">Index Parameters:<br></div>
                         <div class="expansion-media">
                             <div class="preview-image-container preview-image-container--portrait preview-image-container--gucci">
-                                <img src="https://www.maudechurchill.co.uk/_next/image?url=https%3A%2F%2Fcdn.sanity.io%2Fimages%2Fwet7mckj%2Fproduction%2F899750d32b91e18cacedd984b36cbd0824e7383f-1160x1451.jpg%3Frect%3D0%2C0%2C1160%2C1289%26w%3D1080%26h%3D1200&w=1920&q=75" alt="GUCCI">
+                                <img src="https://www.maudechurchill.co.uk/_next/image?url=https%3A%2F%2Fcdn.sanity.io%2Fimages%2Fwet7mckj%2Fproduction%2F899750d32b91e18cacedd984b36cbd0824e7383f-1160x1451.jpg%3Frect%3D0%2C0%2C1160%2C1289%26w%3D1080%26h%3D1200&w=1920&q=75" alt="GUCCI" />
                             </div>
                             <div class="project-description">Placeholder text</div>
                         </div>
@@ -520,31 +607,33 @@
                     <div class="col-index">Hypebeast</div>
                     <div class="col-title">The North Face</div>
                     <div class="col-type">Associate Creative Director</div>
-                    <div class="col-year">2023</div>
                 </div>
                 <div class="row-expandable">
                     <div class="expansion-content">
                         <div class="expansion-meta">Index Parameters:<br>Location: Global Pavilion<br></div>
                         <div class="expansion-media">
                             <div class="preview-image-container preview-image-container--portrait preview-image-container--north-face">
-                                <img src="https://www.maudechurchill.co.uk/_next/image?url=https%3A%2F%2Fcdn.sanity.io%2Fimages%2Fwet7mckj%2Fproduction%2F2225ef97d83f0c9e3d980fad3e295918f1d17a40-1600x2000.jpg%3Frect%3D0%2C111%2C1600%2C1778%26w%3D1080%26h%3D1200&w=1920&q=75" alt="The North Face">
+                                <img src="https://www.maudechurchill.co.uk/_next/image?url=https%3A%2F%2Fcdn.sanity.io%2Fimages%2Fwet7mckj%2Fproduction%2F2225ef97d83f0c9e3d980fad3e295918f1d17a40-1600x2000.jpg%3Frect%3D0%2C111%2C1600%2C1778%26w%3D1080%26h%3D1200&w=1920&q=75" alt="The North Face" />
                             </div>
-                            <div class="project-description">Placeholder text
+                            <div class="project-description">Placeholder text</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="mobile-meta-slot" id="mobile-meta-slot"></div>
     </section>
 
     <section id="information">
         <div class="section-title"></div>
         <div class="info-grid">
-            <div>//</div>
             <div class="info-body">
                 <p>Maude Churchill is a creative director with over a decade of experience in cultural marketing, specialising in fashion, music and lifestyle brands</p>
+                <br>
                 <p>Currently based in London</p>
-                <p>Contact:</p>
+            </div>
+            <div class="info-body">
+                <p>Contact</p>
             </div>
         </div>
     </section>
@@ -574,11 +663,31 @@
             applyTheme(current === 'dark' ? 'light' : 'dark');
         });
 
-        // 1. Timezone Ticker Loop (London, New York, Paris)
+        // Move utility controls to the floating mobile slot on small screens.
+        const headerUtilities = document.querySelector('.header-utilities');
+        const headerMeta = document.getElementById('header-meta');
+        const mobileMetaSlot = document.getElementById('mobile-meta-slot');
+        const mobileMetaQuery = window.matchMedia('(max-width: 868px)');
+
+        function placeHeaderMeta(event) {
+            if (!headerMeta || !headerUtilities || !mobileMetaSlot) return;
+
+            const isMobile = event.matches;
+            const target = isMobile ? mobileMetaSlot : headerUtilities;
+
+            if (headerMeta.parentElement !== target) {
+                target.appendChild(headerMeta);
+            }
+        }
+
+        placeHeaderMeta(mobileMetaQuery);
+        mobileMetaQuery.addEventListener('change', placeHeaderMeta);
+
+        // 1. Timezone Ticker Loop (London, Berlin, Leeds)
         const timeOffsets = {
-            'LON': 'Europe/London',
-            'NYC': 'America/New_York',
-            'PAR': 'Europe/Paris'
+            'LONDON': 'Europe/London',
+            'LEEDS': 'Europe/London',
+            'BERLIN': 'Europe/Berlin'
         };
 
         const tickerItems = document.querySelectorAll('.ticker-item');
@@ -610,7 +719,7 @@
         }
 
         setInterval(updateClocks, 1000);
-        setInterval(cycleTicker, 4000); // Shift city string every 4s
+        setInterval(cycleTicker, 2000); // Shift city string every 2s
         updateClocks();
 
         // 2. Clickable / Expandable Row System
@@ -621,7 +730,10 @@
 
             function setExpandedHeight() {
                 if (!row.classList.contains('expanded') || !expandable) return;
-                expandable.style.maxHeight = expandable.scrollHeight + 'px';
+                const footerReserve = window.matchMedia('(min-width: 869px)').matches ? 112 : 0;
+                const availableHeight = window.innerHeight - expandable.getBoundingClientRect().top - footerReserve;
+                const maxHeight = footerReserve ? Math.max(180, availableHeight) : expandable.scrollHeight;
+                expandable.style.maxHeight = Math.min(expandable.scrollHeight, maxHeight) + 'px';
             }
 
             function toggleRow() {
@@ -658,28 +770,82 @@
 
         // 3. Navigation Page Transitions (Fade out slowly -> Snap quickly)
         const navLinks = document.querySelectorAll('.nav-link');
+        const sectionOrder = ['image-space', 'selected-works', 'information']
+            .map(id => document.getElementById(id))
+            .filter(Boolean);
+
+        function setActiveNav(targetId) {
+            navLinks.forEach(link => {
+                if (link.getAttribute('href') === `#${targetId}`) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+
+        const brandName = document.querySelector('.brand-name');
+        if (brandName) {
+            const finalTitle = 'Maude Churchill';
+            const altTitles = ['Main Character', 'Magic Club', 'Moon Child', 'Mood Curator', 'Music Chooser'];
+            let tick = 0;
+
+            const brandCycle = setInterval(() => {
+                if (tick < 6) {
+                    brandName.textContent = altTitles[tick % altTitles.length];
+                } else {
+                    const reveal = tick - 5;
+                    brandName.textContent = finalTitle.slice(0, reveal);
+                }
+
+                tick += 1;
+                if (tick > finalTitle.length + 5) clearInterval(brandCycle);
+            }, 99);
+        }
+
+        brandName?.addEventListener('click', () => {
+            setActiveNav('image-space');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        function navigateToSection(targetSection) {
+            if (!targetSection) return;
+
+            setActiveNav(targetSection.id);
+            document.body.style.transition = "opacity 0.25s cubic-bezier(0.5, 0, 0.7, 0.2)";
+            document.body.classList.add('page-fade');
+
+            setTimeout(() => {
+                targetSection.scrollIntoView({ behavior: 'auto' });
+
+                document.body.style.transition = "opacity 0.075s ease-out";
+                document.body.classList.remove('page-fade');
+            }, 250);
+        }
         
         navLinks.forEach(link => {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
                 const targetId = this.getAttribute('href');
                 const targetSection = document.querySelector(targetId);
-                
-                if (targetSection) {
-                    navLinks.forEach(l => l.classList.remove('active'));
-                    this.classList.add('active');
-
-                    document.body.style.transition = "opacity 0.5s cubic-bezier(0.5, 0, 0.7, 0.2)"; 
-                    document.body.classList.add('page-fade');
-                    
-                    setTimeout(() => {
-                        targetSection.scrollIntoView({ behavior: 'auto' });
-                        
-                        document.body.style.transition = "opacity 0.15s ease-out";
-                        document.body.classList.remove('page-fade');
-                    }, 500); 
-                }
+                navigateToSection(targetSection);
             });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.code !== 'Space' || e.repeat) return;
+            if (e.target.closest('a, button, input, textarea, select, [contenteditable="true"], .row-trigger')) return;
+            if (!sectionOrder.length) return;
+
+            e.preventDefault();
+
+            const currentIndex = sectionOrder.reduce((closestIndex, section, index) => {
+                const currentDistance = Math.abs(section.getBoundingClientRect().top);
+                const closestDistance = Math.abs(sectionOrder[closestIndex].getBoundingClientRect().top);
+                return currentDistance < closestDistance ? index : closestIndex;
+            }, 0);
+            const nextSection = sectionOrder[(currentIndex + 1) % sectionOrder.length];
+            navigateToSection(nextSection);
         });
 
         // Intersection Observer to highlight current active layout on scroll
@@ -690,13 +856,7 @@
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const id = entry.target.getAttribute('id');
-                    navLinks.forEach(link => {
-                        if (link.getAttribute('href') === `#${id}`) {
-                            link.classList.add('active');
-                        } else {
-                            link.classList.remove('active');
-                        }
-                    });
+                    setActiveNav(id);
                 }
             });
         }, options);
@@ -705,3 +865,4 @@
     </script>
 </body>
 </html>
+
