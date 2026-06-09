@@ -291,7 +291,8 @@
             letter-spacing: 0.05em;
         }
 
-        .image-slot img {
+        .image-slot img,
+        .image-slot video {
             display: block;
             width: 100%;
             height: 100%;
@@ -301,6 +302,35 @@
         .image-slot--photo {
             padding: 0;
             line-height: 0;
+        }
+
+        .image-slot--video {
+            position: relative;
+        }
+
+        .image-slot--video .slot-poster,
+        .image-slot--video .slot-video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            transition: opacity 0.35s cubic-bezier(0.3, 0, 0.1, 1);
+        }
+
+        .image-slot--video .slot-poster {
+            opacity: 1;
+        }
+
+        .image-slot--video .slot-video {
+            opacity: 0;
+        }
+
+        .image-slot--video.is-playing .slot-poster {
+            opacity: 0;
+        }
+
+        .image-slot--video.is-playing .slot-video {
+            opacity: 1;
         }
 
         .image-slot--highlight {
@@ -661,8 +691,11 @@
         <div class="section-title"></div>
         <div class="image-layout">
             <div class="image-track" id="image-track">
-                <div class="image-slot image-slot--photo">
-                    <img src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/prada%20mode%20ldn%20screenshot.png" alt="Prada Mode London" />
+                <div class="image-slot image-slot--photo image-slot--video" id="first-image-slot">
+                    <img class="slot-poster" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/prada%20mode%20ldn%20screenshot.png" alt="Prada Mode London" />
+                    <video class="slot-video" playsinline preload="metadata" aria-label="Prada Mode London">
+                        <source src="https://github.com/ta222222/mc/raw/refs/heads/main/prada+mode+london+25.webm" type="video/webm" />
+                    </video>
                 </div>
                 <div class="image-slot image-slot--highlight">Image</div>
                 <div class="image-slot image-slot--photo">
@@ -863,7 +896,10 @@
         // Image carousel — click or tap advances to next panel.
         const imageLayout = document.querySelector('.image-layout');
         const imageTrack = document.getElementById('image-track');
+        const firstImageSlot = document.getElementById('first-image-slot');
+        const firstSlotVideo = firstImageSlot?.querySelector('.slot-video');
         let imageIndex = 0;
+        let suppressCarouselClick = false;
 
         function updateImageCarousel() {
             if (!imageTrack) return;
@@ -872,11 +908,91 @@
 
         function advanceImageCarousel() {
             if (!imageTrack) return;
+            if (imageIndex === 0 && firstImageSlot?.classList.contains('is-playing')) {
+                pauseFirstSlotVideo();
+            }
             imageIndex = (imageIndex + 1) % imageTrack.children.length;
             updateImageCarousel();
         }
 
-        imageLayout?.addEventListener('click', advanceImageCarousel);
+        function playFirstSlotVideo() {
+            if (!firstImageSlot || !firstSlotVideo) return;
+            firstImageSlot.classList.add('is-playing');
+            firstSlotVideo.currentTime = 0;
+            firstSlotVideo.play().catch(() => {});
+        }
+
+        function pauseFirstSlotVideo() {
+            if (!firstImageSlot || !firstSlotVideo) return;
+            firstImageSlot.classList.remove('is-playing');
+            firstSlotVideo.pause();
+        }
+
+        let firstSlotTapTimer = null;
+        let firstSlotLastTap = 0;
+        let firstSlotTouchHandled = false;
+        const firstSlotTapDelay = 280;
+
+        function clearFirstSlotTapTimer() {
+            if (firstSlotTapTimer) {
+                window.clearTimeout(firstSlotTapTimer);
+                firstSlotTapTimer = null;
+            }
+        }
+
+        function triggerFirstSlotVideo(event) {
+            event?.stopPropagation();
+            clearFirstSlotTapTimer();
+            firstSlotLastTap = 0;
+            suppressCarouselClick = true;
+            playFirstSlotVideo();
+            window.setTimeout(() => {
+                suppressCarouselClick = false;
+            }, 400);
+        }
+
+        function scheduleFirstSlotCarouselAdvance(event) {
+            event?.stopPropagation();
+            clearFirstSlotTapTimer();
+            firstSlotTapTimer = window.setTimeout(() => {
+                firstSlotTapTimer = null;
+                firstSlotLastTap = 0;
+                advanceImageCarousel();
+            }, firstSlotTapDelay);
+        }
+
+        function markFirstSlotTouchHandled() {
+            firstSlotTouchHandled = true;
+            window.setTimeout(() => {
+                firstSlotTouchHandled = false;
+            }, 450);
+        }
+
+        firstImageSlot?.addEventListener('dblclick', triggerFirstSlotVideo);
+
+        firstImageSlot?.addEventListener('click', (event) => {
+            event.stopPropagation();
+            if (suppressCarouselClick || firstSlotTouchHandled) return;
+            scheduleFirstSlotCarouselAdvance(event);
+        });
+
+        firstImageSlot?.addEventListener('touchend', (event) => {
+            markFirstSlotTouchHandled();
+            const now = Date.now();
+            if (now - firstSlotLastTap < firstSlotTapDelay) {
+                event.preventDefault();
+                triggerFirstSlotVideo(event);
+                return;
+            }
+            firstSlotLastTap = now;
+            scheduleFirstSlotCarouselAdvance(event);
+        });
+
+        imageLayout?.addEventListener('click', (event) => {
+            if (suppressCarouselClick) return;
+            if (firstImageSlot?.contains(event.target)) return;
+            advanceImageCarousel();
+        });
 
         // 1. Timezone Ticker Loop (London, Berlin, Leeds)
         const timeOffsets = {
