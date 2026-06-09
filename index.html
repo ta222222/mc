@@ -27,7 +27,7 @@
             --expansion-border: rgba(0, 0, 0, 0.15);
             --preview-bg: rgba(0, 0, 0, 0.05);
             --blur-strength: 15px;
-            --brand-font-size: clamp(1.4em, 2.1vw, 2.2em);
+            --brand-font-size: clamp(0.9em, calc(2.1vw - 0.5em), 1.7em);
             --ui-font-size: clamp(11px, 1vw, 12px);
             --ticker-height: 14px;
             --swiss-transition: all 0.25s cubic-bezier(0.3, 0, 0.1, 1);
@@ -248,8 +248,20 @@
         }
 
         /* --- INTRO IMAGE SPACE --- */
+        #image-space {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        #image-space .section-title {
+            display: none;
+        }
+
         .image-layout {
-            width: min(100%, calc((100vh - 180px - 74px - 8rem) * 16 / 9));
+            /* Midpoint between full-viewport (48px inset) and previous layout (~382px inset) */
+            width: min(calc(100vw - 48px), calc((100vh - 215px) * 16 / 9));
             aspect-ratio: 16 / 9;
             display: flex;
             margin: 0 auto;
@@ -474,7 +486,7 @@
         /* --- RESPONSIVE OPTIMIZATIONS --- */
         @media (max-width: 868px) {
             :root {
-                --brand-font-size: clamp(1.25em, 5.2vw, 1.75em);
+                --brand-font-size: clamp(0.75em, calc(5.2vw - 0.5em), 1.25em);
                 --ui-font-size: clamp(10px, 2.8vw, 12px);
                 --ticker-height: 13px;
             }
@@ -578,25 +590,18 @@
 
         @media (max-width: 1199px) {
             #image-space {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-            #image-space .section-title {
-                display: none;
+                padding: 16px;
             }
 
             .image-layout {
                 width: min(100%, calc((100vh - 200px) * 16 / 9));
                 aspect-ratio: 16 / 9;
-                cursor: default;
+                cursor: pointer;
             }
 
             .image-track {
                 flex-direction: row;
                 gap: 0;
-                transform: none !important;
             }
 
             .image-slot {
@@ -777,29 +782,23 @@
         placeHeaderMeta(mobileMetaQuery);
         mobileMetaQuery.addEventListener('change', placeHeaderMeta);
 
-        // Large desktop image carousel; smaller screens keep one centered panel.
+        // Image carousel — click or tap advances to next panel.
         const imageLayout = document.querySelector('.image-layout');
         const imageTrack = document.getElementById('image-track');
-        const desktopCarouselQuery = window.matchMedia('(min-width: 1200px)');
         let imageIndex = 0;
 
         function updateImageCarousel() {
             if (!imageTrack) return;
-            imageTrack.style.transform = desktopCarouselQuery.matches
-                ? `translateX(-${imageIndex * 100}%)`
-                : '';
+            imageTrack.style.transform = `translateX(-${imageIndex * 100}%)`;
         }
 
-        imageLayout?.addEventListener('click', () => {
-            if (!desktopCarouselQuery.matches || !imageTrack) return;
+        function advanceImageCarousel() {
+            if (!imageTrack) return;
             imageIndex = (imageIndex + 1) % imageTrack.children.length;
             updateImageCarousel();
-        });
+        }
 
-        desktopCarouselQuery.addEventListener('change', () => {
-            imageIndex = 0;
-            updateImageCarousel();
-        });
+        imageLayout?.addEventListener('click', advanceImageCarousel);
 
         // 1. Timezone Ticker Loop (London, Berlin, Leeds)
         const timeOffsets = {
