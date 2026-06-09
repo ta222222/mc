@@ -219,23 +219,43 @@
 
         /* --- INTRO IMAGE SPACE --- */
         .image-layout {
-            min-height: calc(100vh - 180px - 74px - 8rem);
+            width: min(100%, calc((100vh - 180px - 74px - 8rem) * 16 / 9));
+            aspect-ratio: 16 / 9;
             display: flex;
+            margin: 0 auto;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .image-track {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.35s cubic-bezier(0.3, 0, 0.1, 1);
         }
 
         .image-slot {
-            border: 1px solid var(--border-color);
             background: var(--preview-bg);
             color: var(--muted-text);
             display: flex;
             align-items: flex-end;
             justify-content: flex-start;
-            width: 100%;
-            min-height: 160px;
+            flex: 0 0 100%;
+            aspect-ratio: 16 / 9;
             padding: 12px;
             text-transform: uppercase;
             font-size: 11px;
             letter-spacing: 0.05em;
+        }
+
+        .image-slot--highlight {
+            background: #ccff00;
+            color: #000000;
+        }
+
+        .image-slot--cyan {
+            background: #00d9ff;
+            color: #000000;
         }
 
         /* --- ARCHIVE SYSTEM (EXPANDABLE) --- */
@@ -447,7 +467,21 @@
             }
 
             .image-layout {
-                min-height: clamp(180px, 58vw, 340px);
+                width: min(100%, calc((100vh - 240px - 20px) * 16 / 27));
+                height: auto;
+                aspect-ratio: auto;
+                cursor: default;
+            }
+
+            .image-track {
+                flex-direction: column;
+                gap: clamp(6px, 2vw, 10px);
+                transform: none !important;
+            }
+
+            .image-slot {
+                flex: 0 0 auto;
+                width: 100%;
             }
 
             .info-right {
@@ -507,7 +541,7 @@
 
         @media (min-width: 600px) and (max-width: 868px) {
             .image-layout {
-                min-height: clamp(340px, 62vw, 520px);
+                height: clamp(320px, calc(100vh - 220px), 560px);
             }
         }
 
@@ -562,7 +596,11 @@
     <section id="image-space" aria-label="Image and photo space">
         <div class="section-title"></div>
         <div class="image-layout">
-            <div class="image-slot">Image</div>
+            <div class="image-track" id="image-track">
+                <div class="image-slot">Image</div>
+                <div class="image-slot image-slot--highlight">Image</div>
+                <div class="image-slot image-slot--cyan">Image</div>
+            </div>
         </div>
     </section>
 
@@ -676,6 +714,30 @@
 
         placeHeaderMeta(mobileMetaQuery);
         mobileMetaQuery.addEventListener('change', placeHeaderMeta);
+
+        // Desktop image carousel; mobile shows all panels stacked.
+        const imageLayout = document.querySelector('.image-layout');
+        const imageTrack = document.getElementById('image-track');
+        const desktopCarouselQuery = window.matchMedia('(min-width: 869px)');
+        let imageIndex = 0;
+
+        function updateImageCarousel() {
+            if (!imageTrack) return;
+            imageTrack.style.transform = desktopCarouselQuery.matches
+                ? `translateX(-${imageIndex * 100}%)`
+                : '';
+        }
+
+        imageLayout?.addEventListener('click', () => {
+            if (!desktopCarouselQuery.matches || !imageTrack) return;
+            imageIndex = (imageIndex + 1) % imageTrack.children.length;
+            updateImageCarousel();
+        });
+
+        desktopCarouselQuery.addEventListener('change', () => {
+            imageIndex = 0;
+            updateImageCarousel();
+        });
 
         // 1. Timezone Ticker Loop (London, Berlin, Leeds)
         const timeOffsets = {
