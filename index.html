@@ -602,13 +602,15 @@
                 display: flex;
                 justify-content: flex-end;
                 position: fixed;
-                right: max(16px, env(safe-area-inset-right));
-                bottom: max(16px, env(safe-area-inset-bottom));
+                inset: auto max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) auto;
                 z-index: var(--ui-chrome-z);
                 pointer-events: none;
+                isolation: isolate;
             }
 
             .mobile-meta-slot .info-right {
+                position: relative;
+                z-index: var(--ui-chrome-z);
                 align-items: flex-end;
                 gap: 4px;
                 text-align: right;
@@ -719,6 +721,8 @@
         </div>
     </header>
 
+    <div class="mobile-meta-slot" id="mobile-meta-slot"></div>
+
     <section id="image-space" aria-label="Image and photo space">
         <div class="section-title"></div>
         <div class="image-layout">
@@ -735,7 +739,6 @@
                 </div>
             </div>
         </div>
-        <div class="mobile-meta-slot" id="mobile-meta-slot"></div>
     </section>
 
     <section id="selected-works">
