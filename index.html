@@ -410,7 +410,7 @@
         .row-trigger {
             display: grid;
             grid-template-columns: minmax(0, 1fr);
-            padding: clamp(14px, 2vw, 20px) 0;
+            padding: clamp(10px, 1.4vw, 14px) 0;
             cursor: pointer;
             align-items: baseline;
             transition: background-color 0.1s ease;
@@ -675,6 +675,10 @@
         }
 
         @media (min-width: 869px) {
+            #clients {
+                padding-top: calc(180px - 6rem);
+            }
+
             .info-right {
                 position: fixed;
                 right: 24px;
@@ -704,7 +708,7 @@
         <div class="header-utilities">
             <nav class="site-nav">
                 <ul>
-                    <li><a href="#selected-works" class="nav-link">Selected Work</a></li>
+                    <li><a href="#clients" class="nav-link">Clients</a></li>
                     <li><a href="#information" class="nav-link">Information</a></li>
                 </ul>
             </nav>
@@ -743,12 +747,12 @@
         </div>
     </section>
 
-    <section id="selected-works">
+    <section id="clients">
         <div class="section-title"></div>
         <div class="archive-table">
             <div class="archive-row header-row">
                 <div class="row-trigger">
-                    <div class="col-title">Client</div>
+                    <div class="col-title">Clients</div>
                 </div>
             </div>
 
@@ -766,6 +770,15 @@
                             <div class="client-description">Placeholder text</div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div class="archive-row">
+                <div class="row-trigger">
+                    <div class="col-title">Prada</div>
+                </div>
+                <div class="row-expandable">
+                    <div class="expansion-content"></div>
                 </div>
             </div>
 
@@ -806,34 +819,7 @@
 
             <div class="archive-row">
                 <div class="row-trigger">
-                    <div class="col-title">Zegna</div>
-                </div>
-                <div class="row-expandable">
-                    <div class="expansion-content"></div>
-                </div>
-            </div>
-
-            <div class="archive-row">
-                <div class="row-trigger">
                     <div class="col-title">Crocs</div>
-                </div>
-                <div class="row-expandable">
-                    <div class="expansion-content"></div>
-                </div>
-            </div>
-
-            <div class="archive-row">
-                <div class="row-trigger">
-                    <div class="col-title">Ballantine's</div>
-                </div>
-                <div class="row-expandable">
-                    <div class="expansion-content"></div>
-                </div>
-            </div>
-
-            <div class="archive-row">
-                <div class="row-trigger">
-                    <div class="col-title">Adidas Originals</div>
                 </div>
                 <div class="row-expandable">
                     <div class="expansion-content"></div>
@@ -879,15 +865,6 @@
             <div class="archive-row">
                 <div class="row-trigger">
                     <div class="col-title">Dazed Studio</div>
-                </div>
-                <div class="row-expandable">
-                    <div class="expansion-content"></div>
-                </div>
-            </div>
-
-            <div class="archive-row">
-                <div class="row-trigger">
-                    <div class="col-title">Futurimpose</div>
                 </div>
                 <div class="row-expandable">
                     <div class="expansion-content"></div>
@@ -1139,7 +1116,7 @@
         }
 
         setInterval(updateClocks, 1000);
-        setInterval(cycleTicker, 2000); // Shift city string every 2s
+        setInterval(cycleTicker, 3330); // Shift city string every 3.33s
         updateClocks();
 
         // 2. Clickable / Expandable Row System
@@ -1192,7 +1169,7 @@
         const navLinks = document.querySelectorAll('.nav-link');
         const infoSection = document.getElementById('information');
         const desktopMq = window.matchMedia('(min-width: 869px)');
-        const sectionOrder = ['image-space', 'selected-works', 'information']
+        const sectionOrder = ['image-space', 'clients', 'information']
             .map(id => document.getElementById(id))
             .filter(Boolean);
 
