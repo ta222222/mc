@@ -545,7 +545,7 @@
         /* --- RESPONSIVE OPTIMIZATIONS --- */
         @media (max-width: 868px) {
             :root {
-                --brand-font-size: clamp(0.75em, calc(5.2vw - 0.5em), 1.25em);
+                --brand-font-size: clamp(0.975rem, calc(4.68vw + 0.065rem), 1.38125rem);
                 --ui-font-size: clamp(10px, 2.8vw, 12px);
                 --ticker-height: 13px;
             }
@@ -562,8 +562,9 @@
             }
 
             .brand-name {
-                max-width: 10ch;
+                max-width: 11ch;
                 text-align: left;
+                line-height: 0.92;
             }
 
             .header-utilities {
