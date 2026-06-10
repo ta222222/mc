@@ -619,13 +619,7 @@
                 pointer-events: auto;
             }
 
-            html {
-                scroll-snap-type: y proximity;
-            }
-
             section {
-                scroll-snap-align: start;
-                scroll-snap-stop: normal;
                 padding-top: max(120px, calc(104px + env(safe-area-inset-top)));
                 padding-left: max(16px, env(safe-area-inset-left));
                 padding-right: max(16px, env(safe-area-inset-right));
@@ -1225,19 +1219,18 @@
             return Math.abs(infoSection.getBoundingClientRect().top) <= 2;
         }
 
-        function isNearPageBottom() {
-            return window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 24;
+        function isAtPageBottom() {
+            return window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
         }
 
         let bottomSnapTimer = null;
         let snapReleaseTimer = null;
         let isSnapping = false;
+        let hasUserScrolled = false;
 
         function shouldSnapInformationOnMobile() {
-            if (!infoSection || isInformationAligned()) return false;
-            const rect = infoSection.getBoundingClientRect();
-            if (isNearPageBottom()) return true;
-            return rect.top < -12 && rect.bottom > window.innerHeight * 0.35;
+            if (!hasUserScrolled || !infoSection || isInformationAligned()) return false;
+            return isAtPageBottom();
         }
 
         function releaseSnapLock() {
@@ -1263,10 +1256,6 @@
             const fullyVisibleBodies = new Set();
             let brandCycleStarted = false;
             let dwellTimer = null;
-
-            function isAtPageBottom() {
-                return window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
-            }
 
             function isInfoReady() {
                 const allBodiesVisible = fullyVisibleBodies.size === infoBodies.length;
@@ -1326,18 +1315,16 @@
         }
 
         function onPageScroll() {
+            hasUserScrolled = true;
             evaluateBrandTrigger();
             if (desktopMq.matches || isSnapping) return;
             clearTimeout(bottomSnapTimer);
-            bottomSnapTimer = setTimeout(snapInformationOnMobile, 48);
+            bottomSnapTimer = setTimeout(snapInformationOnMobile, 120);
         }
 
         window.addEventListener('scroll', onPageScroll, { passive: true });
         window.addEventListener('scrollend', releaseSnapLock, { passive: true });
-        window.addEventListener('resize', () => {
-            evaluateBrandTrigger();
-            snapInformationOnMobile();
-        });
+        window.addEventListener('resize', evaluateBrandTrigger);
 
         brandName?.addEventListener('click', () => {
             setActiveNav('image-space');
