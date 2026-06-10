@@ -619,7 +619,13 @@
                 pointer-events: auto;
             }
 
+            html {
+                scroll-snap-type: y proximity;
+            }
+
             section {
+                scroll-snap-align: start;
+                scroll-snap-stop: normal;
                 padding-top: max(120px, calc(104px + env(safe-area-inset-top)));
                 padding-left: max(16px, env(safe-area-inset-left));
                 padding-right: max(16px, env(safe-area-inset-right));
@@ -1190,6 +1196,8 @@
 
         // 3. Smooth section navigation
         const navLinks = document.querySelectorAll('.nav-link');
+        const infoSection = document.getElementById('information');
+        const desktopMq = window.matchMedia('(min-width: 869px)');
         const sectionOrder = ['image-space', 'selected-works', 'information']
             .map(id => document.getElementById(id))
             .filter(Boolean);
@@ -1204,24 +1212,132 @@
             });
         }
 
+        function getSectionScrollTop(section) {
+            return window.scrollY + section.getBoundingClientRect().top;
+        }
+
+        function scrollSectionToStart(section) {
+            window.scrollTo({ top: getSectionScrollTop(section), behavior: 'smooth' });
+        }
+
+        function isInformationAligned() {
+            if (!infoSection) return false;
+            return Math.abs(infoSection.getBoundingClientRect().top) <= 2;
+        }
+
+        function isNearPageBottom() {
+            return window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 24;
+        }
+
+        let bottomSnapTimer = null;
+        let snapReleaseTimer = null;
+        let isSnapping = false;
+
+        function shouldSnapInformationOnMobile() {
+            if (!infoSection || isInformationAligned()) return false;
+            const rect = infoSection.getBoundingClientRect();
+            if (isNearPageBottom()) return true;
+            return rect.top < -12 && rect.bottom > window.innerHeight * 0.35;
+        }
+
+        function releaseSnapLock() {
+            isSnapping = false;
+            evaluateBrandTrigger();
+        }
+
+        function snapInformationOnMobile() {
+            if (desktopMq.matches || !infoSection || isSnapping || !shouldSnapInformationOnMobile()) return;
+            isSnapping = true;
+            window.scrollTo({ top: getSectionScrollTop(infoSection), behavior: 'smooth' });
+            clearTimeout(snapReleaseTimer);
+            snapReleaseTimer = setTimeout(releaseSnapLock, 480);
+        }
+
         const brandName = document.querySelector('.brand-name');
-        if (brandName) {
+        const infoBodies = document.querySelectorAll('#information .info-body');
+        let evaluateBrandTrigger = () => {};
+
+        if (brandName && infoBodies.length) {
             const finalTitle = 'Maude Churchill';
             const altTitles = ['Main Character', 'Magic Club', 'Moon Child', 'Mood Curator', 'Music Chooser'];
-            let tick = 0;
+            const fullyVisibleBodies = new Set();
+            let brandCycleStarted = false;
+            let dwellTimer = null;
 
-            const brandCycle = setInterval(() => {
-                if (tick < 6) {
-                    brandName.textContent = altTitles[tick % altTitles.length];
-                } else {
-                    const reveal = tick - 5;
-                    brandName.textContent = finalTitle.slice(0, reveal);
+            function isAtPageBottom() {
+                return window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+            }
+
+            function isInfoReady() {
+                const allBodiesVisible = fullyVisibleBodies.size === infoBodies.length;
+                if (!allBodiesVisible) return false;
+                if (desktopMq.matches) return true;
+                return isInformationAligned() || isAtPageBottom();
+            }
+
+            function startBrandCycle() {
+                if (brandCycleStarted) return;
+                brandCycleStarted = true;
+                let tick = 0;
+
+                const brandCycle = setInterval(() => {
+                    if (tick < 6) {
+                        brandName.textContent = altTitles[tick % altTitles.length];
+                    } else {
+                        const reveal = tick - 5;
+                        brandName.textContent = finalTitle.slice(0, reveal);
+                    }
+
+                    tick += 1;
+                    if (tick > finalTitle.length + 5) clearInterval(brandCycle);
+                }, 99);
+            }
+
+            evaluateBrandTrigger = function () {
+                if (brandCycleStarted) return;
+
+                if (isInfoReady()) {
+                    if (!dwellTimer) {
+                        dwellTimer = setTimeout(() => {
+                            dwellTimer = null;
+                            if (isInfoReady()) startBrandCycle();
+                        }, 3000);
+                    }
+                } else if (dwellTimer) {
+                    clearTimeout(dwellTimer);
+                    dwellTimer = null;
                 }
+            };
 
-                tick += 1;
-                if (tick > finalTitle.length + 5) clearInterval(brandCycle);
-            }, 99);
+            infoBodies.forEach(body => {
+                const bodyObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.intersectionRatio >= 1) {
+                            fullyVisibleBodies.add(body);
+                        } else {
+                            fullyVisibleBodies.delete(body);
+                        }
+                    });
+                    evaluateBrandTrigger();
+                }, { threshold: 1 });
+
+                bodyObserver.observe(body);
+            });
         }
+
+        function onPageScroll() {
+            evaluateBrandTrigger();
+            if (desktopMq.matches || isSnapping) return;
+            clearTimeout(bottomSnapTimer);
+            bottomSnapTimer = setTimeout(snapInformationOnMobile, 48);
+        }
+
+        window.addEventListener('scroll', onPageScroll, { passive: true });
+        window.addEventListener('scrollend', releaseSnapLock, { passive: true });
+        window.addEventListener('resize', () => {
+            evaluateBrandTrigger();
+            snapInformationOnMobile();
+        });
 
         brandName?.addEventListener('click', () => {
             setActiveNav('image-space');
@@ -1232,7 +1348,7 @@
             if (!targetSection) return;
 
             setActiveNav(targetSection.id);
-            targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            scrollSectionToStart(targetSection);
         }
         
         navLinks.forEach(link => {
