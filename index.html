@@ -294,6 +294,7 @@
             margin: 0 auto;
             overflow: hidden;
             cursor: pointer;
+            transition: width 0.35s cubic-bezier(0.3, 0, 0.1, 1), aspect-ratio 0.35s cubic-bezier(0.3, 0, 0.1, 1);
         }
 
         @keyframes first-slide-fade-in {
@@ -373,6 +374,18 @@
 
         .image-slot--video.is-playing .slot-video {
             opacity: 1;
+        }
+
+        .image-slot--carousel-video {
+            padding: 0;
+            line-height: 0;
+            background: transparent;
+            position: relative;
+        }
+
+        .image-slot--carousel-video video {
+            object-fit: contain;
+            object-position: center;
         }
 
         .image-slot--highlight {
@@ -789,6 +802,11 @@
                 grid-template-columns: minmax(0, 1fr);
                 gap: clamp(12px, 3vw, 18px);
             }
+
+            .image-layout.image-layout--portrait-video {
+                aspect-ratio: 4 / 5;
+                width: min(calc(100vw - 32px), calc((100vh - 200px) * 4 / 5));
+            }
         }
 
         @media (max-width: 1199px) {
@@ -812,6 +830,16 @@
             .image-slot {
                 flex: 0 0 100%;
                 width: 100%;
+            }
+
+            .image-slot--carousel-video video {
+                position: absolute;
+                inset: 0;
+                width: 100%;
+                height: 100%;
+                min-height: 100%;
+                object-fit: contain;
+                object-position: center;
             }
         }
 
@@ -910,6 +938,12 @@
                     </video>
                 </div>
                 <div class="image-slot image-slot--highlight">Image</div>
+                <div class="image-slot image-slot--photo image-slot--carousel-video" id="kaytranada-video-slot" data-carousel-video>
+                    <video playsinline loop preload="metadata" aria-label="Kaytranada">
+                        <source src="https://github.com/ta222222/mc/raw/refs/heads/main/Kaytranada%20(VF1,%204x5,%20H264).webm" type="video/webm" />
+                    </video>
+                </div>
+                <div class="image-slot image-slot--cyan">Image</div>
                 <div class="image-slot image-slot--photo">
                     <img src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/hypebeast%20barbour.jpg" alt="Hypebeast Barbour" />
                 </div>
@@ -1172,12 +1206,47 @@
         const imageTrack = document.getElementById('image-track');
         const firstImageSlot = document.getElementById('first-image-slot');
         const firstSlotVideo = firstImageSlot?.querySelector('.slot-video');
+        const carouselVideoSlots = imageTrack
+            ? Array.from(imageTrack.querySelectorAll('[data-carousel-video]'))
+            : [];
+        const kaytranadaVideoSlot = document.getElementById('kaytranada-video-slot');
+        const kaytranadaSlideIndex = kaytranadaVideoSlot && imageTrack
+            ? Array.from(imageTrack.children).indexOf(kaytranadaVideoSlot)
+            : -1;
+        const mobileCarouselQuery = window.matchMedia('(max-width: 868px)');
         let imageIndex = 0;
         let suppressCarouselClick = false;
+
+        function syncCarouselLayout() {
+            if (!imageLayout) return;
+            const showPortrait = mobileCarouselQuery.matches && imageIndex === kaytranadaSlideIndex;
+            imageLayout.classList.toggle('image-layout--portrait-video', showPortrait);
+        }
 
         function updateImageCarousel() {
             if (!imageTrack) return;
             imageTrack.style.transform = `translateX(-${imageIndex * 100}%)`;
+            syncCarouselLayout();
+            syncCarouselVideos();
+        }
+
+        function syncCarouselVideos() {
+            carouselVideoSlots.forEach((slot) => {
+                const video = slot.querySelector('video');
+                if (!video) return;
+
+                const slideIndex = Array.from(imageTrack.children).indexOf(slot);
+                if (slideIndex === imageIndex) {
+                    video.muted = false;
+                    video.play().catch(() => {
+                        video.muted = true;
+                        video.play().catch(() => {});
+                    });
+                } else {
+                    video.pause();
+                    video.muted = true;
+                }
+            });
         }
 
         function advanceImageCarousel() {
@@ -1267,6 +1336,9 @@
             if (firstImageSlot?.contains(event.target)) return;
             advanceImageCarousel();
         });
+
+        mobileCarouselQuery.addEventListener('change', syncCarouselLayout);
+        syncCarouselLayout();
 
         // 1. Timezone Ticker Loop (London, Berlin, Leeds)
         const timeOffsets = {
