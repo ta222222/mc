@@ -20,7 +20,7 @@
         })();
     </script>
     <style>
-        /* --- SWISS MODERNIST RESET & CORE VARIABLES --- */
+        /* --- site design by yung ethernet --- */
         :root {
             color-scheme: light;
             --bg-color: #ffffff;
@@ -266,6 +266,14 @@
             margin-bottom: 10vh;
         }
 
+        #clients {
+            padding-bottom: 40px;
+        }
+
+        #information {
+            padding-top: 90px;
+        }
+
         .section-title {
             font-size: 11px;
             text-transform: uppercase;
@@ -386,6 +394,7 @@
         .image-slot--carousel-video video {
             object-fit: contain;
             object-position: center;
+            cursor: pointer;
         }
 
         .image-slot--highlight {
@@ -546,6 +555,15 @@
             border-bottom: 1px solid var(--border-color);
             overflow: hidden;
             position: relative;
+        }
+
+        #clients .archive-row:not(.header-row) {
+            border-bottom: none;
+            cursor: default;
+        }
+
+        #clients .row-trigger {
+            cursor: default;
         }
 
         .archive-row:not(.header-row) {
@@ -779,6 +797,14 @@
                 padding-bottom: max(80px, calc(64px + env(safe-area-inset-bottom)));
             }
 
+            #clients {
+                padding-bottom: max(40px, calc(32px + env(safe-area-inset-bottom)));
+            }
+
+            #information {
+                padding-top: max(60px, calc(52px + env(safe-area-inset-top)));
+            }
+
             .row-trigger {
                 grid-template-columns: 1fr;
             }
@@ -931,11 +957,11 @@
         <div class="section-title"></div>
         <div class="image-layout">
             <div class="image-track" id="image-track">
-                <div class="image-slot image-slot--photo image-slot--video" id="first-image-slot">
-                    <img class="slot-poster" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/prada%20mode%20ldn%20screenshot.png" alt="Prada Mode London" />
-                    <video class="slot-video" playsinline preload="metadata" aria-label="Prada Mode London">
+                <div class="image-slot image-slot--photo" id="first-image-slot">
+                    <img src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/prada%20mode%20ldn%20screenshot.png" alt="Prada Mode London" />
+                    <!-- <video class="slot-video" playsinline preload="metadata" aria-label="Prada Mode London">
                         <source src="https://github.com/ta222222/mc/raw/refs/heads/main/prada+mode+london+25.webm" type="video/webm" />
-                    </video>
+                    </video> -->
                 </div>
                 <div class="image-slot image-slot--highlight">Image</div>
                 <div class="image-slot image-slot--photo image-slot--carousel-video" id="kaytranada-video-slot" data-carousel-video>
@@ -979,20 +1005,11 @@
                 </div>
             </div>
 
+            <div class="info-grid">
+                <div class="info-body">
             <div class="archive-row">
                 <div class="row-trigger">
                     <div class="col-title">Gucci</div>
-                </div>
-                <div class="row-expandable">
-                    <div class="expansion-content">
-                        <div class="expansion-meta">Index Parameters:<br></div>
-                        <div class="expansion-media">
-                            <div class="preview-image-container preview-image-container--portrait preview-image-container--gucci">
-                                <img src="https://www.maudechurchill.co.uk/_next/image?url=https%3A%2F%2Fcdn.sanity.io%2Fimages%2Fwet7mckj%2Fproduction%2F899750d32b91e18cacedd984b36cbd0824e7383f-1160x1451.jpg%3Frect%3D0%2C0%2C1160%2C1289%26w%3D1080%26h%3D1200&w=1920&q=75" alt="Gucci" />
-                            </div>
-                            <div class="client-description">Placeholder text</div>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -1000,17 +1017,11 @@
                 <div class="row-trigger">
                     <div class="col-title">Prada</div>
                 </div>
-                <div class="row-expandable">
-                    <div class="expansion-content"></div>
-                </div>
             </div>
 
             <div class="archive-row">
                 <div class="row-trigger">
                     <div class="col-title">Moncler</div>
-                </div>
-                <div class="row-expandable">
-                    <div class="expansion-content"></div>
                 </div>
             </div>
 
@@ -1018,25 +1029,11 @@
                 <div class="row-trigger">
                     <div class="col-title">Nike</div>
                 </div>
-                <div class="row-expandable">
-                    <div class="expansion-content"></div>
-                </div>
             </div>
 
             <div class="archive-row">
                 <div class="row-trigger">
                     <div class="col-title">The North Face</div>
-                </div>
-                <div class="row-expandable">
-                    <div class="expansion-content">
-                        <div class="expansion-meta">Index Parameters:<br>Location: Global Pavilion<br></div>
-                        <div class="expansion-media">
-                            <div class="preview-image-container preview-image-container--portrait preview-image-container--north-face">
-                                <img src="https://www.maudechurchill.co.uk/_next/image?url=https%3A%2F%2Fcdn.sanity.io%2Fimages%2Fwet7mckj%2Fproduction%2F2225ef97d83f0c9e3d980fad3e295918f1d17a40-1600x2000.jpg%3Frect%3D0%2C111%2C1600%2C1778%26w%3D1080%26h%3D1200&w=1920&q=75" alt="The North Face" />
-                            </div>
-                            <div class="client-description">Placeholder text</div>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -1044,17 +1041,11 @@
                 <div class="row-trigger">
                     <div class="col-title">Crocs</div>
                 </div>
-                <div class="row-expandable">
-                    <div class="expansion-content"></div>
-                </div>
             </div>
 
             <div class="archive-row">
                 <div class="row-trigger">
                     <div class="col-title">Stone Island</div>
-                </div>
-                <div class="row-expandable">
-                    <div class="expansion-content"></div>
                 </div>
             </div>
 
@@ -1062,17 +1053,12 @@
                 <div class="row-trigger">
                     <div class="col-title">Loro Piana</div>
                 </div>
-                <div class="row-expandable">
-                    <div class="expansion-content"></div>
-                </div>
             </div>
-
+                </div>
+                <div class="info-body">
             <div class="archive-row">
                 <div class="row-trigger">
                     <div class="col-title">PlayStation</div>
-                </div>
-                <div class="row-expandable">
-                    <div class="expansion-content"></div>
                 </div>
             </div>
 
@@ -1080,17 +1066,11 @@
                 <div class="row-trigger">
                     <div class="col-title">Hypebeast</div>
                 </div>
-                <div class="row-expandable">
-                    <div class="expansion-content"></div>
-                </div>
             </div>
 
             <div class="archive-row">
                 <div class="row-trigger">
                     <div class="col-title">Dazed Studio</div>
-                </div>
-                <div class="row-expandable">
-                    <div class="expansion-content"></div>
                 </div>
             </div>
 
@@ -1098,17 +1078,11 @@
                 <div class="row-trigger">
                     <div class="col-title">Boiler Room</div>
                 </div>
-                <div class="row-expandable">
-                    <div class="expansion-content"></div>
-                </div>
             </div>
 
             <div class="archive-row">
                 <div class="row-trigger">
                     <div class="col-title">Mixcloud</div>
-                </div>
-                <div class="row-expandable">
-                    <div class="expansion-content"></div>
                 </div>
             </div>
 
@@ -1116,17 +1090,11 @@
                 <div class="row-trigger">
                     <div class="col-title">Depop</div>
                 </div>
-                <div class="row-expandable">
-                    <div class="expansion-content"></div>
-                </div>
             </div>
 
             <div class="archive-row">
                 <div class="row-trigger">
                     <div class="col-title">Protein</div>
-                </div>
-                <div class="row-expandable">
-                    <div class="expansion-content"></div>
                 </div>
             </div>
 
@@ -1134,8 +1102,7 @@
                 <div class="row-trigger">
                     <div class="col-title">Highsnobiety</div>
                 </div>
-                <div class="row-expandable">
-                    <div class="expansion-content"></div>
+            </div>
                 </div>
             </div>
         </div>
@@ -1148,9 +1115,11 @@
                 <p>Maude Churchill is a creative director with over a decade of experience in cultural marketing, specialising in fashion, music and lifestyle brands</p>
                 <br>
                 <p>Currently based in London</p>
+                <br>
+                <p>Contact</p>
             </div>
             <div class="info-body">
-                <p>Contact</p>
+                <p></p>
             </div>
         </div>
     </section>
@@ -1201,26 +1170,37 @@
         placeHeaderMeta(mobileMetaQuery);
         mobileMetaQuery.addEventListener('change', placeHeaderMeta);
 
-        // Image carousel — click or tap advances to next panel.
+        // Image carousel — left half goes previous, right half goes next.
         const imageLayout = document.querySelector('.image-layout');
         const imageTrack = document.getElementById('image-track');
-        const firstImageSlot = document.getElementById('first-image-slot');
-        const firstSlotVideo = firstImageSlot?.querySelector('.slot-video');
-        const carouselVideoSlots = imageTrack
-            ? Array.from(imageTrack.querySelectorAll('[data-carousel-video]'))
-            : [];
         const kaytranadaVideoSlot = document.getElementById('kaytranada-video-slot');
+        const kaytranadaSlotVideo = kaytranadaVideoSlot?.querySelector('video');
         const kaytranadaSlideIndex = kaytranadaVideoSlot && imageTrack
             ? Array.from(imageTrack.children).indexOf(kaytranadaVideoSlot)
             : -1;
         const mobileCarouselQuery = window.matchMedia('(max-width: 868px)');
         let imageIndex = 0;
-        let suppressCarouselClick = false;
+        let kaytranadaPausedByUser = false;
 
         function syncCarouselLayout() {
             if (!imageLayout) return;
             const showPortrait = mobileCarouselQuery.matches && imageIndex === kaytranadaSlideIndex;
             imageLayout.classList.toggle('image-layout--portrait-video', showPortrait);
+        }
+
+        function playKaytranadaSlotVideo() {
+            if (!kaytranadaSlotVideo) return;
+            kaytranadaSlotVideo.muted = false;
+            kaytranadaSlotVideo.play().catch(() => {
+                kaytranadaSlotVideo.muted = true;
+                kaytranadaSlotVideo.play().catch(() => {});
+            });
+        }
+
+        function pauseKaytranadaSlotVideo() {
+            if (!kaytranadaSlotVideo) return;
+            kaytranadaSlotVideo.pause();
+            kaytranadaSlotVideo.muted = true;
         }
 
         function updateImageCarousel() {
@@ -1231,33 +1211,159 @@
         }
 
         function syncCarouselVideos() {
-            carouselVideoSlots.forEach((slot) => {
-                const video = slot.querySelector('video');
-                if (!video) return;
-
-                const slideIndex = Array.from(imageTrack.children).indexOf(slot);
-                if (slideIndex === imageIndex) {
-                    video.muted = false;
-                    video.play().catch(() => {
-                        video.muted = true;
-                        video.play().catch(() => {});
-                    });
-                } else {
-                    video.pause();
-                    video.muted = true;
+            if (imageIndex === kaytranadaSlideIndex) {
+                if (!kaytranadaPausedByUser) {
+                    playKaytranadaSlotVideo();
                 }
-            });
+            } else {
+                kaytranadaPausedByUser = false;
+                pauseKaytranadaSlotVideo();
+            }
         }
 
-        function advanceImageCarousel() {
+        function goToPreviousSlide() {
             if (!imageTrack) return;
-            if (imageIndex === 0 && firstImageSlot?.classList.contains('is-playing')) {
-                pauseFirstSlotVideo();
+            if (imageIndex === kaytranadaSlideIndex) {
+                pauseKaytranadaSlotVideo();
+            }
+            kaytranadaPausedByUser = false;
+            imageIndex = (imageIndex - 1 + imageTrack.children.length) % imageTrack.children.length;
+            updateImageCarousel();
+        }
+
+        function goToNextSlide() {
+            if (!imageTrack) return;
+            if (imageIndex === kaytranadaSlideIndex) {
+                pauseKaytranadaSlotVideo();
             }
             imageIndex = (imageIndex + 1) % imageTrack.children.length;
             updateImageCarousel();
         }
 
+        function getCarouselPointerX(event) {
+            if (event.changedTouches?.length) {
+                return event.changedTouches[0].clientX;
+            }
+            return event.clientX;
+        }
+
+        function getCarouselPointerY(event) {
+            if (event.changedTouches?.length) {
+                return event.changedTouches[0].clientY;
+            }
+            return event.clientY;
+        }
+
+        function getContainedVideoRect(video) {
+            const elementRect = video.getBoundingClientRect();
+            const videoWidth = video.videoWidth;
+            const videoHeight = video.videoHeight;
+
+            if (!videoWidth || !videoHeight) {
+                return elementRect;
+            }
+
+            const elementWidth = elementRect.width;
+            const elementHeight = elementRect.height;
+            const videoAspect = videoWidth / videoHeight;
+            const elementAspect = elementWidth / elementHeight;
+            let renderedWidth;
+            let renderedHeight;
+            let offsetX = 0;
+            let offsetY = 0;
+
+            if (videoAspect > elementAspect) {
+                renderedWidth = elementWidth;
+                renderedHeight = elementWidth / videoAspect;
+                offsetY = (elementHeight - renderedHeight) / 2;
+            } else {
+                renderedHeight = elementHeight;
+                renderedWidth = elementHeight * videoAspect;
+                offsetX = (elementWidth - renderedWidth) / 2;
+            }
+
+            return {
+                left: elementRect.left + offsetX,
+                right: elementRect.left + offsetX + renderedWidth,
+                top: elementRect.top + offsetY,
+                bottom: elementRect.top + offsetY + renderedHeight,
+                width: renderedWidth,
+                height: renderedHeight
+            };
+        }
+
+        function handleKaytranadaSlideInteraction(event) {
+            if (!kaytranadaSlotVideo) return false;
+
+            const videoRect = getContainedVideoRect(kaytranadaSlotVideo);
+            const clientX = getCarouselPointerX(event);
+            const clientY = getCarouselPointerY(event);
+            const isOnVideo = clientX >= videoRect.left
+                && clientX <= videoRect.right
+                && clientY >= videoRect.top
+                && clientY <= videoRect.bottom;
+
+            if (isOnVideo) {
+                if (!kaytranadaSlotVideo.paused) {
+                    kaytranadaPausedByUser = true;
+                    pauseKaytranadaSlotVideo();
+                } else {
+                    kaytranadaPausedByUser = false;
+                    playKaytranadaSlotVideo();
+                }
+                return true;
+            }
+
+            if (clientX < videoRect.left) {
+                goToPreviousSlide();
+                return true;
+            }
+
+            if (clientX > videoRect.right) {
+                goToNextSlide();
+                return true;
+            }
+
+            const layoutRect = imageLayout.getBoundingClientRect();
+            const x = clientX - layoutRect.left;
+            if (x < layoutRect.width / 2) goToPreviousSlide();
+            else goToNextSlide();
+            return true;
+        }
+
+        function handleImageLayoutInteraction(event) {
+            if (!imageLayout || !imageTrack) return;
+
+            if (imageIndex === kaytranadaSlideIndex) {
+                handleKaytranadaSlideInteraction(event);
+                return;
+            }
+
+            const rect = imageLayout.getBoundingClientRect();
+            const x = getCarouselPointerX(event) - rect.left;
+            const isLeftHalf = x < rect.width / 2;
+
+            if (isLeftHalf) goToPreviousSlide();
+            else goToNextSlide();
+        }
+
+        let carouselTouchHandled = false;
+
+        imageLayout?.addEventListener('click', (event) => {
+            if (carouselTouchHandled) return;
+            handleImageLayoutInteraction(event);
+        });
+
+        imageLayout?.addEventListener('touchend', (event) => {
+            carouselTouchHandled = true;
+            handleImageLayoutInteraction(event);
+            event.preventDefault();
+            window.setTimeout(() => {
+                carouselTouchHandled = false;
+            }, 400);
+        }, { passive: false });
+
+        /*
         function playFirstSlotVideo() {
             if (!firstImageSlot || !firstSlotVideo) return;
             firstImageSlot.classList.add('is-playing');
@@ -1269,7 +1375,12 @@
             if (!firstImageSlot || !firstSlotVideo) return;
             firstImageSlot.classList.remove('is-playing');
             firstSlotVideo.pause();
+            firstSlotVideo.currentTime = 0;
         }
+
+        firstSlotVideo?.addEventListener('ended', () => {
+            pauseFirstSlotVideo();
+        });
 
         let firstSlotTapTimer = null;
         let firstSlotLastTap = 0;
@@ -1330,12 +1441,7 @@
             firstSlotLastTap = now;
             scheduleFirstSlotCarouselAdvance(event);
         });
-
-        imageLayout?.addEventListener('click', (event) => {
-            if (suppressCarouselClick) return;
-            if (firstImageSlot?.contains(event.target)) return;
-            advanceImageCarousel();
-        });
+        */
 
         mobileCarouselQuery.addEventListener('change', syncCarouselLayout);
         syncCarouselLayout();
@@ -1379,52 +1485,6 @@
         setInterval(updateClocks, 1000);
         setInterval(cycleTicker, 3330); // Shift city string every 3.33s
         updateClocks();
-
-        // 2. Clickable / Expandable Row System
-        const rows = document.querySelectorAll('.archive-row:not(.header-row)');
-        rows.forEach(row => {
-            const trigger = row.querySelector('.row-trigger');
-            const expandable = row.querySelector('.row-expandable');
-
-            function setExpandedHeight() {
-                if (!row.classList.contains('expanded') || !expandable) return;
-                const footerReserve = window.matchMedia('(min-width: 869px)').matches ? 112 : 0;
-                const availableHeight = window.innerHeight - expandable.getBoundingClientRect().top - footerReserve;
-                const maxHeight = footerReserve ? Math.max(180, availableHeight) : expandable.scrollHeight;
-                expandable.style.maxHeight = Math.min(expandable.scrollHeight, maxHeight) + 'px';
-            }
-
-            function toggleRow() {
-                const isExpanded = row.classList.contains('expanded');
-                rows.forEach(r => {
-                    r.classList.remove('expanded');
-                    const exp = r.querySelector('.row-expandable');
-                    const t = r.querySelector('.row-trigger');
-                    if (exp) exp.style.maxHeight = '';
-                    if (t) t.setAttribute('aria-expanded', 'false');
-                });
-
-                if (!isExpanded) {
-                    row.classList.add('expanded');
-                    setExpandedHeight();
-                    trigger.setAttribute('aria-expanded', 'true');
-                }
-            }
-
-            trigger.addEventListener('click', toggleRow);
-            trigger.setAttribute('role', 'button');
-            trigger.setAttribute('tabindex', '0');
-            trigger.setAttribute('aria-expanded', 'false');
-
-            trigger.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    toggleRow();
-                }
-            });
-
-            window.addEventListener('resize', setExpandedHeight);
-        });
 
         // 3. Smooth section navigation
         const navLinks = document.querySelectorAll('.nav-link');
@@ -1557,7 +1617,7 @@
 
         if (brandName && infoBodies.length) {
             const finalTitle = 'Maude Churchill';
-            const altTitles = ['Main Character', 'Magic Club', 'Moon Child', 'Mood Curator', 'Music Chooser'];
+            const altTitles = ['Main Character', 'Magic Child', 'Moon Child', 'Mood Curator', 'Music Chooser'];
             const fullyVisibleBodies = new Set();
             let brandCycleStarted = false;
             let dwellTimer = null;
@@ -1642,6 +1702,28 @@
             setActiveNav(targetSection.id);
             scrollSectionToStart(targetSection);
         }
+
+        function isSpaceNavigationAllowed(event) {
+            if (event.code !== 'Space' || event.repeat) return false;
+            if (workLightbox?.classList.contains('is-open')) return false;
+            if (event.target.closest('input, textarea, select, [contenteditable="true"]')) return false;
+            return sectionOrder.length > 0;
+        }
+
+        function handleSpaceSectionNavigation(event) {
+            if (!isSpaceNavigationAllowed(event)) return;
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            const currentIndex = sectionOrder.reduce((closestIndex, section, index) => {
+                const currentDistance = Math.abs(section.getBoundingClientRect().top);
+                const closestDistance = Math.abs(sectionOrder[closestIndex].getBoundingClientRect().top);
+                return currentDistance < closestDistance ? index : closestIndex;
+            }, 0);
+            const nextSection = sectionOrder[(currentIndex + 1) % sectionOrder.length];
+            navigateToSection(nextSection);
+        }
         
         navLinks.forEach(link => {
             link.addEventListener('click', function(e) {
@@ -1652,22 +1734,12 @@
             });
         });
 
-        document.addEventListener('keydown', (e) => {
-            if (e.code !== 'Space' || e.repeat) return;
-            if (workLightbox?.classList.contains('is-open')) return;
-            if (e.target.closest('a, button, input, textarea, select, [contenteditable="true"], .row-trigger')) return;
-            if (!sectionOrder.length) return;
-
-            e.preventDefault();
-
-            const currentIndex = sectionOrder.reduce((closestIndex, section, index) => {
-                const currentDistance = Math.abs(section.getBoundingClientRect().top);
-                const closestDistance = Math.abs(sectionOrder[closestIndex].getBoundingClientRect().top);
-                return currentDistance < closestDistance ? index : closestIndex;
-            }, 0);
-            const nextSection = sectionOrder[(currentIndex + 1) % sectionOrder.length];
-            navigateToSection(nextSection);
-        });
+        document.addEventListener('keydown', handleSpaceSectionNavigation, true);
+        document.addEventListener('keyup', (event) => {
+            if (!isSpaceNavigationAllowed(event)) return;
+            event.preventDefault();
+            event.stopPropagation();
+        }, true);
 
         // Intersection Observer to highlight current active layout on scroll
         const sections = document.querySelectorAll('section');
