@@ -20,7 +20,7 @@
         })();
     </script>
     <style>
-        /* --- site design by yung ethernet --- */
+        /* --- SWISS MODERNIST RESET & CORE VARIABLES --- */
         :root {
             color-scheme: light;
             --bg-color: #ffffff;
@@ -391,6 +391,36 @@
             position: relative;
         }
 
+        #kaytranada-video-slot.image-slot--video .slot-video {
+            opacity: 0;
+        }
+
+        #kaytranada-video-slot.image-slot--video.is-playing .slot-video {
+            opacity: 1;
+        }
+
+        .kaytranada-end-image {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s cubic-bezier(0.3, 0, 0.1, 1);
+        }
+
+        #kaytranada-video-slot.is-ended .kaytranada-end-image {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #kaytranada-video-slot.is-ended .slot-video {
+            opacity: 0;
+            pointer-events: none;
+        }
+
         .image-slot--carousel-video video {
             object-fit: contain;
             object-position: center;
@@ -398,12 +428,12 @@
         }
 
         .image-slot--highlight {
-            background: #ccff00;
+            background: rgb(222, 222, 222);
             color: #000000;
         }
 
         .image-slot--cyan {
-            background: #00d9ff;
+            background: rgb(222, 222, 222);
             color: #000000;
         }
 
@@ -441,8 +471,25 @@
             border: 1px solid var(--border-color);
             background-color: var(--preview-bg);
             cursor: pointer;
-            display: block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: var(--swiss-transition);
+        }
+
+        .work-item-mark {
+            width: 33.33%;
+            height: 33.33%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            container-type: size;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-weight: 700;
+            font-size: 3em;
+            color: rgb(155, 155, 155);
+            line-height: 1;
+            pointer-events: none;
         }
 
         .work-item:hover {
@@ -824,6 +871,14 @@
                 gap: 20px;
             }
 
+            #clients .info-grid {
+                gap: 0;
+            }
+
+            #clients .row-trigger {
+                padding: clamp(4px, 1.1vw, 8px) 0;
+            }
+
             .work-grid {
                 grid-template-columns: minmax(0, 1fr);
                 gap: clamp(12px, 3vw, 18px);
@@ -858,7 +913,8 @@
                 width: 100%;
             }
 
-            .image-slot--carousel-video video {
+            .image-slot--carousel-video.image-slot--video .slot-video,
+            .image-slot--carousel-video .kaytranada-end-image {
                 position: absolute;
                 inset: 0;
                 width: 100%;
@@ -964,8 +1020,13 @@
                     </video> -->
                 </div>
                 <div class="image-slot image-slot--highlight">Image</div>
-                <div class="image-slot image-slot--photo image-slot--carousel-video" id="kaytranada-video-slot" data-carousel-video>
-                    <video playsinline loop preload="metadata" aria-label="Kaytranada">
+                <div class="image-slot image-slot--photo image-slot--carousel-video image-slot--video" id="kaytranada-video-slot" data-carousel-video>
+                    <img
+                        class="kaytranada-end-image"
+                        src="https://github.com/ta222222/mc/blob/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_HERO_063_4x5_CLAIM-small.jpg?raw=true"
+                        alt="Kaytranada for Giorgio Armani"
+                    />
+                    <video class="slot-video" playsinline preload="metadata" aria-label="Kaytranada">
                         <source src="https://github.com/ta222222/mc/raw/refs/heads/main/Kaytranada%20(VF1,%204x5,%20H264).webm" type="video/webm" />
                     </video>
                 </div>
@@ -979,12 +1040,12 @@
 
     <section id="selected-work" aria-label="Selected Work">
         <div class="work-grid">
-            <button type="button" class="work-item" aria-label="View work 1"></button>
-            <button type="button" class="work-item" aria-label="View work 2"></button>
-            <button type="button" class="work-item" aria-label="View work 3"></button>
-            <button type="button" class="work-item" aria-label="View work 4"></button>
-            <button type="button" class="work-item" aria-label="View work 5"></button>
-            <button type="button" class="work-item" aria-label="View work 6"></button>
+            <button type="button" class="work-item" aria-label="View work 1"><span class="work-item-mark" aria-hidden="true">?</span></button>
+            <button type="button" class="work-item" aria-label="View work 2"><span class="work-item-mark" aria-hidden="true">?</span></button>
+            <button type="button" class="work-item" aria-label="View work 3"><span class="work-item-mark" aria-hidden="true">?</span></button>
+            <button type="button" class="work-item" aria-label="View work 4"><span class="work-item-mark" aria-hidden="true">?</span></button>
+            <button type="button" class="work-item" aria-label="View work 5"><span class="work-item-mark" aria-hidden="true">?</span></button>
+            <button type="button" class="work-item" aria-label="View work 6"><span class="work-item-mark" aria-hidden="true">?</span></button>
         </div>
     </section>
 
@@ -1174,13 +1235,62 @@
         const imageLayout = document.querySelector('.image-layout');
         const imageTrack = document.getElementById('image-track');
         const kaytranadaVideoSlot = document.getElementById('kaytranada-video-slot');
-        const kaytranadaSlotVideo = kaytranadaVideoSlot?.querySelector('video');
+        const kaytranadaSlotVideo = kaytranadaVideoSlot?.querySelector('.slot-video');
+        const kaytranadaEndImage = kaytranadaVideoSlot?.querySelector('.kaytranada-end-image');
         const kaytranadaSlideIndex = kaytranadaVideoSlot && imageTrack
             ? Array.from(imageTrack.children).indexOf(kaytranadaVideoSlot)
             : -1;
         const mobileCarouselQuery = window.matchMedia('(max-width: 868px)');
         let imageIndex = 0;
         let kaytranadaPausedByUser = false;
+        let kaytranadaHasEnded = false;
+        let kaytranadaTapTimer = null;
+        let kaytranadaLastTap = 0;
+        const kaytranadaTapDelay = 280;
+
+        function clearKaytranadaTapTimer() {
+            if (kaytranadaTapTimer) {
+                window.clearTimeout(kaytranadaTapTimer);
+                kaytranadaTapTimer = null;
+            }
+        }
+
+        function resetKaytranadaSlot() {
+            if (!kaytranadaVideoSlot || !kaytranadaSlotVideo) return;
+
+            kaytranadaHasEnded = false;
+            kaytranadaPausedByUser = false;
+            kaytranadaLastTap = 0;
+            clearKaytranadaTapTimer();
+            kaytranadaVideoSlot.classList.remove('is-playing', 'is-ended');
+            kaytranadaSlotVideo.pause();
+            kaytranadaSlotVideo.currentTime = 0;
+            kaytranadaSlotVideo.muted = true;
+        }
+
+        function showKaytranadaEndState() {
+            if (!kaytranadaVideoSlot || !kaytranadaSlotVideo) return;
+
+            kaytranadaHasEnded = true;
+            kaytranadaPausedByUser = true;
+            kaytranadaSlotVideo.pause();
+
+            if (mobileCarouselQuery.matches) {
+                kaytranadaVideoSlot.classList.remove('is-playing');
+                kaytranadaVideoSlot.classList.add('is-ended');
+            }
+        }
+
+        function restartKaytranadaVideo() {
+            if (!kaytranadaVideoSlot || !kaytranadaSlotVideo) return;
+
+            kaytranadaHasEnded = false;
+            kaytranadaPausedByUser = false;
+            kaytranadaLastTap = 0;
+            clearKaytranadaTapTimer();
+            kaytranadaVideoSlot.classList.remove('is-ended');
+            playKaytranadaSlotVideo({ restart: true });
+        }
 
         function syncCarouselLayout() {
             if (!imageLayout) return;
@@ -1188,8 +1298,19 @@
             imageLayout.classList.toggle('image-layout--portrait-video', showPortrait);
         }
 
-        function playKaytranadaSlotVideo() {
-            if (!kaytranadaSlotVideo) return;
+        function playKaytranadaSlotVideo({ restart = false } = {}) {
+            if (!kaytranadaSlotVideo || !kaytranadaVideoSlot) return;
+
+            const shouldRestart = restart || kaytranadaHasEnded;
+            kaytranadaHasEnded = false;
+            kaytranadaPausedByUser = false;
+            kaytranadaLastTap = 0;
+            clearKaytranadaTapTimer();
+            kaytranadaVideoSlot.classList.remove('is-ended');
+            kaytranadaVideoSlot.classList.add('is-playing');
+            if (shouldRestart) {
+                kaytranadaSlotVideo.currentTime = 0;
+            }
             kaytranadaSlotVideo.muted = false;
             kaytranadaSlotVideo.play().catch(() => {
                 kaytranadaSlotVideo.muted = true;
@@ -1212,12 +1333,11 @@
 
         function syncCarouselVideos() {
             if (imageIndex === kaytranadaSlideIndex) {
-                if (!kaytranadaPausedByUser) {
-                    playKaytranadaSlotVideo();
+                if (!kaytranadaPausedByUser && !kaytranadaHasEnded) {
+                    playKaytranadaSlotVideo({ restart: true });
                 }
             } else {
-                kaytranadaPausedByUser = false;
-                pauseKaytranadaSlotVideo();
+                resetKaytranadaSlot();
             }
         }
 
@@ -1226,7 +1346,6 @@
             if (imageIndex === kaytranadaSlideIndex) {
                 pauseKaytranadaSlotVideo();
             }
-            kaytranadaPausedByUser = false;
             imageIndex = (imageIndex - 1 + imageTrack.children.length) % imageTrack.children.length;
             updateImageCarousel();
         }
@@ -1239,6 +1358,8 @@
             imageIndex = (imageIndex + 1) % imageTrack.children.length;
             updateImageCarousel();
         }
+
+        kaytranadaSlotVideo?.addEventListener('ended', showKaytranadaEndState);
 
         function getCarouselPointerX(event) {
             if (event.changedTouches?.length) {
@@ -1292,7 +1413,48 @@
             };
         }
 
+        function isPointInRect(x, y, rect) {
+            return x >= rect.left
+                && x <= rect.right
+                && y >= rect.top
+                && y <= rect.bottom;
+        }
+
+        function handleKaytranadaEndedMobileInteraction(event) {
+            const clientX = getCarouselPointerX(event);
+            const clientY = getCarouselPointerY(event);
+            const imageRect = kaytranadaEndImage?.getBoundingClientRect();
+            const isOnImage = imageRect ? isPointInRect(clientX, clientY, imageRect) : false;
+            const now = Date.now();
+
+            if (isOnImage && now - kaytranadaLastTap < kaytranadaTapDelay) {
+                clearKaytranadaTapTimer();
+                kaytranadaLastTap = 0;
+                restartKaytranadaVideo();
+                return true;
+            }
+
+            if (isOnImage) {
+                kaytranadaLastTap = now;
+            } else {
+                kaytranadaLastTap = 0;
+            }
+
+            clearKaytranadaTapTimer();
+            kaytranadaTapTimer = window.setTimeout(() => {
+                kaytranadaTapTimer = null;
+                kaytranadaLastTap = 0;
+                goToNextSlide();
+            }, kaytranadaTapDelay);
+
+            return true;
+        }
+
         function handleKaytranadaSlideInteraction(event) {
+            if (mobileCarouselQuery.matches && kaytranadaHasEnded) {
+                return handleKaytranadaEndedMobileInteraction(event);
+            }
+
             if (!kaytranadaSlotVideo) return false;
 
             const videoRect = getContainedVideoRect(kaytranadaSlotVideo);
@@ -1304,12 +1466,13 @@
                 && clientY <= videoRect.bottom;
 
             if (isOnVideo) {
-                if (!kaytranadaSlotVideo.paused) {
+                if (kaytranadaHasEnded) {
+                    playKaytranadaSlotVideo({ restart: true });
+                } else if (kaytranadaSlotVideo.paused) {
+                    playKaytranadaSlotVideo();
+                } else {
                     kaytranadaPausedByUser = true;
                     pauseKaytranadaSlotVideo();
-                } else {
-                    kaytranadaPausedByUser = false;
-                    playKaytranadaSlotVideo();
                 }
                 return true;
             }
@@ -1617,7 +1780,7 @@
 
         if (brandName && infoBodies.length) {
             const finalTitle = 'Maude Churchill';
-            const altTitles = ['Main Character', 'Magic Child', 'Moon Child', 'Mood Curator', 'Music Chooser'];
+            const altTitles = ['Main Character', 'Magic Child', 'Mood Curator', 'Music Chooser'];
             const fullyVisibleBodies = new Set();
             let brandCycleStarted = false;
             let dwellTimer = null;
