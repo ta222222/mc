@@ -315,9 +315,34 @@
             }
         }
 
-        #first-image-slot {
+        #vibram-video-slot {
             opacity: 0;
             animation: first-slide-fade-in 1.1s cubic-bezier(0.25, 0.1, 0.25, 1) 0.2s forwards;
+        }
+
+        #vibram-video-slot.image-slot--video .slot-video {
+            opacity: 0;
+        }
+
+        #vibram-video-slot.image-slot--video.is-playing .slot-video {
+            opacity: 1;
+        }
+
+        #vibram-video-slot.is-ended .slot-video {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .image-layout.image-layout--vibram-desktop {
+            width: min(
+                calc(100vw - 48px),
+                calc((100vh - 215px) * var(--vibram-aspect, 1.7777777778))
+            );
+        }
+
+        #vibram-video-slot .slot-video {
+            object-fit: contain;
+            object-position: center;
         }
 
         .image-track {
@@ -888,6 +913,33 @@
                 aspect-ratio: 4 / 5;
                 width: min(calc(100vw - 32px), calc((100vh - 200px) * 4 / 5));
             }
+
+            #image-space.image-space--vibram-hero {
+                padding: 0;
+                margin-top: calc(-1 * max(120px, calc(104px + env(safe-area-inset-top))));
+                margin-bottom: calc(-1 * max(80px, calc(64px + env(safe-area-inset-bottom))));
+                margin-left: calc(50% - 50vw);
+                margin-right: calc(50% - 50vw);
+                width: 100vw;
+                min-height: 100dvh;
+                min-height: 100svh;
+                align-items: stretch;
+                justify-content: stretch;
+            }
+
+            .image-layout.image-layout--vibram-hero {
+                width: 100%;
+                height: 100dvh;
+                height: 100svh;
+                max-width: none;
+                aspect-ratio: unset;
+                margin: 0;
+            }
+
+            #vibram-video-slot .slot-video {
+                object-fit: cover;
+                object-position: center;
+            }
         }
 
         @media (max-width: 1199px) {
@@ -1013,6 +1065,11 @@
         <div class="section-title"></div>
         <div class="image-layout">
             <div class="image-track" id="image-track">
+                <div class="image-slot image-slot--photo image-slot--carousel-video image-slot--video" id="vibram-video-slot" data-carousel-video>
+                    <video class="slot-video" playsinline preload="metadata" aria-label="Vibram by the Sea">
+                        <source src="https://github.com/ta222222/mc/raw/refs/heads/main/VIBRAM%20BY%20THE%20SEA%201(1).webm" type="video/webm" />
+                    </video>
+                </div>
                 <div class="image-slot image-slot--photo" id="first-image-slot">
                     <img src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/prada%20mode%20ldn%20screenshot.png" alt="Prada Mode London" />
                     <!-- <video class="slot-video" playsinline preload="metadata" aria-label="Prada Mode London">
@@ -1232,8 +1289,14 @@
         mobileMetaQuery.addEventListener('change', placeHeaderMeta);
 
         // Image carousel — left half goes previous, right half goes next.
+        const imageSpace = document.getElementById('image-space');
         const imageLayout = document.querySelector('.image-layout');
         const imageTrack = document.getElementById('image-track');
+        const vibramVideoSlot = document.getElementById('vibram-video-slot');
+        const vibramSlotVideo = vibramVideoSlot?.querySelector('.slot-video');
+        const vibramSlideIndex = vibramVideoSlot && imageTrack
+            ? Array.from(imageTrack.children).indexOf(vibramVideoSlot)
+            : -1;
         const kaytranadaVideoSlot = document.getElementById('kaytranada-video-slot');
         const kaytranadaSlotVideo = kaytranadaVideoSlot?.querySelector('.slot-video');
         const kaytranadaEndImage = kaytranadaVideoSlot?.querySelector('.kaytranada-end-image');
@@ -1247,12 +1310,61 @@
         let kaytranadaTapTimer = null;
         let kaytranadaLastTap = 0;
         const kaytranadaTapDelay = 280;
+        let vibramPausedByUser = false;
+        let vibramHasEnded = false;
+        let vibramTapTimer = null;
+        let vibramLastTap = 0;
+        const vibramTapDelay = 280;
 
         function clearKaytranadaTapTimer() {
             if (kaytranadaTapTimer) {
                 window.clearTimeout(kaytranadaTapTimer);
                 kaytranadaTapTimer = null;
             }
+        }
+
+        function clearVibramTapTimer() {
+            if (vibramTapTimer) {
+                window.clearTimeout(vibramTapTimer);
+                vibramTapTimer = null;
+            }
+        }
+
+        function resetVibramSlot() {
+            if (!vibramVideoSlot || !vibramSlotVideo) return;
+
+            vibramHasEnded = false;
+            vibramPausedByUser = false;
+            vibramLastTap = 0;
+            clearVibramTapTimer();
+            vibramVideoSlot.classList.remove('is-playing', 'is-ended');
+            vibramSlotVideo.pause();
+            vibramSlotVideo.currentTime = 0;
+            vibramSlotVideo.muted = true;
+        }
+
+        function showVibramEndState() {
+            if (!vibramVideoSlot || !vibramSlotVideo) return;
+
+            vibramHasEnded = true;
+            vibramPausedByUser = true;
+            vibramSlotVideo.pause();
+
+            if (mobileCarouselQuery.matches) {
+                vibramVideoSlot.classList.remove('is-playing');
+                vibramVideoSlot.classList.add('is-ended');
+            }
+        }
+
+        function restartVibramVideo() {
+            if (!vibramVideoSlot || !vibramSlotVideo) return;
+
+            vibramHasEnded = false;
+            vibramPausedByUser = false;
+            vibramLastTap = 0;
+            clearVibramTapTimer();
+            vibramVideoSlot.classList.remove('is-ended');
+            playVibramSlotVideo({ restart: true });
         }
 
         function resetKaytranadaSlot() {
@@ -1292,10 +1404,55 @@
             playKaytranadaSlotVideo({ restart: true });
         }
 
+        function setVibramAspect() {
+            if (!imageLayout || !vibramSlotVideo?.videoWidth) return;
+            const aspect = vibramSlotVideo.videoWidth / vibramSlotVideo.videoHeight;
+            imageLayout.style.setProperty('--vibram-aspect', String(aspect));
+            if (imageIndex === vibramSlideIndex && !mobileCarouselQuery.matches) {
+                imageLayout.style.aspectRatio = `${vibramSlotVideo.videoWidth} / ${vibramSlotVideo.videoHeight}`;
+            }
+        }
+
         function syncCarouselLayout() {
             if (!imageLayout) return;
+            const onVibram = imageIndex === vibramSlideIndex;
             const showPortrait = mobileCarouselQuery.matches && imageIndex === kaytranadaSlideIndex;
+            const showVibramHero = onVibram && mobileCarouselQuery.matches;
             imageLayout.classList.toggle('image-layout--portrait-video', showPortrait);
+            imageLayout.classList.toggle('image-layout--vibram-hero', showVibramHero);
+            imageLayout.classList.toggle('image-layout--vibram-desktop', onVibram && !mobileCarouselQuery.matches);
+            imageSpace?.classList.toggle('image-space--vibram-hero', showVibramHero);
+            if (showVibramHero || showPortrait || !onVibram) {
+                imageLayout.style.aspectRatio = showPortrait ? '4 / 5' : '';
+            } else {
+                setVibramAspect();
+            }
+        }
+
+        function playVibramSlotVideo({ restart = false } = {}) {
+            if (!vibramSlotVideo || !vibramVideoSlot) return;
+
+            const shouldRestart = restart || vibramHasEnded;
+            vibramHasEnded = false;
+            vibramPausedByUser = false;
+            vibramLastTap = 0;
+            clearVibramTapTimer();
+            vibramVideoSlot.classList.remove('is-ended');
+            vibramVideoSlot.classList.add('is-playing');
+            if (shouldRestart) {
+                vibramSlotVideo.currentTime = 0;
+            }
+            vibramSlotVideo.muted = false;
+            vibramSlotVideo.play().catch(() => {
+                vibramSlotVideo.muted = true;
+                vibramSlotVideo.play().catch(() => {});
+            });
+        }
+
+        function pauseVibramSlotVideo() {
+            if (!vibramSlotVideo) return;
+            vibramSlotVideo.pause();
+            vibramSlotVideo.muted = true;
         }
 
         function playKaytranadaSlotVideo({ restart = false } = {}) {
@@ -1332,6 +1489,14 @@
         }
 
         function syncCarouselVideos() {
+            if (imageIndex === vibramSlideIndex) {
+                if (!vibramPausedByUser && !vibramHasEnded) {
+                    playVibramSlotVideo({ restart: true });
+                }
+            } else {
+                resetVibramSlot();
+            }
+
             if (imageIndex === kaytranadaSlideIndex) {
                 if (!kaytranadaPausedByUser && !kaytranadaHasEnded) {
                     playKaytranadaSlotVideo({ restart: true });
@@ -1343,6 +1508,9 @@
 
         function goToPreviousSlide() {
             if (!imageTrack) return;
+            if (imageIndex === vibramSlideIndex) {
+                pauseVibramSlotVideo();
+            }
             if (imageIndex === kaytranadaSlideIndex) {
                 pauseKaytranadaSlotVideo();
             }
@@ -1352,6 +1520,9 @@
 
         function goToNextSlide() {
             if (!imageTrack) return;
+            if (imageIndex === vibramSlideIndex) {
+                pauseVibramSlotVideo();
+            }
             if (imageIndex === kaytranadaSlideIndex) {
                 pauseKaytranadaSlotVideo();
             }
@@ -1360,6 +1531,9 @@
         }
 
         kaytranadaSlotVideo?.addEventListener('ended', showKaytranadaEndState);
+        vibramSlotVideo?.addEventListener('ended', showVibramEndState);
+
+        vibramSlotVideo?.addEventListener('loadedmetadata', setVibramAspect);
 
         function getCarouselPointerX(event) {
             if (event.changedTouches?.length) {
@@ -1418,6 +1592,87 @@
                 && x <= rect.right
                 && y >= rect.top
                 && y <= rect.bottom;
+        }
+
+        function getVibramVideoRect() {
+            if (mobileCarouselQuery.matches && imageIndex === vibramSlideIndex) {
+                return vibramVideoSlot.getBoundingClientRect();
+            }
+            return getContainedVideoRect(vibramSlotVideo);
+        }
+
+        function handleVibramEndedMobileInteraction(event) {
+            const clientX = getCarouselPointerX(event);
+            const clientY = getCarouselPointerY(event);
+            const videoRect = getVibramVideoRect();
+            const isOnVideo = isPointInRect(clientX, clientY, videoRect);
+            const now = Date.now();
+
+            if (isOnVideo && now - vibramLastTap < vibramTapDelay) {
+                clearVibramTapTimer();
+                vibramLastTap = 0;
+                restartVibramVideo();
+                return true;
+            }
+
+            if (isOnVideo) {
+                vibramLastTap = now;
+            } else {
+                vibramLastTap = 0;
+            }
+
+            clearVibramTapTimer();
+            vibramTapTimer = window.setTimeout(() => {
+                vibramTapTimer = null;
+                vibramLastTap = 0;
+                goToNextSlide();
+            }, vibramTapDelay);
+
+            return true;
+        }
+
+        function handleVibramSlideInteraction(event) {
+            if (mobileCarouselQuery.matches && vibramHasEnded) {
+                return handleVibramEndedMobileInteraction(event);
+            }
+
+            if (!vibramSlotVideo) return false;
+
+            const videoRect = getVibramVideoRect();
+            const clientX = getCarouselPointerX(event);
+            const clientY = getCarouselPointerY(event);
+            const isOnVideo = clientX >= videoRect.left
+                && clientX <= videoRect.right
+                && clientY >= videoRect.top
+                && clientY <= videoRect.bottom;
+
+            if (isOnVideo) {
+                if (vibramHasEnded) {
+                    playVibramSlotVideo({ restart: true });
+                } else if (vibramSlotVideo.paused) {
+                    playVibramSlotVideo();
+                } else {
+                    vibramPausedByUser = true;
+                    pauseVibramSlotVideo();
+                }
+                return true;
+            }
+
+            if (clientX < videoRect.left) {
+                goToPreviousSlide();
+                return true;
+            }
+
+            if (clientX > videoRect.right) {
+                goToNextSlide();
+                return true;
+            }
+
+            const layoutRect = imageLayout.getBoundingClientRect();
+            const x = clientX - layoutRect.left;
+            if (x < layoutRect.width / 2) goToPreviousSlide();
+            else goToNextSlide();
+            return true;
         }
 
         function handleKaytranadaEndedMobileInteraction(event) {
@@ -1496,6 +1751,11 @@
 
         function handleImageLayoutInteraction(event) {
             if (!imageLayout || !imageTrack) return;
+
+            if (imageIndex === vibramSlideIndex) {
+                handleVibramSlideInteraction(event);
+                return;
+            }
 
             if (imageIndex === kaytranadaSlideIndex) {
                 handleKaytranadaSlideInteraction(event);
@@ -1608,6 +1868,7 @@
 
         mobileCarouselQuery.addEventListener('change', syncCarouselLayout);
         syncCarouselLayout();
+        syncCarouselVideos();
 
         // 1. Timezone Ticker Loop (London, Berlin, Leeds)
         const timeOffsets = {
