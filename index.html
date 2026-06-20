@@ -333,11 +333,32 @@
             pointer-events: auto;
         }
 
-        .image-layout.image-layout--vibram-desktop {
-            width: min(
-                calc(100vw - 48px),
-                calc((100vh - 215px) * var(--vibram-aspect, 1.7777777778))
-            );
+        section#image-space.image-space--vibram-hero {
+            height: 100dvh;
+            height: 100svh;
+            min-height: 100dvh;
+            max-height: 100dvh;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+            align-items: stretch;
+            justify-content: stretch;
+            box-sizing: border-box;
+        }
+
+        .image-layout.image-layout--vibram-hero {
+            width: 100%;
+            height: 100%;
+            max-width: none;
+            aspect-ratio: unset;
+            margin: 0;
+            flex: 1 1 auto;
+        }
+
+        .image-layout.image-layout--vibram-hero .image-slot {
+            aspect-ratio: unset;
+            height: 100%;
+            align-self: stretch;
         }
 
         #vibram-video-slot .slot-video {
@@ -914,29 +935,7 @@
                 width: min(calc(100vw - 32px), calc((100vh - 200px) * 4 / 5));
             }
 
-            #image-space.image-space--vibram-hero {
-                padding: 0;
-                margin-top: calc(-1 * max(120px, calc(104px + env(safe-area-inset-top))));
-                margin-bottom: calc(-1 * max(80px, calc(64px + env(safe-area-inset-bottom))));
-                margin-left: calc(50% - 50vw);
-                margin-right: calc(50% - 50vw);
-                width: 100vw;
-                min-height: 100dvh;
-                min-height: 100svh;
-                align-items: stretch;
-                justify-content: stretch;
-            }
-
-            .image-layout.image-layout--vibram-hero {
-                width: 100%;
-                height: 100dvh;
-                height: 100svh;
-                max-width: none;
-                aspect-ratio: unset;
-                margin: 0;
-            }
-
-            #vibram-video-slot .slot-video {
+            .image-layout.image-layout--vibram-hero #vibram-video-slot .slot-video {
                 object-fit: cover;
                 object-position: center;
             }
@@ -1404,29 +1403,15 @@
             playKaytranadaSlotVideo({ restart: true });
         }
 
-        function setVibramAspect() {
-            if (!imageLayout || !vibramSlotVideo?.videoWidth) return;
-            const aspect = vibramSlotVideo.videoWidth / vibramSlotVideo.videoHeight;
-            imageLayout.style.setProperty('--vibram-aspect', String(aspect));
-            if (imageIndex === vibramSlideIndex && !mobileCarouselQuery.matches) {
-                imageLayout.style.aspectRatio = `${vibramSlotVideo.videoWidth} / ${vibramSlotVideo.videoHeight}`;
-            }
-        }
-
         function syncCarouselLayout() {
             if (!imageLayout) return;
             const onVibram = imageIndex === vibramSlideIndex;
             const showPortrait = mobileCarouselQuery.matches && imageIndex === kaytranadaSlideIndex;
-            const showVibramHero = onVibram && mobileCarouselQuery.matches;
+            const showVibramHero = onVibram;
             imageLayout.classList.toggle('image-layout--portrait-video', showPortrait);
             imageLayout.classList.toggle('image-layout--vibram-hero', showVibramHero);
-            imageLayout.classList.toggle('image-layout--vibram-desktop', onVibram && !mobileCarouselQuery.matches);
             imageSpace?.classList.toggle('image-space--vibram-hero', showVibramHero);
-            if (showVibramHero || showPortrait || !onVibram) {
-                imageLayout.style.aspectRatio = showPortrait ? '4 / 5' : '';
-            } else {
-                setVibramAspect();
-            }
+            imageLayout.style.aspectRatio = showPortrait ? '4 / 5' : '';
         }
 
         function playVibramSlotVideo({ restart = false } = {}) {
@@ -1533,8 +1518,6 @@
         kaytranadaSlotVideo?.addEventListener('ended', showKaytranadaEndState);
         vibramSlotVideo?.addEventListener('ended', showVibramEndState);
 
-        vibramSlotVideo?.addEventListener('loadedmetadata', setVibramAspect);
-
         function getCarouselPointerX(event) {
             if (event.changedTouches?.length) {
                 return event.changedTouches[0].clientX;
@@ -1595,9 +1578,6 @@
         }
 
         function getVibramVideoRect() {
-            if (mobileCarouselQuery.matches && imageIndex === vibramSlideIndex) {
-                return vibramVideoSlot.getBoundingClientRect();
-            }
             return getContainedVideoRect(vibramSlotVideo);
         }
 
@@ -1641,10 +1621,7 @@
             const videoRect = getVibramVideoRect();
             const clientX = getCarouselPointerX(event);
             const clientY = getCarouselPointerY(event);
-            const isOnVideo = clientX >= videoRect.left
-                && clientX <= videoRect.right
-                && clientY >= videoRect.top
-                && clientY <= videoRect.bottom;
+            const isOnVideo = isPointInRect(clientX, clientY, videoRect);
 
             if (isOnVideo) {
                 if (vibramHasEnded) {
@@ -1658,12 +1635,12 @@
                 return true;
             }
 
-            if (clientX < videoRect.left) {
+            if (clientX < videoRect.left || clientY < videoRect.top) {
                 goToPreviousSlide();
                 return true;
             }
 
-            if (clientX > videoRect.right) {
+            if (clientX > videoRect.right || clientY > videoRect.bottom) {
                 goToNextSlide();
                 return true;
             }
