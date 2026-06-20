@@ -1345,15 +1345,8 @@
 
         function showVibramEndState() {
             if (!vibramVideoSlot || !vibramSlotVideo) return;
-
-            vibramHasEnded = true;
-            vibramPausedByUser = true;
-            vibramSlotVideo.pause();
-
-            if (mobileCarouselQuery.matches) {
-                vibramVideoSlot.classList.remove('is-playing');
-                vibramVideoSlot.classList.add('is-ended');
-            }
+            if (imageIndex !== vibramSlideIndex) return;
+            playVibramSlotVideo({ restart: true });
         }
 
         function restartVibramVideo() {
