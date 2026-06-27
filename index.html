@@ -267,6 +267,17 @@
             transition: width 0.35s cubic-bezier(0.3, 0, 0.1, 1), aspect-ratio 0.35s cubic-bezier(0.3, 0, 0.1, 1);
         }
 
+        /* Desktop: on the Armani (portrait 4:5) slide, shrink the stage to a
+           portrait rectangle sized to the viewport so the image fits the screen
+           nicely instead of stretching across the full 16:9 width. */
+        @media (min-width: 869px) {
+            .image-layout.image-layout--portrait-video {
+                aspect-ratio: 4 / 5;
+                width: min(600px, calc(100vw - 48px), calc((100vh - 160px) * 4 / 5));
+                margin: 0 auto;
+            }
+        }
+
         @keyframes first-slide-fade-in {
             from {
                 opacity: 0;
@@ -394,11 +405,23 @@
         #kaytranada-video-slot.is-ended .kaytranada-end-image {
             opacity: 1;
             pointer-events: auto;
+            cursor: pointer;
         }
 
         #kaytranada-video-slot.is-ended .slot-video {
             opacity: 0;
             pointer-events: none;
+        }
+
+        /* Fallback: show the Armani still while the video can't load / is buffering. */
+        #kaytranada-video-slot.is-video-fallback .kaytranada-end-image {
+            opacity: 1;
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        #kaytranada-video-slot.is-video-fallback .slot-video {
+            opacity: 0;
         }
 
         .image-slot--carousel-video video {
@@ -421,6 +444,9 @@
         .work-grid {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
+            /* grid-gap + fixed fallback first for old Safari/Firefox (no clamp()/gap). */
+            grid-gap: 28px;
+            grid-gap: clamp(20px, 3vw, 36px);
             gap: clamp(20px, 3vw, 36px);
             width: var(--stage-width);
             margin: 0 auto;
@@ -446,24 +472,33 @@
             appearance: none;
             -webkit-appearance: none;
             width: 100%;
-            aspect-ratio: 4 / 3;
-            padding: 0;
+            /* Legacy-safe aspect ratio: padding-bottom is a % of the element's
+               width, so it sets the height even on old Safari / Firefox that
+               don't support the modern `aspect-ratio` property. 75% = 4:3. */
+            height: 0;
+            padding: 0 0 75%;
+            position: relative;
+            display: block;
             border: 1px solid var(--border-color);
             background-color: var(--preview-bg);
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             transition: var(--swiss-transition);
         }
 
         .work-item-mark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            -webkit-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
             width: 33.33%;
             height: 33.33%;
             display: flex;
+            display: -webkit-flex;
             align-items: center;
+            -webkit-align-items: center;
             justify-content: center;
-            container-type: size;
+            -webkit-justify-content: center;
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             font-weight: 700;
             font-size: 3em;
@@ -1588,12 +1623,17 @@
 
             .work-grid {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
+                grid-gap: 12px;
+                grid-gap: clamp(10px, 3vw, 16px);
                 gap: clamp(10px, 3vw, 16px);
             }
 
             #selected-work .work-item {
-                aspect-ratio: 1 / 1;
-                height: auto;
+                /* Rectangular (landscape) tiles fit the mobile page better than
+                   squares. 66% padding-bottom = a 3:2 rectangle. */
+                height: 0;
+                padding: 0 0 66%;
+                aspect-ratio: auto;
             }
 
             .image-layout.image-layout--portrait-video {
@@ -1923,8 +1963,8 @@
                 </div>
                 <div class="info-contact">
                     <p class="info-section-label"><span id="contact-typewriter">Contact</span></p>
-                    <p>For projects and general enquiries:</p>
-                    <p><a href="mailto:mc@maudechurchill.com">howdy@maudechurchill.com</a></p>
+                    <p>Projects and general enquiries:</p>
+                    <p><a href="mailto:mc@maudechurchill.com">hello@maudechurchill.com</a></p>
                     <p><a href="https://www.instagram.com/maudechurchill" target="_blank" rel="noopener">@maudechurchill (Instagram)</a></p>
                 </div>
             </div>
@@ -2092,6 +2132,9 @@
         let kaytranadaTapTimer = null;
         let kaytranadaLastTap = 0;
         const kaytranadaTapDelay = 280;
+        let kaytranadaStallTimer = null;
+        const kaytranadaStallDelay = 2500;
+        let kaytranadaReadyHandler = null;
         let vibramPausedByUser = false;
         let vibramHasEnded = false;
         let vibramTapTimer = null;
@@ -2128,7 +2171,7 @@
         function showVibramEndState() {
             if (!vibramVideoSlot || !vibramSlotVideo) return;
             if (imageIndex !== vibramSlideIndex) return;
-            playVibramSlotVideo({ restart: true });
+            advanceToKaytranadaSlide();
         }
 
         function restartVibramVideo() {
@@ -2142,6 +2185,37 @@
             playVibramSlotVideo({ restart: true });
         }
 
+        function clearKaytranadaStallTimer() {
+            if (kaytranadaStallTimer) {
+                window.clearTimeout(kaytranadaStallTimer);
+                kaytranadaStallTimer = null;
+            }
+        }
+
+        // Show the "That's so Armani" still in place of the video.
+        function showKaytranadaFallback() {
+            clearKaytranadaStallTimer();
+            kaytranadaVideoSlot?.classList.add('is-video-fallback');
+        }
+
+        // Hide the fallback once the video is actually playing again.
+        function hideKaytranadaFallback() {
+            clearKaytranadaStallTimer();
+            kaytranadaVideoSlot?.classList.remove('is-video-fallback');
+        }
+
+        // After a short grace period, reveal the still if the video still hasn't
+        // buffered enough to play smoothly (bad / slow connection).
+        function scheduleKaytranadaFallback() {
+            if (kaytranadaStallTimer) return;
+            kaytranadaStallTimer = window.setTimeout(() => {
+                kaytranadaStallTimer = null;
+                if (!kaytranadaSlotVideo || kaytranadaSlotVideo.readyState < 3) {
+                    showKaytranadaFallback();
+                }
+            }, kaytranadaStallDelay);
+        }
+
         function resetKaytranadaSlot() {
             if (!kaytranadaVideoSlot || !kaytranadaSlotVideo) return;
 
@@ -2149,7 +2223,8 @@
             kaytranadaPausedByUser = false;
             kaytranadaLastTap = 0;
             clearKaytranadaTapTimer();
-            kaytranadaVideoSlot.classList.remove('is-playing', 'is-ended');
+            clearKaytranadaStallTimer();
+            kaytranadaVideoSlot.classList.remove('is-playing', 'is-ended', 'is-video-fallback');
             kaytranadaSlotVideo.pause();
             kaytranadaSlotVideo.currentTime = 0;
             kaytranadaSlotVideo.muted = true;
@@ -2179,15 +2254,127 @@
             playKaytranadaSlotVideo({ restart: true });
         }
 
+        // Clicking the "That's so Armani" still: crossfade to the video and play.
+        // If the clip isn't buffered yet (still loading / slow connection), keep
+        // the photo up and fade the video in only once it can actually play.
+        function triggerKaytranadaPlayback() {
+            if (!kaytranadaVideoSlot || !kaytranadaSlotVideo) return;
+
+            const video = kaytranadaSlotVideo;
+            clearKaytranadaTapTimer();
+            clearKaytranadaStallTimer();
+            kaytranadaLastTap = 0;
+            kaytranadaHasEnded = false;
+            kaytranadaPausedByUser = false;
+
+            if (kaytranadaReadyHandler) {
+                video.removeEventListener('playing', kaytranadaReadyHandler);
+                video.removeEventListener('canplay', kaytranadaReadyHandler);
+                kaytranadaReadyHandler = null;
+            }
+
+            const crossfadeToVideo = () => {
+                kaytranadaVideoSlot.classList.remove('is-ended', 'is-video-fallback');
+                kaytranadaVideoSlot.classList.add('is-playing');
+            };
+
+            video.currentTime = 0;
+
+            // readyState >= 3 (HAVE_FUTURE_DATA) means it can play now.
+            if (video.readyState >= 3) {
+                crossfadeToVideo();
+            } else {
+                kaytranadaReadyHandler = () => {
+                    video.removeEventListener('playing', kaytranadaReadyHandler);
+                    video.removeEventListener('canplay', kaytranadaReadyHandler);
+                    kaytranadaReadyHandler = null;
+                    crossfadeToVideo();
+                };
+                video.addEventListener('playing', kaytranadaReadyHandler);
+                video.addEventListener('canplay', kaytranadaReadyHandler);
+            }
+
+            autoplaySlotVideo(video, { sound: true });
+        }
+
+        // Randomly decide how the Armani (Kaytranada) slide should appear when
+        // it becomes the active slide: either autoplay the video, or hold on the
+        // "That's so Armani" still image. Sets state only — syncCarouselVideos()
+        // then plays the video (or leaves the still showing) accordingly.
+        function prepareKaytranadaPresentation() {
+            if (!kaytranadaVideoSlot || !kaytranadaSlotVideo) return;
+
+            clearKaytranadaTapTimer();
+            kaytranadaLastTap = 0;
+            const showStill = Math.random() < 0.5;
+            if (showStill) {
+                kaytranadaHasEnded = true;
+                kaytranadaPausedByUser = true;
+                kaytranadaSlotVideo.pause();
+                kaytranadaSlotVideo.muted = true;
+                kaytranadaVideoSlot.classList.remove('is-playing');
+                kaytranadaVideoSlot.classList.add('is-ended');
+            } else {
+                kaytranadaHasEnded = false;
+                kaytranadaPausedByUser = false;
+                kaytranadaVideoSlot.classList.remove('is-ended');
+            }
+        }
+
+        // When the Vibram film finishes, glide the carousel over to the Armani
+        // slide and present it (still image or video, chosen at random).
+        function advanceToKaytranadaSlide() {
+            if (!imageTrack || kaytranadaSlideIndex < 0) return;
+            pauseVibramSlotVideo();
+            prepareKaytranadaPresentation();
+            imageIndex = kaytranadaSlideIndex;
+            updateImageCarousel();
+        }
+
         function syncCarouselLayout() {
             if (!imageLayout) return;
             const onVibram = imageIndex === vibramSlideIndex;
-            const showPortrait = mobileCarouselQuery.matches && imageIndex === kaytranadaSlideIndex;
+            // The Armani slide is portrait (4:5); use the portrait stage on every
+            // device so the image fits instead of being letterboxed in 16:9.
+            const showPortrait = imageIndex === kaytranadaSlideIndex;
             const showVibramHero = onVibram && mobileCarouselQuery.matches;
             imageLayout.classList.toggle('image-layout--portrait-video', showPortrait);
             imageLayout.classList.toggle('image-layout--vibram-hero', showVibramHero);
             imageSpace?.classList.toggle('image-space--vibram-hero', showVibramHero);
             imageLayout.style.aspectRatio = showPortrait ? '4 / 5' : '';
+        }
+
+        // Reliably autostart a slot video on both mobile and desktop. Muted
+        // playback is the only mode browsers always allow to autoplay, so we
+        // start muted to guarantee the video begins, then (on desktop) try to
+        // restore sound without ever interrupting playback.
+        function autoplaySlotVideo(video, { sound = false } = {}) {
+            if (!video) return;
+
+            const wantSound = sound && !mobileCarouselQuery.matches;
+            const restoreSound = () => {
+                video.muted = false;
+                const replay = video.play();
+                if (replay && replay.catch) {
+                    replay.catch(() => {
+                        video.muted = true;
+                        video.play().catch(() => {});
+                    });
+                }
+            };
+
+            video.muted = true;
+            const started = video.play();
+            if (started && started.then) {
+                started.then(() => {
+                    if (wantSound) restoreSound();
+                }).catch(() => {
+                    video.muted = true;
+                    video.play().catch(() => {});
+                });
+            } else if (wantSound) {
+                restoreSound();
+            }
         }
 
         function playVibramSlotVideo({ restart = false } = {}) {
@@ -2203,12 +2390,8 @@
             if (shouldRestart) {
                 vibramSlotVideo.currentTime = 0;
             }
-            // Keep muted on mobile so autoplay isn't interrupted; sound on desktop.
-            vibramSlotVideo.muted = mobileCarouselQuery.matches;
-            vibramSlotVideo.play().catch(() => {
-                vibramSlotVideo.muted = true;
-                vibramSlotVideo.play().catch(() => {});
-            });
+            // Force autostart everywhere; sound is restored on desktop if allowed.
+            autoplaySlotVideo(vibramSlotVideo, { sound: true });
         }
 
         function pauseVibramSlotVideo() {
@@ -2230,11 +2413,12 @@
             if (shouldRestart) {
                 kaytranadaSlotVideo.currentTime = 0;
             }
-            kaytranadaSlotVideo.muted = false;
-            kaytranadaSlotVideo.play().catch(() => {
-                kaytranadaSlotVideo.muted = true;
-                kaytranadaSlotVideo.play().catch(() => {});
-            });
+            // Force autostart everywhere; sound is restored on desktop if allowed.
+            autoplaySlotVideo(kaytranadaSlotVideo, { sound: true });
+            // If playback can't get going (slow/no connection), fall back to the still.
+            if (kaytranadaSlotVideo.readyState < 3) {
+                scheduleKaytranadaFallback();
+            }
         }
 
         function pauseKaytranadaSlotVideo() {
@@ -2295,6 +2479,14 @@
         kaytranadaSlotVideo?.addEventListener('ended', showKaytranadaEndState);
         vibramSlotVideo?.addEventListener('ended', showVibramEndState);
 
+        // Show the Armani still as a fallback when the video errors or buffers,
+        // and hide it again as soon as the video resumes playing.
+        kaytranadaSlotVideo?.addEventListener('error', showKaytranadaFallback);
+        kaytranadaSlotVideo?.addEventListener('stalled', scheduleKaytranadaFallback);
+        kaytranadaSlotVideo?.addEventListener('waiting', scheduleKaytranadaFallback);
+        kaytranadaSlotVideo?.addEventListener('playing', hideKaytranadaFallback);
+        kaytranadaSlotVideo?.addEventListener('canplaythrough', hideKaytranadaFallback);
+
         function getCarouselPointerX(event) {
             if (event.changedTouches?.length) {
                 return event.changedTouches[0].clientX;
@@ -2334,6 +2526,44 @@
             } else {
                 renderedHeight = elementHeight;
                 renderedWidth = elementHeight * videoAspect;
+                offsetX = (elementWidth - renderedWidth) / 2;
+            }
+
+            return {
+                left: elementRect.left + offsetX,
+                right: elementRect.left + offsetX + renderedWidth,
+                top: elementRect.top + offsetY,
+                bottom: elementRect.top + offsetY + renderedHeight,
+                width: renderedWidth,
+                height: renderedHeight
+            };
+        }
+
+        function getContainedImageRect(img) {
+            const elementRect = img.getBoundingClientRect();
+            const naturalWidth = img.naturalWidth;
+            const naturalHeight = img.naturalHeight;
+
+            if (!naturalWidth || !naturalHeight) {
+                return elementRect;
+            }
+
+            const elementWidth = elementRect.width;
+            const elementHeight = elementRect.height;
+            const imageAspect = naturalWidth / naturalHeight;
+            const elementAspect = elementWidth / elementHeight;
+            let renderedWidth;
+            let renderedHeight;
+            let offsetX = 0;
+            let offsetY = 0;
+
+            if (imageAspect > elementAspect) {
+                renderedWidth = elementWidth;
+                renderedHeight = elementWidth / imageAspect;
+                offsetY = (elementHeight - renderedHeight) / 2;
+            } else {
+                renderedHeight = elementHeight;
+                renderedWidth = elementHeight * imageAspect;
                 offsetX = (elementWidth - renderedWidth) / 2;
             }
 
@@ -2432,30 +2662,22 @@
         function handleKaytranadaEndedMobileInteraction(event) {
             const clientX = getCarouselPointerX(event);
             const clientY = getCarouselPointerY(event);
-            const imageRect = kaytranadaEndImage?.getBoundingClientRect();
+            const imageRect = kaytranadaEndImage ? getContainedImageRect(kaytranadaEndImage) : null;
             const isOnImage = imageRect ? isPointInRect(clientX, clientY, imageRect) : false;
-            const now = Date.now();
 
-            if (isOnImage && now - kaytranadaLastTap < kaytranadaTapDelay) {
+            // Tapping the still fades in and plays the Armani video.
+            if (isOnImage) {
                 clearKaytranadaTapTimer();
                 kaytranadaLastTap = 0;
-                restartKaytranadaVideo();
+                triggerKaytranadaPlayback();
                 return true;
             }
 
-            if (isOnImage) {
-                kaytranadaLastTap = now;
-            } else {
-                kaytranadaLastTap = 0;
-            }
-
-            clearKaytranadaTapTimer();
-            kaytranadaTapTimer = window.setTimeout(() => {
-                kaytranadaTapTimer = null;
-                kaytranadaLastTap = 0;
-                goToNextSlide();
-            }, kaytranadaTapDelay);
-
+            // Taps in the surrounding margins navigate the carousel.
+            const layoutRect = imageLayout.getBoundingClientRect();
+            const x = clientX - layoutRect.left;
+            if (x < layoutRect.width / 2) goToPreviousSlide();
+            else goToNextSlide();
             return true;
         }
 
@@ -2466,9 +2688,37 @@
 
             if (!kaytranadaSlotVideo) return false;
 
-            const videoRect = getContainedVideoRect(kaytranadaSlotVideo);
             const clientX = getCarouselPointerX(event);
             const clientY = getCarouselPointerY(event);
+
+            // While the Armani still is on screen (chosen on load, ended, or shown
+            // as a load/connection fallback), clicking the photo fades in + plays
+            // the video; clicks beyond the photo navigate the carousel.
+            const stillShowing = kaytranadaVideoSlot.classList.contains('is-ended')
+                || kaytranadaVideoSlot.classList.contains('is-video-fallback');
+            if (stillShowing) {
+                const imageRect = kaytranadaEndImage
+                    ? getContainedImageRect(kaytranadaEndImage)
+                    : getContainedVideoRect(kaytranadaSlotVideo);
+                if (isPointInRect(clientX, clientY, imageRect)) {
+                    triggerKaytranadaPlayback();
+                    return true;
+                }
+                if (clientX < imageRect.left) {
+                    goToPreviousSlide();
+                    return true;
+                }
+                if (clientX > imageRect.right) {
+                    goToNextSlide();
+                    return true;
+                }
+                const stillLayoutRect = imageLayout.getBoundingClientRect();
+                if (clientX - stillLayoutRect.left < stillLayoutRect.width / 2) goToPreviousSlide();
+                else goToNextSlide();
+                return true;
+            }
+
+            const videoRect = getContainedVideoRect(kaytranadaSlotVideo);
             const isOnVideo = clientX >= videoRect.left
                 && clientX <= videoRect.right
                 && clientY >= videoRect.top
@@ -2476,7 +2726,7 @@
 
             if (isOnVideo) {
                 if (kaytranadaHasEnded) {
-                    playKaytranadaSlotVideo({ restart: true });
+                    triggerKaytranadaPlayback();
                 } else if (kaytranadaSlotVideo.paused) {
                     playKaytranadaSlotVideo();
                 } else {
@@ -2621,8 +2871,30 @@
         */
 
         mobileCarouselQuery.addEventListener('change', syncCarouselLayout);
-        syncCarouselLayout();
-        syncCarouselVideos();
+
+        // On each page load, randomly start on either the Vibram video or the
+        // Giorgio Armani (Kaytranada) video — one or the other, never both.
+        const randomStartSlides = [vibramSlideIndex, kaytranadaSlideIndex]
+            .filter(index => index >= 0);
+        if (randomStartSlides.length) {
+            imageIndex = randomStartSlides[Math.floor(Math.random() * randomStartSlides.length)];
+        }
+        // If we land on the Armani slide, rotate between autoplaying the video
+        // and holding on the "That's so Armani" still image.
+        if (imageIndex === kaytranadaSlideIndex) {
+            prepareKaytranadaPresentation();
+        }
+        // Jump to the chosen start slide without the sliding animation.
+        if (imageTrack) {
+            const prevTransition = imageTrack.style.transition;
+            imageTrack.style.transition = 'none';
+            updateImageCarousel();
+            // Force a reflow so the transition removal applies before restoring it.
+            void imageTrack.offsetWidth;
+            imageTrack.style.transition = prevTransition;
+        } else {
+            updateImageCarousel();
+        }
 
         // 3. Smooth section navigation
         const navLinks = document.querySelectorAll('.nav-link');
