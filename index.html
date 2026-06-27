@@ -572,8 +572,9 @@
             text-underline-offset: 4px;
         }
 
-        /* Titled work tile (e.g. Vibram) */
-        .work-item--vibram {
+        /* Titled work tiles (e.g. Vibram, Giorgio Armani) */
+        .work-item--vibram,
+        .work-item--armani {
             position: relative;
             overflow: hidden;
         }
@@ -875,8 +876,8 @@
         .work-lightbox.is-gallery .work-lightbox-media {
             aspect-ratio: 4 / 5;
             width: auto;
-            height: min(80dvh, 62vw);
-            max-height: 80dvh;
+            height: min(66dvh, 44vw);
+            max-height: 66dvh;
         }
 
         .wl-gallery {
@@ -1178,17 +1179,17 @@
 
         .info-toggle-icon {
             font-weight: 400;
-            transition: transform 0.25s cubic-bezier(0.3, 0, 0.1, 1);
+            transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
         }
 
         .info-toggle.is-open .info-toggle-icon {
-            transform: rotate(45deg);
+            transform: rotate(135deg);
         }
 
         .info-toggle-panel {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.3s cubic-bezier(0.3, 0, 0.1, 1);
+            transition: max-height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .info-toggle-inner {
@@ -1196,6 +1197,14 @@
             font-size: 14px;
             line-height: 1.5;
             max-width: 560px;
+            opacity: 0;
+            transform: translateY(-8px);
+            transition: opacity 0.45s ease 0.05s, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .info-toggle.is-open .info-toggle-inner {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .info-toggle-inner p {
@@ -1355,29 +1364,25 @@
                 columns: 2;
             }
 
-            /* "More" accordions expand upward (float above trigger, no downward overflow) */
-            .info-toggle {
-                position: relative;
+            /* Smart "More": opening an item collapses the About column (incl. clients)
+               and pushes the content above up so the expanded item reads properly. */
+            .info-body--about {
+                overflow: hidden;
+                max-height: 1500px;
+                transition: max-height 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                            opacity 0.4s ease,
+                            margin 0.6s cubic-bezier(0.16, 1, 0.3, 1);
             }
 
-            .info-toggle-panel {
-                position: absolute;
-                left: 0;
-                right: 0;
-                bottom: 100%;
-                z-index: 60;
-                background-color: var(--bg-color);
+            #information.is-more-open .info-body--about {
+                max-height: 0;
+                opacity: 0;
+                margin-bottom: 0;
+                pointer-events: none;
             }
 
-            .info-toggle.is-open .info-toggle-panel {
-                box-shadow: 0 -10px 24px rgba(0, 0, 0, 0.45);
-            }
-
-            .info-toggle-inner {
-                padding-top: clamp(12px, 2.4vw, 16px);
-                padding-bottom: clamp(14px, 2.6vw, 18px);
-                border-top: 1px solid var(--border-color);
-                border-bottom: 1px solid var(--expansion-border);
+            #information.is-more-open .info-grid {
+                gap: 0;
             }
 
             #clients .info-grid {
@@ -1388,14 +1393,21 @@
                 padding: clamp(4px, 1.1vw, 8px) 0;
             }
 
-            /* Each work item becomes its own full-width section/card, stacked */
+            /* Two square boxes per row, centered on the page */
+            #selected-work {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+
             .work-grid {
-                grid-template-columns: minmax(0, 1fr);
-                gap: clamp(18px, 5vw, 30px);
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: clamp(10px, 3vw, 16px);
             }
 
             #selected-work .work-item {
-                aspect-ratio: 4 / 5;
+                aspect-ratio: 1 / 1;
                 height: auto;
             }
 
@@ -1533,13 +1545,8 @@
                     <li><a href="#information" class="nav-link">Information</a></li>
                 </ul>
             </nav>
-        <div class="info-right" id="header-meta">
-                <a class="ig-link" href="https://www.instagram.com/maudechurchill" target="_blank" rel="noopener">@maudechurchill</a>
-            </div>
         </div>
     </header>
-
-    <div class="mobile-meta-slot" id="mobile-meta-slot"></div>
 
     <section id="image-space" aria-label="Image and photo space">
         <div class="section-title"></div>
@@ -1594,7 +1601,6 @@
                     <source src="https://github.com/ta222222/mc/raw/refs/heads/main/TEASER%201.webm" type="video/webm" />
                 </video>
             </button>
-            <button type="button" class="work-item" aria-label="View work 2"><span class="work-item-mark" aria-hidden="true">?</span></button>
             <button type="button" class="work-item work-item--armani" aria-label="View Giorgio Armani featuring Kaytranada"
                 data-project-title="Giorgio Armani"
                 data-project-eyebrow="Campaign"
@@ -1610,6 +1616,7 @@
                 <img class="work-gallery-img" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_179_4x5.jpg" alt="Giorgio Armani featuring Kaytranada" hidden />
                 <img class="work-gallery-img" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_HERO_063_4x5_CLAIM-small.jpg" alt="Giorgio Armani featuring Kaytranada — That's so Armani" hidden />
             </button>
+            <button type="button" class="work-item" aria-label="View work 2"><span class="work-item-mark" aria-hidden="true">?</span></button>
             <button type="button" class="work-item" aria-label="View work 4"><span class="work-item-mark" aria-hidden="true">?</span></button>
             <button type="button" class="work-item" aria-label="View work 5"><span class="work-item-mark" aria-hidden="true">?</span></button>
             <button type="button" class="work-item" aria-label="View work 6"><span class="work-item-mark" aria-hidden="true">?</span></button>
@@ -1633,7 +1640,7 @@
     <section id="information">
         <div class="section-title"></div>
         <div class="info-grid">
-            <div class="info-body">
+            <div class="info-body info-body--about">
                 <p class="info-section-label">About</p>
                 <p>Maude Churchill is a London-based creative director with over a decade of experience working at the intersection of fashion, music and youth culture. She builds campaigns, brand worlds and cultural moments that feel native to the communities they speak to.</p>
                 <p>Her practice moves fluidly between art direction, brand strategy and production — translating loose ideas into coherent visual systems, and partnering with photographers, designers, musicians and studios to bring them to life across film, print and live experience.</p>
@@ -1673,7 +1680,7 @@
                         <div class="info-toggle-panel">
                             <div class="info-toggle-inner">
                                 <p>DBAC — Don't Be A Creep — is an initiative dedicated to making nightlife a safe space, for the safety and happiness of all partygoers, ravers and nightlifers.</p>
-                                <p><a href="https://www.instagram.com/dontbeacreep/" target="_blank" rel="noopener">@dontbeacreep ↗</a></p>
+                                <p><a href="https://www.instagram.com/dontbeacreep/" target="_blank" rel="noopener">@dontbeacreep (Instagram) ↗</a></p>
                             </div>
                         </div>
                     </div>
@@ -1702,15 +1709,15 @@
                         </div>
                     </div>
                     <div class="info-toggle">
-                        <button type="button" class="info-toggle-trigger" aria-expanded="false">
-                            <span>Contact</span>
+                        <button type="button" class="info-toggle-trigger" aria-expanded="false" aria-label="Contact">
+                            <span id="contact-typewriter" aria-hidden="true">Contact</span>
                             <span class="info-toggle-icon" aria-hidden="true">+</span>
                         </button>
                         <div class="info-toggle-panel">
                             <div class="info-toggle-inner">
-                                <p>For projects, bookings and general enquiries:</p>
+                                <p>For projects and general enquiries:</p>
                                 <p><a href="mailto:hello@maudechurchill.com">hello@maudechurchill.com</a></p>
-                                <p><a href="https://www.instagram.com/maudechurchill" target="_blank" rel="noopener">@maudechurchill ↗</a></p>
+                                <p><a href="https://www.instagram.com/maudechurchill" target="_blank" rel="noopener">@maudechurchill (Instagram) ↗</a></p>
                             </div>
                         </div>
                     </div>
@@ -1721,6 +1728,14 @@
 
     <script>
         // Information section toggle menu (accordion).
+        const informationSection = document.getElementById('information');
+
+        function syncMoreOpenState() {
+            if (!informationSection) return;
+            const anyOpen = document.querySelectorAll('.info-toggle.is-open').length > 0;
+            informationSection.classList.toggle('is-more-open', anyOpen);
+        }
+
         document.querySelectorAll('.info-toggle-trigger').forEach(trigger => {
             const toggle = trigger.closest('.info-toggle');
             const panel = trigger.nextElementSibling;
@@ -1731,8 +1746,85 @@
                 trigger.setAttribute('aria-expanded', String(!isOpen));
                 toggle.classList.toggle('is-open', !isOpen);
                 panel.style.maxHeight = isOpen ? '0px' : `${panel.scrollHeight}px`;
+                syncMoreOpenState();
             });
         });
+
+        // "Contact" typewriter: slow type → backspace → fast type → blink (3.33s) → rest, every 33s.
+        (function contactTypewriter() {
+            const el = document.getElementById('contact-typewriter');
+            if (!el) return;
+
+            const word = 'Contact';
+            const SLOW = 145;
+            const ERASE = 80;
+            const FAST = 45;
+            const BLINK_DURATION = 3330;
+            const BLINK_EVERY = 470;
+            const CYCLE = 33000;
+
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                el.textContent = word;
+                return;
+            }
+
+            let timers = [];
+
+            function wait(ms) {
+                return new Promise(resolve => {
+                    timers.push(window.setTimeout(resolve, ms));
+                });
+            }
+
+            function clearTimers() {
+                timers.forEach(window.clearTimeout);
+                timers = [];
+            }
+
+            function paint(text, showCursor) {
+                el.textContent = text + (showCursor ? '\u200A|' : '\u200A\u00A0');
+            }
+
+            async function type(speed) {
+                for (let i = 1; i <= word.length; i++) {
+                    paint(word.slice(0, i), true);
+                    await wait(speed);
+                }
+            }
+
+            async function erase(speed) {
+                for (let i = word.length - 1; i >= 0; i--) {
+                    paint(word.slice(0, i), true);
+                    await wait(speed);
+                }
+            }
+
+            async function blink(duration, every) {
+                let elapsed = 0;
+                let on = false;
+                while (elapsed < duration) {
+                    paint(word, on);
+                    on = !on;
+                    await wait(every);
+                    elapsed += every;
+                }
+            }
+
+            async function runSequence() {
+                clearTimers();
+                paint('', true);
+                await type(SLOW);
+                await wait(320);
+                await erase(ERASE);
+                await wait(140);
+                await type(FAST);
+                await blink(BLINK_DURATION, BLINK_EVERY);
+                el.textContent = word;
+            }
+
+            runSequence();
+            window.setInterval(runSequence, CYCLE);
+        })();
 
         // Keep nav in the header on mobile while placing the IG link at bottom right.
         const headerUtilities = document.querySelector('.header-utilities');
