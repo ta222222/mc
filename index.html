@@ -607,8 +607,9 @@
             }
         }
 
-        .work-item--vibram:hover video.work-item-thumb,
-        .work-item--vibram.is-previewing video.work-item-thumb {
+        /* Barbour still blurs and zooms on hover */
+        .work-item--barbour:hover .work-item-thumb,
+        .work-item--barbour.is-previewing .work-item-thumb {
             filter: blur(5px);
             transform: scale(1.04);
         }
