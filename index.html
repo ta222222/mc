@@ -576,7 +576,8 @@
         .work-item--vibram,
         .work-item--armani,
         .work-item--barbour,
-        .work-item--prada {
+        .work-item--prada,
+        .work-item--nike {
             position: relative;
             overflow: hidden;
         }
@@ -654,6 +655,11 @@
 
         .work-item .work-carousel-img.is-active {
             opacity: 1;
+        }
+
+        /* Fast-cycling carousel variant (e.g. Nike Goadme Hardwear) */
+        .work-item .work-carousel--fast .work-carousel-img {
+            transition: opacity 0.12s linear;
         }
 
         @media (min-width: 869px) {
@@ -1777,8 +1783,9 @@
                 data-project-role="Creative Direction"
                 data-project-talent="Kaytranada"
                 data-project-description="A portrait campaign for Giorgio Armani featuring artist and producer Kaytranada — tailoring, leather and quiet confidence, shot under the line 'That's so Armani.'">
-                <img class="work-item-thumb" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_134_4x5.jpg" alt="Giorgio Armani featuring Kaytranada" />
+                <img class="work-item-thumb" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_101_4x5.jpg" alt="Giorgio Armani featuring Kaytranada" />
                 <span class="work-item-label" aria-hidden="true">Giorgio Armani</span>
+                <img class="work-gallery-img" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_101_4x5.jpg" alt="Giorgio Armani featuring Kaytranada" hidden />
                 <img class="work-gallery-img" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_134_4x5.jpg" alt="Giorgio Armani featuring Kaytranada" hidden />
                 <img class="work-gallery-img" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_179_4x5.jpg" alt="Giorgio Armani featuring Kaytranada" hidden />
                 <img class="work-gallery-img" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_HERO_063_4x5_CLAIM-small.jpg" alt="Giorgio Armani featuring Kaytranada — That's so Armani" hidden />
@@ -1814,7 +1821,16 @@
                     <source src="https://github.com/ta222222/mc/raw/refs/heads/main/prada+mode+london+25.webm" type="video/webm" />
                 </video>
             </button>
-            <button type="button" class="work-item" aria-label="View work 5"><span class="work-item-mark" aria-hidden="true">?</span></button>
+            <button type="button" class="work-item work-item--nike" aria-label="View Nike Goadme Hardwear"
+                data-project-title="Nike Goadme Hardwear"
+                data-project-eyebrow="Campaign"
+                data-project-year="2025"
+                data-project-client="Nike"
+                data-project-role="Creative Direction"
+                data-project-description="Nike Goadme Hardwear — a hardwear campaign spanning archive, athletes and product, shot across a cast of collaborators.">
+                <img class="work-item-thumb" src="https://github.com/ta222222/mc/raw/refs/heads/main/06.webp" alt="Nike Goadme Hardwear" />
+                <span class="work-item-label" aria-hidden="true">Nike Goadme Hardwear</span>
+            </button>
             <button type="button" class="work-item" aria-label="View work 6"><span class="work-item-mark" aria-hidden="true">?</span></button>
         </div>
     </section>
@@ -2878,6 +2894,90 @@
                 timer = setInterval(() => {
                     setActive((index + 1) % layers.length);
                 }, 1800);
+            };
+            const stopCarousel = () => {
+                if (timer) { clearInterval(timer); timer = null; }
+                setActive(0);
+            };
+
+            host.addEventListener('mouseenter', startCarousel);
+            host.addEventListener('mouseleave', stopCarousel);
+            host.addEventListener('focus', startCarousel);
+            host.addEventListener('blur', stopCarousel);
+        });
+
+        // Nike Goadme Hardwear: quick image carousel on hover. The images aren't
+        // in the repo yet — drop the real files in (or add more filenames to the
+        // array) and they'll be injected automatically using the prefix below.
+        const NIKE_HARDWEAR_PREFIX = 'https://github.com/ta222222/mc/raw/refs/heads/main/';
+        const NIKE_HARDWEAR_IMAGES = [
+            '06.webp', // nike
+            '02.webp', // nike
+            'BLACKATLANTICANDNICOLEGREENWOOD.png',
+            'HARDWEAR_2_BRENNAN-WOJTYLA_1.jpg',
+            'HARDWEAR_3_FOAM_2.jpg',
+            'HARDWEAR_4_MATTIA-GUARNERA_2.jpg',
+            'HARDWEAR_5_BLACKATLANTICNET_4.jpg',
+            'HARDWEAR_5_BLACKATLANTICNET_6.jpg',
+            'HARDWEAR_7_FP_1.jpg',
+            'HARDWEAR_7_FP_2.jpg',
+            'LUYU-MING.png',
+            'LUYU-MING1.png',
+            'MATTIAGUARNERA.png',
+            'NOLICENCEARCHIVE2.png',
+            'NOLICENCEARCHIVE3.png',
+            'OUTSIDE BILLBOARD .png',
+            'SPIKE1.png',
+            'SPIKE2.png',
+            'SPIKE3.png',
+            'SPIKE4.png',
+            'SPIKE5.png',
+            'SPIKE6.png',
+            'SPIKE7.png'
+        ];
+
+        document.querySelectorAll('.work-item--nike').forEach(host => {
+            const sources = NIKE_HARDWEAR_IMAGES
+                .filter(Boolean)
+                .map(name => NIKE_HARDWEAR_PREFIX + encodeURIComponent(name));
+            if (sources.length < 2) return;
+
+            const carousel = document.createElement('div');
+            carousel.className = 'work-carousel work-carousel--fast';
+            carousel.setAttribute('aria-hidden', 'true');
+
+            const layers = sources.map((src, i) => {
+                const layer = document.createElement('img');
+                layer.className = 'work-carousel-img' + (i === 0 ? ' is-active' : '');
+                layer.src = src;
+                layer.alt = '';
+                layer.loading = 'lazy';
+                carousel.appendChild(layer);
+                return layer;
+            });
+
+            const thumb = host.querySelector('.work-item-thumb');
+            if (thumb && thumb.parentNode) {
+                thumb.parentNode.insertBefore(carousel, thumb.nextSibling);
+            } else {
+                host.appendChild(carousel);
+            }
+
+            let index = 0;
+            let timer = null;
+
+            const setActive = (next) => {
+                layers[index].classList.remove('is-active');
+                index = next;
+                layers[index].classList.add('is-active');
+            };
+
+            const startCarousel = () => {
+                if (timer) return;
+                setActive((index + 1) % layers.length);
+                timer = setInterval(() => {
+                    setActive((index + 1) % layers.length);
+                }, 320);
             };
             const stopCarousel = () => {
                 if (timer) { clearInterval(timer); timer = null; }
