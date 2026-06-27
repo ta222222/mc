@@ -599,6 +599,12 @@
             object-position: center 25%;
         }
 
+        @media (min-width: 869px) {
+            .work-item--armani .work-item-thumb {
+                object-position: center top;
+            }
+        }
+
         .work-item--vibram:hover video.work-item-thumb,
         .work-item--vibram.is-previewing video.work-item-thumb {
             filter: blur(5px);
@@ -932,6 +938,39 @@
             }
         }
 
+        /* Desktop photo gallery: image and details modal side by side (not overlapping) */
+        @media (min-width: 869px) {
+            .work-lightbox.is-gallery .work-lightbox-panel {
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+                gap: clamp(24px, 3vw, 56px);
+            }
+
+            .work-lightbox.is-gallery .work-lightbox-details {
+                position: static;
+                inset: auto;
+                transform: none;
+                width: min(340px, 30vw);
+                flex: 0 0 auto;
+            }
+
+            .work-lightbox.is-open.is-gallery .work-lightbox-details {
+                animation-name: wl-card-in-side;
+            }
+        }
+
+        @keyframes wl-card-in-side {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
         /* --- ARCHIVE SYSTEM (EXPANDABLE) --- */
         .archive-table {
             width: 100%;
@@ -1205,6 +1244,29 @@
         .info-toggle.is-open .info-toggle-inner {
             opacity: 1;
             transform: translateY(0);
+        }
+
+        /* --- CONTACT SECTION (its own block below More) --- */
+        .info-contact {
+            margin-top: clamp(28px, 4vw, 48px);
+        }
+
+        .info-contact p {
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 8px;
+            max-width: 560px;
+        }
+
+        .info-contact .info-section-label {
+            font-size: 11px;
+            margin-bottom: 16px;
+        }
+
+        .info-contact a {
+            color: var(--text-color);
+            text-decoration: underline;
+            text-underline-offset: 3px;
         }
 
         .info-toggle-inner p {
@@ -1680,7 +1742,7 @@
                         <div class="info-toggle-panel">
                             <div class="info-toggle-inner">
                                 <p>DBAC — Don't Be A Creep — is an initiative dedicated to making nightlife a safe space, for the safety and happiness of all partygoers, ravers and nightlifers.</p>
-                                <p><a href="https://www.instagram.com/dontbeacreep/" target="_blank" rel="noopener">@dontbeacreep (Instagram) ↗</a></p>
+                                <p><a href="https://www.instagram.com/dontbeacreep/" target="_blank" rel="noopener">@dontbeacreep (Instagram)</a></p>
                             </div>
                         </div>
                     </div>
@@ -1708,19 +1770,12 @@
                             </div>
                         </div>
                     </div>
-                    <div class="info-toggle">
-                        <button type="button" class="info-toggle-trigger" aria-expanded="false" aria-label="Contact">
-                            <span id="contact-typewriter" aria-hidden="true">Contact</span>
-                            <span class="info-toggle-icon" aria-hidden="true">+</span>
-                        </button>
-                        <div class="info-toggle-panel">
-                            <div class="info-toggle-inner">
-                                <p>For projects and general enquiries:</p>
-                                <p><a href="mailto:hello@maudechurchill.com">hello@maudechurchill.com</a></p>
-                                <p><a href="https://www.instagram.com/maudechurchill" target="_blank" rel="noopener">@maudechurchill (Instagram) ↗</a></p>
-                            </div>
-                        </div>
-                    </div>
+                </div>
+                <div class="info-contact">
+                    <p class="info-section-label"><span id="contact-typewriter">Contact</span></p>
+                    <p>For projects and general enquiries:</p>
+                    <p><a href="mailto:hello@maudechurchill.com">hello@maudechurchill.com</a></p>
+                    <p><a href="https://www.instagram.com/maudechurchill" target="_blank" rel="noopener">@maudechurchill (Instagram)</a></p>
                 </div>
             </div>
         </div>
