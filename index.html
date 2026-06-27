@@ -3,21 +3,13 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="color-scheme" content="light dark" />
+    <meta name="color-scheme" content="dark" />
     <meta name="theme-color" content="#000000" id="theme-color-meta" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" id="status-bar-meta" />
     <title>Maude Churchill — Creative Director</title>
     <script>
-        (function () {
-            var theme = localStorage.getItem('theme');
-            if (!theme) theme = 'dark';
-            document.documentElement.setAttribute('data-theme', theme);
-            var themeColorMeta = document.getElementById('theme-color-meta');
-            var statusBarMeta = document.getElementById('status-bar-meta');
-            var isDark = theme === 'dark';
-            if (themeColorMeta) themeColorMeta.setAttribute('content', isDark ? '#000000' : '#ffffff');
-            if (statusBarMeta) statusBarMeta.setAttribute('content', isDark ? 'black' : 'default');
-        })();
+        // Dark mode is permanent — no toggle.
+        document.documentElement.setAttribute('data-theme', 'dark');
     </script>
     <style>
         /* --- SWISS MODERNIST RESET & CORE VARIABLES --- */
@@ -133,8 +125,7 @@
 
         header a,
         header .brand-name,
-        header .ticker-wrap,
-        header .theme-toggle {
+        header .ig-link {
             pointer-events: auto;
         }
 
@@ -182,11 +173,17 @@
             display: contents;
         }
 
+        /* Primary nav lives top-right, stacked under the brand line. */
         .site-nav {
-            grid-column: 1;
-            grid-row: 3;
-            align-self: end;
-            justify-self: start;
+            grid-column: 2;
+            grid-row: 1;
+            align-self: start;
+            justify-self: end;
+            text-align: right;
+        }
+
+        .site-nav ul li a {
+            text-align: right;
         }
 
         .info-right {
@@ -205,50 +202,15 @@
             pointer-events: auto;
         }
 
-        .theme-toggle {
+        .ig-link {
             font-family: inherit;
-            font-size: inherit;
+            font-size: var(--ui-font-size);
             font-weight: 500;
             text-transform: uppercase;
             letter-spacing: 0.02em;
             color: var(--text-color);
-            background: none;
-            border: none;
-            padding: 0;
-            cursor: pointer;
-            transition: var(--theme-transition);
-            position: relative;
-            z-index: var(--ui-chrome-z);
             text-decoration: underline;
             text-underline-offset: 4px;
-        }
-
-        .meta-text {
-            max-width: 320px;
-            text-transform: uppercase;
-            font-weight: 500;
-            line-height: 1.3;
-        }
-
-        /* Ticker Styling */
-        .ticker-wrap {
-            height: var(--ticker-height);
-            overflow: hidden;
-            position: relative;
-            z-index: var(--ui-chrome-z);
-        }
-        
-        .ticker-frame {
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.3s cubic-bezier(0.3, 0, 0.1, 1);
-        }
-
-        .ticker-item {
-            height: var(--ticker-height);
-            line-height: var(--ticker-height);
-            font-variant-numeric: tabular-nums;
-            white-space: nowrap;
         }
 
         /* --- SECTION ANCHORS --- */
@@ -610,6 +572,361 @@
             text-underline-offset: 4px;
         }
 
+        /* Titled work tile (e.g. Vibram) */
+        .work-item--vibram {
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Thumbnail still that sharpens/plays on hover */
+        .work-item .work-item-thumb {
+            display: block;
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 1;
+            filter: blur(0);
+            transform: scale(1);
+            transition: filter 0.4s cubic-bezier(0.3, 0, 0.1, 1), transform 0.4s cubic-bezier(0.3, 0, 0.1, 1);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .work-item--vibram:hover video.work-item-thumb,
+        .work-item--vibram.is-previewing video.work-item-thumb {
+            filter: blur(5px);
+            transform: scale(1.04);
+        }
+
+        .work-item-label {
+            position: absolute;
+            z-index: 2;
+            top: 12px;
+            left: 12px;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-weight: 500;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--muted-text);
+            line-height: 1;
+            pointer-events: none;
+        }
+
+        /* Project lightbox: video left, floating details card */
+        .work-lightbox.is-project .work-lightbox-panel {
+            width: min(92vw, calc(82dvh * 16 / 9));
+            max-height: 82dvh;
+        }
+
+        .work-lightbox-details {
+            position: absolute;
+            top: 50%;
+            right: clamp(12px, 3vw, 32px);
+            transform: translateY(-50%);
+            z-index: 3;
+            width: min(82vw, 320px);
+            padding: clamp(18px, 2.2vw, 28px);
+            background: rgba(20, 20, 20, 0.32);
+            backdrop-filter: blur(16px) saturate(140%);
+            -webkit-backdrop-filter: blur(16px) saturate(140%);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 2px;
+            color: #ffffff;
+            text-align: left;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+        }
+
+        .work-lightbox-details[hidden] {
+            display: none;
+        }
+
+        .wl-detail-eyebrow {
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            opacity: 0.6;
+            margin-bottom: 10px;
+        }
+
+        .wl-detail-title {
+            position: relative;
+            font-size: clamp(18px, 2.4vw, 24px);
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            line-height: 1.1;
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+        }
+
+        /* Hairline rule under the title that draws in */
+        .wl-detail-title::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.4);
+            transform: scaleX(0);
+            transform-origin: left center;
+        }
+
+        .wl-detail-list {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0 16px;
+            margin: 0 0 18px;
+            font-size: 12px;
+            line-height: 1.3;
+        }
+
+        .wl-detail-list dt,
+        .wl-detail-list dd {
+            padding: 9px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+        }
+
+        .wl-detail-list dt {
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            opacity: 0.55;
+            font-weight: 600;
+        }
+
+        .wl-detail-list dd {
+            margin: 0;
+            font-weight: 500;
+            text-align: right;
+        }
+
+        .wl-detail-desc {
+            font-size: 13px;
+            line-height: 1.45;
+            opacity: 0.85;
+        }
+
+        /* --- SWISS REVEAL: project lightbox motion --- */
+        .work-lightbox-details {
+            opacity: 0;
+        }
+
+        .work-lightbox-details::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #ffffff;
+            transform: scaleX(0);
+            transform-origin: left center;
+        }
+
+        .wl-detail-eyebrow,
+        .wl-detail-title,
+        .wl-detail-list,
+        .wl-detail-desc {
+            opacity: 0;
+            will-change: transform, opacity;
+        }
+
+        .work-lightbox.is-project .work-lightbox-media {
+            opacity: 0;
+        }
+
+        .work-lightbox.is-open.is-project .work-lightbox-media {
+            animation: wl-media-in 0.6s cubic-bezier(0.3, 0, 0.1, 1) both;
+        }
+
+        @keyframes wl-media-in {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+                clip-path: inset(0 0 8% 0);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+                clip-path: inset(0 0 0 0);
+            }
+        }
+
+        .work-lightbox.is-open.is-project .work-lightbox-details {
+            animation: wl-card-in 0.55s cubic-bezier(0.3, 0, 0.1, 1) 0.05s both;
+        }
+
+        .work-lightbox.is-open.is-project .work-lightbox-details::before {
+            animation: wl-line-draw 0.7s cubic-bezier(0.3, 0, 0.1, 1) 0.18s both;
+        }
+
+        .work-lightbox.is-open.is-project .wl-detail-title::after {
+            animation: wl-line-draw 0.7s cubic-bezier(0.3, 0, 0.1, 1) 0.5s both;
+        }
+
+        .work-lightbox.is-open.is-project .wl-detail-eyebrow {
+            animation: wl-text-in 0.5s cubic-bezier(0.3, 0, 0.1, 1) 0.22s both;
+        }
+
+        .work-lightbox.is-open.is-project .wl-detail-title {
+            animation: wl-text-in 0.5s cubic-bezier(0.3, 0, 0.1, 1) 0.3s both;
+        }
+
+        .work-lightbox.is-open.is-project .wl-detail-list {
+            animation: wl-text-in 0.5s cubic-bezier(0.3, 0, 0.1, 1) 0.42s both;
+        }
+
+        .work-lightbox.is-open.is-project .wl-detail-desc {
+            animation: wl-text-in 0.5s cubic-bezier(0.3, 0, 0.1, 1) 0.52s both;
+        }
+
+        @keyframes wl-card-in {
+            from {
+                opacity: 0;
+                transform: translateY(-50%) translateX(18px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(-50%) translateX(0);
+            }
+        }
+
+        @keyframes wl-line-draw {
+            from {
+                transform: scaleX(0);
+            }
+            to {
+                transform: scaleX(1);
+            }
+        }
+
+        @keyframes wl-text-in {
+            from {
+                opacity: 0;
+                transform: translateY(9px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 868px) {
+            /* Stack the video and details modal, centered with even space above/below */
+            .work-lightbox.is-project .work-lightbox-panel {
+                flex-direction: column;
+                align-items: stretch;
+                justify-content: center;
+                width: min(92vw, calc(50dvh * 16 / 9));
+                max-height: 92dvh;
+                gap: clamp(14px, 3.5vw, 20px);
+            }
+
+            .work-lightbox.is-project .work-lightbox-media {
+                width: 100%;
+                max-height: 50dvh;
+                flex: 0 0 auto;
+            }
+
+            .work-lightbox.is-project .work-lightbox-details {
+                position: static;
+                top: auto;
+                right: auto;
+                bottom: auto;
+                left: auto;
+                transform: none;
+                width: 100%;
+                flex: 0 0 auto;
+            }
+
+            .work-lightbox.is-open.is-project .work-lightbox-details {
+                animation: wl-card-in-mobile 0.55s cubic-bezier(0.3, 0, 0.1, 1) 0.05s both;
+            }
+
+            .wl-detail-list {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @keyframes wl-card-in-mobile {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- MULTI-IMAGE PROJECT GALLERY (e.g. Armani) --- */
+        .work-lightbox.is-gallery .work-lightbox-panel {
+            width: auto;
+            max-width: 92vw;
+        }
+
+        .work-lightbox.is-gallery .work-lightbox-media {
+            aspect-ratio: 4 / 5;
+            width: auto;
+            height: min(80dvh, 62vw);
+            max-height: 80dvh;
+        }
+
+        .wl-gallery {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .wl-gallery-img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background-color: var(--bg-color);
+            animation: wl-text-in 0.4s cubic-bezier(0.3, 0, 0.1, 1) both;
+        }
+
+        .wl-gallery-count {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            z-index: 2;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding: 5px 9px;
+            pointer-events: none;
+        }
+
+        @media (max-width: 868px) {
+            .work-lightbox.is-gallery .work-lightbox-panel {
+                width: auto;
+                max-width: 92vw;
+                align-items: center;
+            }
+
+            .work-lightbox.is-gallery .work-lightbox-media {
+                width: auto;
+                height: 50dvh;
+                max-height: 50dvh;
+                align-self: center;
+            }
+
+            .work-lightbox.is-gallery .work-lightbox-details {
+                width: 100%;
+            }
+        }
+
         /* --- ARCHIVE SYSTEM (EXPANDABLE) --- */
         .archive-table {
             width: 100%;
@@ -774,6 +1091,143 @@
             max-width: 700px;
         }
 
+        /* --- CLIENTS GRID (dense contact-sheet) --- */
+        .clients-wrap {
+            width: var(--stage-width);
+            margin: 0 auto;
+        }
+
+        .clients-heading {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: var(--muted-text);
+            margin-bottom: 14px;
+        }
+
+        .clients-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            border-top: 1px solid var(--border-color);
+            border-left: 1px solid var(--border-color);
+        }
+
+        .client-name {
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: clamp(12px, 1.3vw, 18px) 14px;
+            font-size: var(--ui-font-size);
+            text-transform: uppercase;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            line-height: 1.2;
+            transition: background-color 0.15s ease;
+        }
+
+        .client-name:hover {
+            background-color: var(--hover-bg);
+        }
+
+        /* --- INFO TOGGLE MENU (accordion) --- */
+        .info-section-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: var(--muted-text);
+            margin-bottom: 16px;
+        }
+
+        .info-toggles {
+            border-top: 1px solid var(--border-color);
+        }
+
+        .info-toggle {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .info-toggle-trigger {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            appearance: none;
+            -webkit-appearance: none;
+            background: none;
+            border: none;
+            padding: clamp(12px, 1.4vw, 16px) 0;
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: var(--ui-font-size);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .info-toggle-trigger:hover {
+            opacity: 0.6;
+        }
+
+        .info-toggle-icon {
+            font-weight: 400;
+            transition: transform 0.25s cubic-bezier(0.3, 0, 0.1, 1);
+        }
+
+        .info-toggle.is-open .info-toggle-icon {
+            transform: rotate(45deg);
+        }
+
+        .info-toggle-panel {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s cubic-bezier(0.3, 0, 0.1, 1);
+        }
+
+        .info-toggle-inner {
+            padding: 0 0 clamp(16px, 2.2vw, 22px);
+            font-size: 14px;
+            line-height: 1.5;
+            max-width: 560px;
+        }
+
+        .info-toggle-inner p {
+            margin-bottom: 12px;
+        }
+
+        .info-toggle-inner a {
+            color: var(--text-color);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        /* --- INFO CLIENTS LIST --- */
+        .info-clients {
+            margin-top: clamp(48px, 6vw, 88px);
+        }
+
+        .info-clients-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            columns: 2;
+            column-gap: clamp(16px, 3vw, 32px);
+            border-top: 1px solid var(--border-color);
+            padding-top: clamp(14px, 1.6vw, 18px);
+        }
+
+        .info-clients-list li {
+            break-inside: avoid;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            padding: 6px 0;
+        }
+
         .mobile-meta-slot {
             display: none;
         }
@@ -886,7 +1340,15 @@
 
             .info-grid {
                 grid-template-columns: 1fr;
-                gap: 20px;
+                gap: clamp(36px, 9vw, 52px);
+            }
+
+            .info-clients {
+                margin-top: clamp(32px, 8vw, 44px);
+            }
+
+            .info-clients-list {
+                columns: 2;
             }
 
             #clients .info-grid {
@@ -899,7 +1361,14 @@
 
             .work-grid {
                 grid-template-columns: minmax(0, 1fr);
-                gap: clamp(12px, 3vw, 18px);
+                gap: 8px;
+            }
+
+            /* Shrink box height so all six fit on screen at once */
+            #selected-work .work-item {
+                aspect-ratio: auto;
+                height: calc((100dvh - 250px) / 6);
+                min-height: 52px;
             }
 
             .image-layout.image-layout--portrait-video {
@@ -984,7 +1453,14 @@
 
         @media (min-width: 869px) {
             #clients {
-                padding-top: calc(180px - 6rem);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                min-height: 100dvh;
+                min-height: 100svh;
+                padding-top: 120px;
+                padding-bottom: 80px;
             }
 
             .info-right {
@@ -1015,19 +1491,6 @@
             .work-lightbox-media {
                 max-height: 77dvh;
             }
-
-            .nav-item--selected-work {
-                position: fixed;
-                top: 24px;
-                right: 24px;
-                z-index: var(--ui-chrome-z);
-                pointer-events: auto;
-            }
-
-            .nav-item--selected-work a {
-                margin-bottom: 0;
-                text-align: right;
-            }
         }
     </style>
 </head>
@@ -1039,21 +1502,11 @@
             <nav class="site-nav">
                 <ul>
                     <li class="nav-item--selected-work"><a href="#selected-work" class="nav-link">Selected Work</a></li>
-                    <li><a href="#clients" class="nav-link">Clients</a></li>
                     <li><a href="#information" class="nav-link">Information</a></li>
                 </ul>
             </nav>
         <div class="info-right" id="header-meta">
-                <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Switch to light mode" aria-pressed="true">
-                    <span class="theme-toggle-label">Dark</span>
-                </button>
-                <div class="meta-text ticker-wrap">
-                    <div class="ticker-frame" id="ticker-frame">
-                        <div class="ticker-item" data-city="LONDON">00:00:00 LON</div>
-                        <div class="ticker-item" data-city="BERLIN">00:00:00 BER</div>
-                        <div class="ticker-item" data-city="LEEDS">00:00:00 LDS</div>
-                    </div>
-                </div>
+                <a class="ig-link" href="https://www.instagram.com/maudechurchill" target="_blank" rel="noopener">@maudechurchill</a>
             </div>
         </div>
     </header>
@@ -1065,7 +1518,7 @@
         <div class="image-layout">
             <div class="image-track" id="image-track">
                 <div class="image-slot image-slot--photo image-slot--carousel-video image-slot--video" id="vibram-video-slot" data-carousel-video>
-                    <video class="slot-video" playsinline preload="metadata" aria-label="Vibram by the Sea">
+                    <video class="slot-video" playsinline autoplay muted preload="auto" aria-label="Vibram by the Sea">
                         <source src="https://github.com/ta222222/mc/raw/refs/heads/main/VIBRAM%20BY%20THE%20SEA%201(1).webm" type="video/webm" />
                     </video>
                 </div>
@@ -1097,9 +1550,38 @@
 
     <section id="selected-work" aria-label="Selected Work">
         <div class="work-grid">
-            <button type="button" class="work-item" aria-label="View work 1"><span class="work-item-mark" aria-hidden="true">?</span></button>
+            <button type="button" class="work-item work-item--vibram" aria-label="View Vibram by the Sea"
+                data-project-title="Vibram by the Sea"
+                data-project-eyebrow="Selected Work"
+                data-project-year="2025"
+                data-project-client="Vibram"
+                data-project-role="Creative Direction"
+                data-project-format="Short Film"
+                data-project-description="A coastal campaign film for Vibram — exploring grip, terrain and movement where the land meets the sea.">
+                <video class="work-item-thumb" muted loop playsinline preload="auto" aria-hidden="true">
+                    <source src="https://github.com/ta222222/mc/raw/refs/heads/main/TEASER%201.webm" type="video/webm" />
+                </video>
+                <span class="work-item-label" aria-hidden="true">Vibram</span>
+                <video class="slot-video work-full-video" playsinline preload="metadata" muted aria-label="Vibram by the Sea — Teaser">
+                    <source src="https://github.com/ta222222/mc/raw/refs/heads/main/TEASER%201.webm" type="video/webm" />
+                </video>
+            </button>
             <button type="button" class="work-item" aria-label="View work 2"><span class="work-item-mark" aria-hidden="true">?</span></button>
-            <button type="button" class="work-item" aria-label="View work 3"><span class="work-item-mark" aria-hidden="true">?</span></button>
+            <button type="button" class="work-item work-item--armani" aria-label="View Giorgio Armani featuring Kaytranada"
+                data-project-title="Giorgio Armani"
+                data-project-eyebrow="Campaign"
+                data-project-year="2025"
+                data-project-client="Giorgio Armani"
+                data-project-role="Creative Direction"
+                data-project-format="Photography"
+                data-project-talent="Kaytranada"
+                data-project-description="A portrait campaign for Giorgio Armani featuring artist and producer Kaytranada — tailoring, leather and quiet confidence, shot under the line 'That's so Armani.'">
+                <img class="work-item-thumb" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_134_4x5.jpg" alt="Giorgio Armani featuring Kaytranada" />
+                <span class="work-item-label" aria-hidden="true">Giorgio Armani</span>
+                <img class="work-gallery-img" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_134_4x5.jpg" alt="Giorgio Armani featuring Kaytranada" hidden />
+                <img class="work-gallery-img" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_179_4x5.jpg" alt="Giorgio Armani featuring Kaytranada" hidden />
+                <img class="work-gallery-img" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_HERO_063_4x5_CLAIM-small.jpg" alt="Giorgio Armani featuring Kaytranada — That's so Armani" hidden />
+            </button>
             <button type="button" class="work-item" aria-label="View work 4"><span class="work-item-mark" aria-hidden="true">?</span></button>
             <button type="button" class="work-item" aria-label="View work 5"><span class="work-item-mark" aria-hidden="true">?</span></button>
             <button type="button" class="work-item" aria-label="View work 6"><span class="work-item-mark" aria-hidden="true">?</span></button>
@@ -1111,166 +1593,120 @@
         <div class="work-lightbox-backdrop" id="work-lightbox-backdrop"></div>
         <div class="work-lightbox-panel">
             <div class="work-lightbox-media" id="work-lightbox-media"></div>
+            <aside class="work-lightbox-details" id="work-lightbox-details" hidden>
+                <p class="wl-detail-eyebrow" id="wl-detail-eyebrow"></p>
+                <h3 class="wl-detail-title" id="wl-detail-title"></h3>
+                <dl class="wl-detail-list" id="wl-detail-list"></dl>
+                <p class="wl-detail-desc" id="wl-detail-desc"></p>
+            </aside>
         </div>
     </div>
-
-    <section id="clients">
-        <div class="section-title"></div>
-        <div class="archive-table">
-            <div class="archive-row header-row">
-                <div class="row-trigger">
-                    <div class="col-title">Clients</div>
-                </div>
-            </div>
-
-            <div class="info-grid">
-                <div class="info-body">
-            <div class="archive-row">
-                <div class="row-trigger">
-                    <div class="col-title">Gucci</div>
-                </div>
-            </div>
-
-            <div class="archive-row">
-                <div class="row-trigger">
-                    <div class="col-title">Prada</div>
-                </div>
-            </div>
-
-            <div class="archive-row">
-                <div class="row-trigger">
-                    <div class="col-title">Moncler</div>
-                </div>
-            </div>
-
-            <div class="archive-row">
-                <div class="row-trigger">
-                    <div class="col-title">Nike</div>
-                </div>
-            </div>
-
-            <div class="archive-row">
-                <div class="row-trigger">
-                    <div class="col-title">The North Face</div>
-                </div>
-            </div>
-
-            <div class="archive-row">
-                <div class="row-trigger">
-                    <div class="col-title">Crocs</div>
-                </div>
-            </div>
-
-            <div class="archive-row">
-                <div class="row-trigger">
-                    <div class="col-title">Stone Island</div>
-                </div>
-            </div>
-
-            <div class="archive-row">
-                <div class="row-trigger">
-                    <div class="col-title">Loro Piana</div>
-                </div>
-            </div>
-                </div>
-                <div class="info-body">
-            <div class="archive-row">
-                <div class="row-trigger">
-                    <div class="col-title">PlayStation</div>
-                </div>
-            </div>
-
-            <div class="archive-row">
-                <div class="row-trigger">
-                    <div class="col-title">Hypebeast</div>
-                </div>
-            </div>
-
-            <div class="archive-row">
-                <div class="row-trigger">
-                    <div class="col-title">Dazed Studio</div>
-                </div>
-            </div>
-
-            <div class="archive-row">
-                <div class="row-trigger">
-                    <div class="col-title">Boiler Room</div>
-                </div>
-            </div>
-
-            <div class="archive-row">
-                <div class="row-trigger">
-                    <div class="col-title">Mixcloud</div>
-                </div>
-            </div>
-
-            <div class="archive-row">
-                <div class="row-trigger">
-                    <div class="col-title">Depop</div>
-                </div>
-            </div>
-
-            <div class="archive-row">
-                <div class="row-trigger">
-                    <div class="col-title">Protein</div>
-                </div>
-            </div>
-
-            <div class="archive-row">
-                <div class="row-trigger">
-                    <div class="col-title">Highsnobiety</div>
-                </div>
-            </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <section id="information">
         <div class="section-title"></div>
         <div class="info-grid">
             <div class="info-body">
-                <p>Maude Churchill is a creative director with over a decade of experience in cultural marketing, specialising in fashion, music and lifestyle brands</p>
-                <br>
-                <p>Currently based in London</p>
-                <br>
-                <p>Contact</p>
+                <p class="info-section-label">About</p>
+                <p>Maude Churchill is a London-based creative director with over a decade of experience working at the intersection of fashion, music and youth culture. She builds campaigns, brand worlds and cultural moments that feel native to the communities they speak to.</p>
+                <p>Her practice moves fluidly between art direction, brand strategy and production — translating loose ideas into coherent visual systems, and partnering with photographers, designers, musicians and studios to bring them to life across film, print and live experience.</p>
+                <p>She came up through editorial before moving into insights and creative strategy — a trajectory that lends her direction a rare, holistic fluency, equally at ease with a cultural thesis and the image that proves it. Her favourite work begins inside a brand's core values and carries them outward, communicating with an audience by plugging into the cultural zeitgeist through the right creative talent at the right moment.</p>
+                <p>She is also co-founder of Don't Be A Creep, a music and arts initiative that works closely with festivals and venues to build safer, more inclusive spaces through creative campaigns — evidence of a practice in which cultural relevance and genuine care are never mutually exclusive.</p>
+                <p>Currently based in London, working internationally.</p>
+                <div class="info-clients">
+                    <p class="info-section-label">Clients</p>
+                    <ul class="info-clients-list">
+                        <li>Gucci</li>
+                        <li>Prada</li>
+                        <li>Moncler</li>
+                        <li>Nike</li>
+                        <li>The North Face</li>
+                        <li>Crocs</li>
+                        <li>Stone Island</li>
+                        <li>Loro Piana</li>
+                        <li>PlayStation</li>
+                        <li>Hypebeast</li>
+                        <li>Dazed Studio</li>
+                        <li>Boiler Room</li>
+                        <li>Mixcloud</li>
+                        <li>Depop</li>
+                        <li>Protein</li>
+                        <li>Highsnobiety</li>
+                    </ul>
+                </div>
             </div>
             <div class="info-body">
-                <p></p>
+                <p class="info-section-label">More</p>
+                <div class="info-toggles">
+                    <div class="info-toggle">
+                        <button type="button" class="info-toggle-trigger" aria-expanded="false">
+                            <span>DBAC (Don't Be A Creep)</span>
+                            <span class="info-toggle-icon" aria-hidden="true">+</span>
+                        </button>
+                        <div class="info-toggle-panel">
+                            <div class="info-toggle-inner">
+                                <p>DBAC — Don't Be A Creep — is an initiative dedicated to making nightlife a safe space, for the safety and happiness of all partygoers, ravers and nightlifers.</p>
+                                <p><a href="https://www.instagram.com/dontbeacreep/" target="_blank" rel="noopener">@dontbeacreep ↗</a></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-toggle">
+                        <button type="button" class="info-toggle-trigger" aria-expanded="false">
+                            <span>DJ Side Project</span>
+                            <span class="info-toggle-icon" aria-hidden="true">+</span>
+                        </button>
+                        <div class="info-toggle-panel">
+                            <div class="info-toggle-inner">
+                                <p>A DJ side project of Maude Churchill and Ella Lucia.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-toggle">
+                        <button type="button" class="info-toggle-trigger" aria-expanded="false">
+                            <span>Latest Radio Show(s)</span>
+                            <span class="info-toggle-icon" aria-hidden="true">+</span>
+                        </button>
+                        <div class="info-toggle-panel">
+                            <div class="info-toggle-inner">
+                                <p>A monthly two-hour selection recorded for online radio — part DBAC, part personal diary of whatever's been on rotation.</p>
+                                <p><a href="https://soundcloud.com/loosefm/maude-28-may-26" target="_blank" rel="noopener">Latest show — LOOSE.fm, 28 May '26 ↗</a></p>
+                                <p><a href="https://www.mixcloud.com/maudechurchill/" target="_blank" rel="noopener">Browse the full radio archive ↗</a></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-toggle">
+                        <button type="button" class="info-toggle-trigger" aria-expanded="false">
+                            <span>Contact</span>
+                            <span class="info-toggle-icon" aria-hidden="true">+</span>
+                        </button>
+                        <div class="info-toggle-panel">
+                            <div class="info-toggle-inner">
+                                <p>For projects, bookings and general enquiries:</p>
+                                <p><a href="mailto:hello@maudechurchill.com">hello@maudechurchill.com</a></p>
+                                <p><a href="https://www.instagram.com/maudechurchill" target="_blank" rel="noopener">@maudechurchill ↗</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
     <script>
-        // 0. Dark mode toggle (persisted + system preference fallback)
-        const themeToggle = document.getElementById('theme-toggle');
-        const themeLabel = themeToggle?.querySelector('.theme-toggle-label');
-        const themeColorMeta = document.getElementById('theme-color-meta');
-        const statusBarMeta = document.getElementById('status-bar-meta');
-        const storedTheme = localStorage.getItem('theme');
+        // Information section toggle menu (accordion).
+        document.querySelectorAll('.info-toggle-trigger').forEach(trigger => {
+            const toggle = trigger.closest('.info-toggle');
+            const panel = trigger.nextElementSibling;
+            if (!toggle || !panel) return;
 
-        function applyTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem('theme', theme);
-            themeColorMeta?.setAttribute('content', theme === 'dark' ? '#000000' : '#ffffff');
-            statusBarMeta?.setAttribute('content', theme === 'dark' ? 'black' : 'default');
-            if (themeLabel) {
-                themeLabel.textContent = theme === 'dark' ? 'Dark' : 'Light';
-            }
-            themeToggle?.setAttribute('aria-pressed', theme === 'dark');
-            themeToggle?.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-        }
-
-        const initialTheme = storedTheme || 'dark';
-        applyTheme(initialTheme);
-
-        themeToggle?.addEventListener('click', () => {
-            const current = document.documentElement.getAttribute('data-theme') || 'dark';
-            applyTheme(current === 'dark' ? 'light' : 'dark');
+            trigger.addEventListener('click', () => {
+                const isOpen = trigger.getAttribute('aria-expanded') === 'true';
+                trigger.setAttribute('aria-expanded', String(!isOpen));
+                toggle.classList.toggle('is-open', !isOpen);
+                panel.style.maxHeight = isOpen ? '0px' : `${panel.scrollHeight}px`;
+            });
         });
 
-        // Keep nav in the header on mobile while placing theme/time at bottom right.
+        // Keep nav in the header on mobile while placing the IG link at bottom right.
         const headerUtilities = document.querySelector('.header-utilities');
         const headerMeta = document.getElementById('header-meta');
         const mobileMetaSlot = document.getElementById('mobile-meta-slot');
@@ -1421,7 +1857,8 @@
             if (shouldRestart) {
                 vibramSlotVideo.currentTime = 0;
             }
-            vibramSlotVideo.muted = false;
+            // Keep muted on mobile so autoplay isn't interrupted; sound on desktop.
+            vibramSlotVideo.muted = mobileCarouselQuery.matches;
             vibramSlotVideo.play().catch(() => {
                 vibramSlotVideo.muted = true;
                 vibramSlotVideo.play().catch(() => {});
@@ -1841,51 +2278,11 @@
         syncCarouselLayout();
         syncCarouselVideos();
 
-        // 1. Timezone Ticker Loop (London, Berlin, Leeds)
-        const timeOffsets = {
-            'LONDON': 'Europe/London',
-            'LEEDS': 'Europe/London',
-            'BERLIN': 'Europe/Berlin'
-        };
-
-        const tickerItems = document.querySelectorAll('.ticker-item');
-        const tickerFrame = document.getElementById('ticker-frame');
-        let currentTickerIndex = 0;
-
-        function updateClocks() {
-            tickerItems.forEach(item => {
-                const city = item.getAttribute('data-city');
-                const timezone = timeOffsets[city];
-                const now = new Date();
-                const timeString = now.toLocaleTimeString('en-GB', { 
-                    timeZone: timezone, 
-                    hour12: false,
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit'
-                });
-                item.innerText = `${timeString} ${city}`;
-            });
-        }
-        
-        // Cycle Ticker View Frame
-        function cycleTicker() {
-            if (tickerItems.length <= 1) return;
-            currentTickerIndex = (currentTickerIndex + 1) % tickerItems.length;
-            const tickerStep = tickerItems[0].offsetHeight || 14;
-            const yOffset = currentTickerIndex * -tickerStep;
-            tickerFrame.style.transform = `translateY(${yOffset}px)`;
-        }
-
-        setInterval(updateClocks, 1000);
-        setInterval(cycleTicker, 3330); // Shift city string every 3.33s
-        updateClocks();
-
         // 3. Smooth section navigation
         const navLinks = document.querySelectorAll('.nav-link');
         const infoSection = document.getElementById('information');
         const desktopMq = window.matchMedia('(min-width: 869px)');
-        const sectionOrder = ['image-space', 'selected-work', 'clients', 'information']
+        const sectionOrder = ['image-space', 'selected-work', 'information']
             .map(id => document.getElementById(id))
             .filter(Boolean);
 
@@ -1895,6 +2292,11 @@
         const workLightboxMedia = document.getElementById('work-lightbox-media');
         const workLightboxClose = document.getElementById('work-lightbox-close');
         const workLightboxBackdrop = document.getElementById('work-lightbox-backdrop');
+        const workLightboxDetails = document.getElementById('work-lightbox-details');
+        const wlDetailEyebrow = document.getElementById('wl-detail-eyebrow');
+        const wlDetailTitle = document.getElementById('wl-detail-title');
+        const wlDetailList = document.getElementById('wl-detail-list');
+        const wlDetailDesc = document.getElementById('wl-detail-desc');
         let activeWorkVideo = null;
 
         function clearWorkLightboxMedia() {
@@ -1905,29 +2307,124 @@
             if (workLightboxMedia) {
                 workLightboxMedia.innerHTML = '';
             }
+            workLightbox?.classList.remove('is-gallery');
+        }
+
+        function buildWorkGallery(sources) {
+            const wrap = document.createElement('div');
+            wrap.className = 'wl-gallery';
+
+            const imgEl = document.createElement('img');
+            imgEl.className = 'wl-gallery-img';
+            imgEl.alt = '';
+            wrap.appendChild(imgEl);
+
+            const count = document.createElement('div');
+            count.className = 'wl-gallery-count';
+            wrap.appendChild(count);
+
+            let idx = 0;
+
+            function render() {
+                imgEl.src = sources[idx];
+                count.textContent = `${idx + 1} / ${sources.length}`;
+                imgEl.style.animation = 'none';
+                void imgEl.offsetWidth;
+                imgEl.style.animation = '';
+            }
+
+            function go(dir) {
+                idx = (idx + dir + sources.length) % sources.length;
+                render();
+            }
+
+            wrap.addEventListener('click', (event) => {
+                if (sources.length < 2) return;
+                const rect = wrap.getBoundingClientRect();
+                const x = event.clientX - rect.left;
+                go(x < rect.width / 2 ? -1 : 1);
+            });
+
+            render();
+            return wrap;
+        }
+
+        function hideWorkLightboxDetails() {
+            if (!workLightboxDetails) return;
+            workLightbox?.classList.remove('is-project');
+            workLightboxDetails.hidden = true;
+            if (wlDetailEyebrow) wlDetailEyebrow.textContent = '';
+            if (wlDetailTitle) wlDetailTitle.textContent = '';
+            if (wlDetailList) wlDetailList.innerHTML = '';
+            if (wlDetailDesc) wlDetailDesc.textContent = '';
+        }
+
+        function renderWorkLightboxDetails(item) {
+            if (!workLightboxDetails) return false;
+
+            const data = item.dataset || {};
+            if (!data.projectTitle) return false;
+
+            if (wlDetailEyebrow) wlDetailEyebrow.textContent = data.projectEyebrow || 'Selected Work';
+            if (wlDetailTitle) wlDetailTitle.textContent = data.projectTitle;
+
+            if (wlDetailList) {
+                wlDetailList.innerHTML = '';
+                const fields = [
+                    ['Year', data.projectYear],
+                    ['Client', data.projectClient],
+                    ['Role', data.projectRole],
+                    ['Format', data.projectFormat],
+                    ['Featuring', data.projectTalent]
+                ];
+                fields.forEach(([label, value]) => {
+                    if (!value) return;
+                    const dt = document.createElement('dt');
+                    dt.textContent = label;
+                    const dd = document.createElement('dd');
+                    dd.textContent = value;
+                    wlDetailList.append(dt, dd);
+                });
+            }
+
+            if (wlDetailDesc) wlDetailDesc.textContent = data.projectDescription || '';
+
+            workLightboxDetails.hidden = false;
+            workLightbox?.classList.add('is-project');
+            return true;
         }
 
         function openWorkLightbox(item) {
             if (!workLightbox || !workLightboxMedia || !item) return;
 
             clearWorkLightboxMedia();
+            hideWorkLightboxDetails();
 
-            const img = item.querySelector('img');
-            const video = item.querySelector('video');
+            const galleryImgs = item.querySelectorAll('.work-gallery-img');
+            const video = item.querySelector('.work-full-video')
+                || item.querySelector('video:not(.work-item-thumb)');
+            const img = item.querySelector('img:not(.work-item-thumb)') || item.querySelector('img');
 
-            if (img) {
-                const clone = img.cloneNode(true);
-                clone.removeAttribute('hidden');
-                workLightboxMedia.appendChild(clone);
+            if (galleryImgs.length) {
+                const sources = Array.from(galleryImgs).map(node => node.getAttribute('src'));
+                workLightboxMedia.appendChild(buildWorkGallery(sources));
+                workLightbox.classList.add('is-gallery');
             } else if (video) {
                 const clone = video.cloneNode(true);
                 clone.removeAttribute('hidden');
                 clone.controls = true;
+                clone.muted = false;
                 clone.setAttribute('playsinline', '');
                 workLightboxMedia.appendChild(clone);
                 activeWorkVideo = clone;
                 clone.play().catch(() => {});
+            } else if (img) {
+                const clone = img.cloneNode(true);
+                clone.removeAttribute('hidden');
+                workLightboxMedia.appendChild(clone);
             }
+
+            renderWorkLightboxDetails(item);
 
             workLightbox.classList.add('is-open');
             workLightbox.setAttribute('aria-hidden', 'false');
@@ -1941,10 +2438,32 @@
             workLightbox.setAttribute('aria-hidden', 'true');
             document.body.style.overflow = '';
             clearWorkLightboxMedia();
+            hideWorkLightboxDetails();
         }
 
         workItems.forEach(item => {
             item.addEventListener('click', () => openWorkLightbox(item));
+        });
+
+        // Hover-to-play teaser thumbnails on work tiles.
+        document.querySelectorAll('.work-item-thumb').forEach(thumb => {
+            const host = thumb.closest('.work-item');
+            if (!host) return;
+
+            const playThumb = () => {
+                host.classList.add('is-previewing');
+                thumb.play().catch(() => {});
+            };
+            const stopThumb = () => {
+                host.classList.remove('is-previewing');
+                thumb.pause();
+                thumb.currentTime = 0;
+            };
+
+            host.addEventListener('mouseenter', playThumb);
+            host.addEventListener('mouseleave', stopThumb);
+            host.addEventListener('focus', playThumb);
+            host.addEventListener('blur', stopThumb);
         });
 
         workLightboxClose?.addEventListener('click', closeWorkLightbox);
