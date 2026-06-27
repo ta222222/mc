@@ -572,9 +572,11 @@
             text-underline-offset: 4px;
         }
 
-        /* Titled work tiles (e.g. Vibram, Giorgio Armani) */
+        /* Titled work tiles (e.g. Vibram, Giorgio Armani, Barbour, Prada Mode) */
         .work-item--vibram,
-        .work-item--armani {
+        .work-item--armani,
+        .work-item--barbour,
+        .work-item--prada {
             position: relative;
             overflow: hidden;
         }
@@ -609,6 +611,25 @@
         .work-item--vibram.is-previewing video.work-item-thumb {
             filter: blur(5px);
             transform: scale(1.04);
+        }
+
+        /* Muted teaser video that fades in over a still placeholder on hover */
+        .work-item .work-item-hover-video {
+            display: block;
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 0.4s cubic-bezier(0.3, 0, 0.1, 1);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .work-item:hover .work-item-hover-video,
+        .work-item.is-previewing .work-item-hover-video {
+            opacity: 1;
         }
 
         /* Hover carousel that crossfades through the Armani gallery images */
@@ -749,6 +770,31 @@
             opacity: 0.85;
         }
 
+        .wl-detail-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 16px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #ffffff;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+            padding-bottom: 3px;
+            transition: border-color 0.25s ease, opacity 0.25s ease;
+        }
+
+        .wl-detail-link::after {
+            content: "\2197";
+            font-size: 13px;
+        }
+
+        .wl-detail-link:hover {
+            border-bottom-color: #ffffff;
+        }
+
         /* --- SWISS REVEAL: project lightbox motion --- */
         .work-lightbox-details {
             opacity: 0;
@@ -769,7 +815,8 @@
         .wl-detail-eyebrow,
         .wl-detail-title,
         .wl-detail-list,
-        .wl-detail-desc {
+        .wl-detail-desc,
+        .wl-detail-link {
             opacity: 0;
             will-change: transform, opacity;
         }
@@ -821,6 +868,10 @@
 
         .work-lightbox.is-open.is-project .wl-detail-desc {
             animation: wl-text-in 0.5s cubic-bezier(0.3, 0, 0.1, 1) 0.52s both;
+        }
+
+        .work-lightbox.is-open.is-project .wl-detail-link:not([hidden]) {
+            animation: wl-text-in 0.5s cubic-bezier(0.3, 0, 0.1, 1) 0.6s both;
         }
 
         @keyframes wl-card-in {
@@ -1685,13 +1736,6 @@
                     </video>
                 </div>
                 <div class="image-slot image-slot--highlight">Image</div>
-                <div class="image-slot image-slot--photo" id="first-image-slot">
-                    <img src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/prada%20mode%20ldn%20screenshot.png" alt="Prada Mode London" />
-                    <!-- <video class="slot-video" playsinline preload="metadata" aria-label="Prada Mode London">
-                        <source src="https://github.com/ta222222/mc/raw/refs/heads/main/prada+mode+london+25.webm" type="video/webm" />
-                    </video> -->
-                </div>
-                <div class="image-slot image-slot--highlight">Image</div>
                 <div class="image-slot image-slot--photo image-slot--carousel-video image-slot--video" id="kaytranada-video-slot" data-carousel-video>
                     <img
                         class="kaytranada-end-image"
@@ -1701,10 +1745,6 @@
                     <video class="slot-video" playsinline preload="metadata" aria-label="Kaytranada">
                         <source src="https://github.com/ta222222/mc/raw/refs/heads/main/Kaytranada%20(VF1,%204x5,%20H264).webm" type="video/webm" />
                     </video>
-                </div>
-                <div class="image-slot image-slot--cyan">Image</div>
-                <div class="image-slot image-slot--photo">
-                    <img src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/hypebeast%20barbour.jpg" alt="Hypebeast Barbour" />
                 </div>
             </div>
         </div>
@@ -1742,8 +1782,37 @@
                 <img class="work-gallery-img" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_179_4x5.jpg" alt="Giorgio Armani featuring Kaytranada" hidden />
                 <img class="work-gallery-img" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_HERO_063_4x5_CLAIM-small.jpg" alt="Giorgio Armani featuring Kaytranada — That's so Armani" hidden />
             </button>
-            <button type="button" class="work-item" aria-label="View work 2"><span class="work-item-mark" aria-hidden="true">?</span></button>
-            <button type="button" class="work-item" aria-label="View work 4"><span class="work-item-mark" aria-hidden="true">?</span></button>
+            <button type="button" class="work-item work-item--barbour" aria-label="View Barbour Heritage+ campaign"
+                data-project-title="Barbour"
+                data-project-eyebrow="Campaign"
+                data-project-year="2024"
+                data-project-client="Barbour"
+                data-project-role="Associate Creative Director"
+                data-project-talent="Bafic & KwolleM"
+                data-project-format="Heritage+ Collection"
+                data-project-description="A heritage campaign for Barbour's Heritage+ collection, in partnership with Hypebeast — exploring heritage, legacy and craft with photographer/director Bafic and producer KwolleM."
+                data-project-link="https://hypebeast.com/2024/9/barbour-bafic-kwollem-heritage-collection-campaign-video"
+                data-project-link-label="Read the editorial on Hypebeast">
+                <img class="work-item-thumb" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/hypebeast%20barbour.jpg" alt="Barbour Heritage+ campaign for Hypebeast" />
+                <span class="work-item-label" aria-hidden="true">Barbour</span>
+            </button>
+            <button type="button" class="work-item work-item--prada" aria-label="View Prada Mode London"
+                data-project-title="Prada Mode London"
+                data-project-eyebrow="Event Film"
+                data-project-year="2025"
+                data-project-client="Prada"
+                data-project-role="Creative Direction"
+                data-project-format="Short Film"
+                data-project-description="Prada Mode's London edition — the brand's travelling members' club bringing art, music and conversation together for a singular cultural moment.">
+                <img class="work-item-thumb" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/prada%20mode%20ldn%20screenshot.png" alt="Prada Mode London" />
+                <video class="work-item-hover-video" muted loop playsinline preload="metadata" aria-hidden="true">
+                    <source src="https://github.com/ta222222/mc/raw/refs/heads/main/prada+mode+london+25.webm" type="video/webm" />
+                </video>
+                <span class="work-item-label" aria-hidden="true">Prada Mode</span>
+                <video class="slot-video work-full-video" playsinline preload="metadata" muted aria-label="Prada Mode London">
+                    <source src="https://github.com/ta222222/mc/raw/refs/heads/main/prada+mode+london+25.webm" type="video/webm" />
+                </video>
+            </button>
             <button type="button" class="work-item" aria-label="View work 5"><span class="work-item-mark" aria-hidden="true">?</span></button>
             <button type="button" class="work-item" aria-label="View work 6"><span class="work-item-mark" aria-hidden="true">?</span></button>
         </div>
@@ -1759,6 +1828,7 @@
                 <h3 class="wl-detail-title" id="wl-detail-title"></h3>
                 <dl class="wl-detail-list" id="wl-detail-list"></dl>
                 <p class="wl-detail-desc" id="wl-detail-desc"></p>
+                <a class="wl-detail-link" id="wl-detail-link" target="_blank" rel="noopener" hidden></a>
             </aside>
         </div>
     </div>
@@ -1822,12 +1892,12 @@
                     </div>
                     <div class="info-toggle">
                         <button type="button" class="info-toggle-trigger" aria-expanded="false">
-                            <span>*Latest Radio Show(s)*</span>
+                            <span>Latest Radio Show(s)</span>
                             <span class="info-toggle-icon" aria-hidden="true">+</span>
                         </button>
                         <div class="info-toggle-panel">
                             <div class="info-toggle-inner">
-                                <p>A monthly two-hour selection recorded for online radio — basically a musical diary of whatever's been on rotation lately.</p>
+                                <p>A monthly two-hour selection recorded for online radio — part DBAC, part personal diary of whatever's been on rotation.</p>
                                 <p><a href="https://soundcloud.com/loosefm/maude-28-may-26" target="_blank" rel="noopener">Latest show — LOOSE.fm, 28 May '26</a></p>
                                 <p><a href="https://www.mixcloud.com/maudechurchill/" target="_blank" rel="noopener">Browse the full radio archive</a></p>
                             </div>
@@ -2556,6 +2626,7 @@
         const wlDetailTitle = document.getElementById('wl-detail-title');
         const wlDetailList = document.getElementById('wl-detail-list');
         const wlDetailDesc = document.getElementById('wl-detail-desc');
+        const wlDetailLink = document.getElementById('wl-detail-link');
         let activeWorkVideo = null;
 
         function clearWorkLightboxMedia() {
@@ -2616,6 +2687,11 @@
             if (wlDetailTitle) wlDetailTitle.textContent = '';
             if (wlDetailList) wlDetailList.innerHTML = '';
             if (wlDetailDesc) wlDetailDesc.textContent = '';
+            if (wlDetailLink) {
+                wlDetailLink.hidden = true;
+                wlDetailLink.removeAttribute('href');
+                wlDetailLink.textContent = '';
+            }
         }
 
         function renderWorkLightboxDetails(item) {
@@ -2647,6 +2723,18 @@
             }
 
             if (wlDetailDesc) wlDetailDesc.textContent = data.projectDescription || '';
+
+            if (wlDetailLink) {
+                if (data.projectLink) {
+                    wlDetailLink.href = data.projectLink;
+                    wlDetailLink.textContent = data.projectLinkLabel || 'View editorial';
+                    wlDetailLink.hidden = false;
+                } else {
+                    wlDetailLink.hidden = true;
+                    wlDetailLink.removeAttribute('href');
+                    wlDetailLink.textContent = '';
+                }
+            }
 
             workLightboxDetails.hidden = false;
             workLightbox?.classList.add('is-project');
@@ -2723,6 +2811,26 @@
             host.addEventListener('mouseleave', stopThumb);
             host.addEventListener('focus', playThumb);
             host.addEventListener('blur', stopThumb);
+        });
+
+        // Muted teaser videos that play over a still placeholder on hover.
+        document.querySelectorAll('.work-item-hover-video').forEach(video => {
+            const host = video.closest('.work-item');
+            if (!host) return;
+
+            const playPreview = () => {
+                video.muted = true;
+                video.play().catch(() => {});
+            };
+            const stopPreview = () => {
+                video.pause();
+                video.currentTime = 0;
+            };
+
+            host.addEventListener('mouseenter', playPreview);
+            host.addEventListener('mouseleave', stopPreview);
+            host.addEventListener('focus', playPreview);
+            host.addEventListener('blur', stopPreview);
         });
 
         // Armani tile: on hover, slowly crossfade through all gallery images,
