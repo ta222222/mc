@@ -611,6 +611,35 @@
             transform: scale(1.04);
         }
 
+        /* Hover carousel that crossfades through the Armani gallery images */
+        .work-carousel {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .work-item .work-carousel-img {
+            display: block;
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 1.2s ease-in-out;
+        }
+
+        .work-item .work-carousel-img.is-active {
+            opacity: 1;
+        }
+
+        @media (min-width: 869px) {
+            .work-item--armani .work-carousel-img {
+                object-position: center top;
+            }
+        }
+
         .work-item-label {
             position: absolute;
             z-index: 2;
@@ -2683,18 +2712,74 @@
 
             const playThumb = () => {
                 host.classList.add('is-previewing');
-                thumb.play().catch(() => {});
+                if (typeof thumb.play === 'function') thumb.play().catch(() => {});
             };
             const stopThumb = () => {
                 host.classList.remove('is-previewing');
-                thumb.pause();
-                thumb.currentTime = 0;
+                if (typeof thumb.pause === 'function') thumb.pause();
+                if ('currentTime' in thumb) thumb.currentTime = 0;
             };
 
             host.addEventListener('mouseenter', playThumb);
             host.addEventListener('mouseleave', stopThumb);
             host.addEventListener('focus', playThumb);
             host.addEventListener('blur', stopThumb);
+        });
+
+        // Armani tile: on hover, slowly crossfade through all gallery images,
+        // then reset back to the first image when the pointer leaves.
+        document.querySelectorAll('.work-item--armani').forEach(host => {
+            const sources = Array.from(host.querySelectorAll('.work-gallery-img'))
+                .map(node => node.getAttribute('src'))
+                .filter(Boolean);
+            if (sources.length < 2) return;
+
+            const carousel = document.createElement('div');
+            carousel.className = 'work-carousel';
+            carousel.setAttribute('aria-hidden', 'true');
+
+            const layers = sources.map((src, i) => {
+                const layer = document.createElement('img');
+                layer.className = 'work-carousel-img' + (i === 0 ? ' is-active' : '');
+                layer.src = src;
+                layer.alt = '';
+                layer.loading = 'lazy';
+                carousel.appendChild(layer);
+                return layer;
+            });
+
+            const thumb = host.querySelector('.work-item-thumb');
+            if (thumb && thumb.parentNode) {
+                thumb.parentNode.insertBefore(carousel, thumb.nextSibling);
+            } else {
+                host.appendChild(carousel);
+            }
+
+            let index = 0;
+            let timer = null;
+
+            const setActive = (next) => {
+                layers[index].classList.remove('is-active');
+                index = next;
+                layers[index].classList.add('is-active');
+            };
+
+            const startCarousel = () => {
+                if (timer) return;
+                setActive((index + 1) % layers.length);
+                timer = setInterval(() => {
+                    setActive((index + 1) % layers.length);
+                }, 1800);
+            };
+            const stopCarousel = () => {
+                if (timer) { clearInterval(timer); timer = null; }
+                setActive(0);
+            };
+
+            host.addEventListener('mouseenter', startCarousel);
+            host.addEventListener('mouseleave', stopCarousel);
+            host.addEventListener('focus', startCarousel);
+            host.addEventListener('blur', stopCarousel);
         });
 
         workLightboxClose?.addEventListener('click', closeWorkLightbox);
