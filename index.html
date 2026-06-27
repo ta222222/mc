@@ -293,6 +293,12 @@
             animation: first-slide-fade-in 1.1s cubic-bezier(0.25, 0.1, 0.25, 1) 0.2s forwards;
         }
 
+        /* Fade the Armani slot in on load, exactly like the Vibram video. */
+        #kaytranada-video-slot {
+            opacity: 0;
+            animation: first-slide-fade-in 1.1s cubic-bezier(0.25, 0.1, 0.25, 1) 0.2s forwards;
+        }
+
         #vibram-video-slot.image-slot--video .slot-video {
             opacity: 0;
         }
@@ -380,6 +386,11 @@
             line-height: 0;
             background: transparent;
             position: relative;
+            /* Fill the stage exactly (overrides the base 16/9 slot ratio) so no
+               grey/white background strip is ever exposed behind the media. */
+            aspect-ratio: auto;
+            height: 100%;
+            align-self: stretch;
         }
 
         #kaytranada-video-slot.image-slot--video .slot-video {
@@ -397,9 +408,25 @@
             height: 100%;
             object-fit: contain;
             object-position: center;
-            opacity: 0;
+            /* Kept fully opaque as the backdrop behind the video. This avoids a
+               flash of the grey/white page showing through during crossfades or
+               transient states (the video simply fades in/out on top of it). */
+            opacity: 1;
             pointer-events: none;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
             transition: opacity 0.35s cubic-bezier(0.3, 0, 0.1, 1);
+        }
+
+        /* Promote the video to its own GPU layer so its edges don't shimmer /
+           leave a 1px flickering line against the background during playback. */
+        #kaytranada-video-slot .slot-video {
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
         }
 
         #kaytranada-video-slot.is-ended .kaytranada-end-image {
@@ -424,6 +451,28 @@
             opacity: 0;
         }
 
+        /* Black cover used for the cinematic vibram -> armani transition: the
+           slide arrives black, then this layer fades away to reveal the content.
+           Relaxed fade for the still photo; swift fade for the video. */
+        .kaytranada-cover {
+            position: absolute;
+            inset: 0;
+            z-index: 5;
+            background: #000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.85s cubic-bezier(0.3, 0, 0.1, 1);
+        }
+
+        #kaytranada-video-slot.is-entering .kaytranada-cover {
+            opacity: 1;
+            transition: none;
+        }
+
+        #kaytranada-video-slot.reveal-swift .kaytranada-cover {
+            transition: opacity 0.32s cubic-bezier(0.3, 0, 0.1, 1);
+        }
+
         .image-slot--carousel-video video {
             object-fit: contain;
             object-position: center;
@@ -431,12 +480,12 @@
         }
 
         .image-slot--highlight {
-            background: rgb(222, 222, 222);
+            background: rgb(0, 0, 0);
             color: #000000;
         }
 
         .image-slot--cyan {
-            background: rgb(222, 222, 222);
+            background: rgb(0, 0, 0);
             color: #000000;
         }
 
@@ -1792,6 +1841,7 @@
                     <video class="slot-video" playsinline preload="metadata" aria-label="Kaytranada">
                         <source src="https://github.com/ta222222/mc/raw/refs/heads/main/Kaytranada%20(VF1,%204x5,%20H264).webm" type="video/webm" />
                     </video>
+                    <div class="kaytranada-cover" aria-hidden="true"></div>
                 </div>
             </div>
         </div>
@@ -2306,7 +2356,8 @@
 
             clearKaytranadaTapTimer();
             kaytranadaLastTap = 0;
-            const showStill = Math.random() < 0.5;
+            // Favour the "That's so Armani" still so the photo appears more often.
+            const showStill = Math.random() < 0.7;
             if (showStill) {
                 kaytranadaHasEnded = true;
                 kaytranadaPausedByUser = true;
@@ -2323,12 +2374,23 @@
 
         // When the Vibram film finishes, glide the carousel over to the Armani
         // slide and present it (still image or video, chosen at random).
+        // Restart the fade-in animation so the Armani slot eases back in (same
+        // effect the Vibram video uses on page load).
+        function fadeInKaytranadaSlot() {
+            if (!kaytranadaVideoSlot) return;
+            kaytranadaVideoSlot.style.animation = 'none';
+            // Force a reflow so the animation can be retriggered.
+            void kaytranadaVideoSlot.offsetWidth;
+            kaytranadaVideoSlot.style.animation = '';
+        }
+
         function advanceToKaytranadaSlide() {
             if (!imageTrack || kaytranadaSlideIndex < 0) return;
             pauseVibramSlotVideo();
             prepareKaytranadaPresentation();
             imageIndex = kaytranadaSlideIndex;
             updateImageCarousel();
+            fadeInKaytranadaSlot();
         }
 
         function syncCarouselLayout() {
