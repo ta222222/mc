@@ -920,21 +920,40 @@
         }
 
         @media (max-width: 868px) {
+            /* Stack the photo above the details modal and size both to the device so they
+               fit comfortably on small screens (e.g. iPhone 15 Pro), with even spacing. */
             .work-lightbox.is-gallery .work-lightbox-panel {
-                width: auto;
-                max-width: 92vw;
+                flex-direction: column;
                 align-items: center;
+                justify-content: center;
+                width: min(92vw, 440px);
+                max-width: 92vw;
+                max-height: 92dvh;
+                gap: clamp(12px, 3.2vw, 20px);
+                overflow-y: auto;
+                padding-block: clamp(8px, 2vw, 16px);
             }
 
             .work-lightbox.is-gallery .work-lightbox-media {
+                height: 46dvh;
                 width: auto;
-                height: 50dvh;
-                max-height: 50dvh;
+                aspect-ratio: 4 / 5;
+                max-width: 92vw;
+                flex: 0 0 auto;
                 align-self: center;
             }
 
             .work-lightbox.is-gallery .work-lightbox-details {
+                position: static;
+                inset: auto;
+                transform: none;
                 width: 100%;
+                flex: 0 0 auto;
+                padding: clamp(16px, 4vw, 22px);
+            }
+
+            .work-lightbox.is-open.is-gallery .work-lightbox-details {
+                animation: wl-card-in-mobile 0.55s cubic-bezier(0.3, 0, 0.1, 1) 0.05s both;
             }
         }
 
@@ -1431,29 +1450,37 @@
                 columns: 2;
             }
 
-            /* "More" accordions expand upward (float above trigger), and the client list
-               smartly collapses while open so the rest of Information stays visible. */
-            .info-toggle {
+            /* "More" accordions reveal upward into the freed client-list space. The panel
+               floats above the whole More block (not the individual trigger), so the "More"
+               title and its triggers stay visible, with a gap separating the revealed content
+               from the About/Clients section above. */
+            .info-body {
                 position: relative;
+            }
+
+            .info-toggle {
+                position: static;
             }
 
             .info-toggle-panel {
                 position: absolute;
                 left: 0;
                 right: 0;
-                bottom: 100%;
+                bottom: calc(100% + clamp(20px, 5vw, 32px));
                 z-index: 60;
                 background-color: var(--bg-color);
             }
 
             .info-toggle.is-open .info-toggle-panel {
-                box-shadow: 0 -12px 28px rgba(0, 0, 0, 0.5);
+                box-shadow: 0 16px 30px rgba(0, 0, 0, 0.5);
             }
 
+            /* Keep the client list's space reserved (don't collapse its height) but hide it,
+               so the upward-floating panel reveals into that blank space instead of
+               overlapping the About text above it. */
             #information.is-more-open .info-clients {
-                max-height: 0;
                 opacity: 0;
-                margin-top: 0;
+                visibility: hidden;
                 pointer-events: none;
             }
 
@@ -1775,7 +1802,7 @@
                             <div class="info-toggle-inner">
                                 <p>A monthly two-hour selection recorded for online radio — part DBAC, part personal diary of whatever's been on rotation.</p>
                                 <p><a href="https://soundcloud.com/loosefm/maude-28-may-26" target="_blank" rel="noopener">Latest show — LOOSE.fm, 28 May '26 ↗</a></p>
-                                <p><a href="https://www.mixcloud.com/maudechurchill/" target="_blank" rel="noopener">Browse the full radio archive ↗</a></p>
+                                <p><a href="https://www.mixcloud.com/maudechurchill/" target="_blank" rel="noopener">Browse the full radio archive</a></p>
                             </div>
                         </div>
                     </div>
@@ -1800,13 +1827,34 @@
             informationSection.classList.toggle('is-more-open', anyOpen);
         }
 
-        document.querySelectorAll('.info-toggle-trigger').forEach(trigger => {
+        const infoToggleTriggers = document.querySelectorAll('.info-toggle-trigger');
+
+        function closeInfoToggle(trigger) {
+            const toggle = trigger.closest('.info-toggle');
+            const panel = trigger.nextElementSibling;
+            if (!toggle || !panel) return;
+            trigger.setAttribute('aria-expanded', 'false');
+            toggle.classList.remove('is-open');
+            panel.style.maxHeight = '0px';
+        }
+
+        infoToggleTriggers.forEach(trigger => {
             const toggle = trigger.closest('.info-toggle');
             const panel = trigger.nextElementSibling;
             if (!toggle || !panel) return;
 
             trigger.addEventListener('click', () => {
                 const isOpen = trigger.getAttribute('aria-expanded') === 'true';
+
+                // Accordion: only one item open at a time — close any other open item first.
+                if (!isOpen) {
+                    infoToggleTriggers.forEach(other => {
+                        if (other !== trigger && other.getAttribute('aria-expanded') === 'true') {
+                            closeInfoToggle(other);
+                        }
+                    });
+                }
+
                 trigger.setAttribute('aria-expanded', String(!isOpen));
                 toggle.classList.toggle('is-open', !isOpen);
                 panel.style.maxHeight = isOpen ? '0px' : `${panel.scrollHeight}px`;
