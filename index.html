@@ -1420,31 +1420,41 @@
 
             .info-clients {
                 margin-top: clamp(32px, 8vw, 44px);
+                overflow: hidden;
+                max-height: 800px;
+                transition: max-height 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                            opacity 0.4s ease,
+                            margin 0.6s cubic-bezier(0.16, 1, 0.3, 1);
             }
 
             .info-clients-list {
                 columns: 2;
             }
 
-            /* Smart "More": opening an item collapses the About column (incl. clients)
-               and pushes the content above up so the expanded item reads properly. */
-            .info-body--about {
-                overflow: hidden;
-                max-height: 1500px;
-                transition: max-height 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-                            opacity 0.4s ease,
-                            margin 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            /* "More" accordions expand upward (float above trigger), and the client list
+               smartly collapses while open so the rest of Information stays visible. */
+            .info-toggle {
+                position: relative;
             }
 
-            #information.is-more-open .info-body--about {
+            .info-toggle-panel {
+                position: absolute;
+                left: 0;
+                right: 0;
+                bottom: 100%;
+                z-index: 60;
+                background-color: var(--bg-color);
+            }
+
+            .info-toggle.is-open .info-toggle-panel {
+                box-shadow: 0 -12px 28px rgba(0, 0, 0, 0.5);
+            }
+
+            #information.is-more-open .info-clients {
                 max-height: 0;
                 opacity: 0;
-                margin-bottom: 0;
+                margin-top: 0;
                 pointer-events: none;
-            }
-
-            #information.is-more-open .info-grid {
-                gap: 0;
             }
 
             #clients .info-grid {
@@ -1706,7 +1716,6 @@
                 <p class="info-section-label">About</p>
                 <p>Maude Churchill is a London-based creative director with over a decade of experience working at the intersection of fashion, music and youth culture. She builds campaigns, brand worlds and cultural moments that feel native to the communities they speak to.</p>
                 <p>Her practice moves fluidly between art direction, brand strategy and production — translating loose ideas into coherent visual systems, and partnering with photographers, designers, musicians and studios to bring them to life across film, print and live experience.</p>
-                <p>She came up through editorial before moving into insights and creative strategy — a trajectory that lends her direction a rare, holistic fluency, equally at ease with a cultural thesis and the image that proves it. Her favourite work begins inside a brand's core values and carries them outward, communicating with an audience by plugging into the cultural zeitgeist through the right creative talent at the right moment.</p>
                 <p>She is also co-founder of Don't Be A Creep, a music and arts initiative that works closely with festivals and venues to build safer, more inclusive spaces through creative campaigns — evidence of a practice in which cultural relevance and genuine care are never mutually exclusive.</p>
                 <p>Currently based in London, working internationally.</p>
                 <div class="info-clients">
@@ -2677,6 +2686,14 @@
             return window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
         }
 
+        // The Information section now holds About, Clients, More and Contact, so it can be
+        // taller than the viewport. Only snap its top into view when the whole section fits;
+        // otherwise snapping up would hide the newly added bottom content (Contact).
+        function informationFitsViewport() {
+            if (!infoSection) return false;
+            return infoSection.getBoundingClientRect().height <= window.innerHeight + 2;
+        }
+
         let bottomSnapTimer = null;
         let snapReleaseTimer = null;
         let isSnapping = false;
@@ -2684,6 +2701,7 @@
 
         function shouldSnapInformationOnMobile() {
             if (!hasUserScrolled || !infoSection || isInformationAligned()) return false;
+            if (!informationFitsViewport()) return false;
             return isAtPageBottom();
         }
 
