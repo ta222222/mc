@@ -293,7 +293,7 @@
             animation: first-slide-fade-in 1.1s cubic-bezier(0.25, 0.1, 0.25, 1) 0.2s forwards;
         }
 
-        /* Fade the Armani slot in on load, exactly like the Vibram video. */
+        /* Fade the Armani slot in with the same basic fade the Vibram slot uses. */
         #kaytranada-video-slot {
             opacity: 0;
             animation: first-slide-fade-in 1.1s cubic-bezier(0.25, 0.1, 0.25, 1) 0.2s forwards;
@@ -313,8 +313,12 @@
         }
 
         #vibram-video-slot .slot-video {
-            object-fit: contain;
+            object-fit: cover;
             object-position: center;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
         }
 
         .image-track {
@@ -384,7 +388,7 @@
         .image-slot--carousel-video {
             padding: 0;
             line-height: 0;
-            background: transparent;
+            background: #000;
             position: relative;
             /* Fill the stage exactly (overrides the base 16/9 slot ratio) so no
                grey/white background strip is ever exposed behind the media. */
@@ -403,14 +407,8 @@
 
         .kaytranada-end-image {
             position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            object-position: center;
-            /* Kept fully opaque as the backdrop behind the video. This avoids a
-               flash of the grey/white page showing through during crossfades or
-               transient states (the video simply fades in/out on top of it). */
+            /* Opaque backdrop behind the video (prevents flicker); the whole slot
+               fades in together via the basic Vibram-style fade above. */
             opacity: 1;
             pointer-events: none;
             -webkit-transform: translateZ(0);
@@ -420,13 +418,25 @@
             transition: opacity 0.35s cubic-bezier(0.3, 0, 0.1, 1);
         }
 
-        /* Promote the video to its own GPU layer so its edges don't shimmer /
-           leave a 1px flickering line against the background during playback. */
-        #kaytranada-video-slot .slot-video {
+        /* Promote carousel media to their own GPU layers and bleed 1px past the
+           slot edges so subpixel gaps never show as hairlines during playback. */
+        #kaytranada-video-slot .slot-video,
+        #kaytranada-video-slot .kaytranada-end-image {
+            inset: -1px;
+            width: calc(100% + 2px);
+            height: calc(100% + 2px);
+            object-fit: cover;
+            object-position: center;
             -webkit-transform: translateZ(0);
             transform: translateZ(0);
             -webkit-backface-visibility: hidden;
             backface-visibility: hidden;
+        }
+
+        #vibram-video-slot .slot-video {
+            inset: -1px;
+            width: calc(100% + 2px);
+            height: calc(100% + 2px);
         }
 
         #kaytranada-video-slot.is-ended .kaytranada-end-image {
@@ -461,7 +471,12 @@
             background: #000;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.85s cubic-bezier(0.3, 0, 0.1, 1);
+            /* Subtle, light reveal for the still — matches the accordion fade. */
+            transition: opacity 0.45s ease 0.05s;
+        }
+
+        #kaytranada-video-slot.reveal-swift .kaytranada-cover {
+            transition: opacity 0.32s cubic-bezier(0.3, 0, 0.1, 1);
         }
 
         #kaytranada-video-slot.is-entering .kaytranada-cover {
@@ -469,12 +484,8 @@
             transition: none;
         }
 
-        #kaytranada-video-slot.reveal-swift .kaytranada-cover {
-            transition: opacity 0.32s cubic-bezier(0.3, 0, 0.1, 1);
-        }
-
         .image-slot--carousel-video video {
-            object-fit: contain;
+            object-fit: cover;
             object-position: center;
             cursor: pointer;
         }
@@ -1325,6 +1336,20 @@
             max-width: 700px;
         }
 
+        .info-body a {
+            color: var(--text-color);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .info-links {
+            margin-top: clamp(28px, 4vw, 48px);
+        }
+
+        .info-links p {
+            margin-bottom: 8px;
+        }
+
         /* --- CLIENTS GRID (dense contact-sheet) --- */
         .clients-wrap {
             width: var(--stage-width);
@@ -1750,11 +1775,11 @@
             .image-slot--carousel-video.image-slot--video .slot-video,
             .image-slot--carousel-video .kaytranada-end-image {
                 position: absolute;
-                inset: 0;
-                width: 100%;
-                height: 100%;
-                min-height: 100%;
-                object-fit: contain;
+                inset: -1px;
+                width: calc(100% + 2px);
+                height: calc(100% + 2px);
+                min-height: calc(100% + 2px);
+                object-fit: cover;
                 object-position: center;
             }
         }
@@ -1945,10 +1970,17 @@
         <div class="info-grid">
             <div class="info-body info-body--about">
                 <p class="info-section-label">About</p>
-                <p>Maude Churchill is a London-based creative director with over a decade of experience working at the intersection of fashion, music and youth culture. She builds campaigns, brand worlds and cultural moments that feel native to the communities they speak to.</p>
-                <p>Her practice moves fluidly between art direction, brand strategy and production — translating loose ideas into coherent visual systems, and partnering with photographers, designers, musicians and studios to bring them to life across film, print and live experience.</p>
-                <p>She is also co-founder of Don't Be A Creep, a music and arts initiative that works closely with festivals and venues to build safer, more inclusive spaces through creative campaigns — evidence of a practice in which cultural relevance and genuine care are never mutually exclusive.</p>
-                <p>Currently in London, working internationally.</p>
+                <p>Maude Churchill is one of few female creative directors working primarily across music and fashion, creating content campaigns and events from creative conception to delivery.</p>
+                <p>A background in editorial helps her craft stories.
+                    <p>Experience with insights provides a qualitative understanding of the audience.</p>
+                <p>Enough time spent at parties to know what brings people to events + keeps them there.</p>
+                <p>Co-founder of Don't Be A Creep, Maude works directly with music venues and festivals to help safeguard attendees by establishing wellbeing processes and communicating them through visual campaigns.</p>
+                <p>In her spare time Maude DJs for brand events, parties and on the radio</p>
+                <div class="info-links">
+                    <p class="info-section-label">Links</p>
+                    <p><a href="https://ra.co/news/75750" target="_blank" rel="noopener">RA article</a></p>
+                    <p><a href="https://www.buildhollywood.co.uk/features/the-artists-and-djs-de-creeping-festivals/" target="_blank" rel="noopener">Build Hollywood Interview</a></p>
+                </div>
                 <div class="info-clients">
                     <p class="info-section-label">Clients</p>
                     <ul class="info-clients-list">
@@ -2175,6 +2207,25 @@
         const kaytranadaSlideIndex = kaytranadaVideoSlot && imageTrack
             ? Array.from(imageTrack.children).indexOf(kaytranadaVideoSlot)
             : -1;
+
+        // Armani stills to rotate between whenever the photo is shown.
+        const kaytranadaStillSources = [
+            'https://github.com/ta222222/mc/blob/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_HERO_063_4x5_CLAIM-small.jpg?raw=true',
+            'https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_179_4x5.jpg'
+        ];
+        // Preload both so swapping never flashes.
+        kaytranadaStillSources.forEach(src => { const img = new Image(); img.src = src; });
+
+        // Pick a random Armani still and apply it to the slot's image.
+        function pickKaytranadaStill() {
+            if (!kaytranadaEndImage) return;
+            const next = kaytranadaStillSources[
+                Math.floor(Math.random() * kaytranadaStillSources.length)
+            ];
+            if (kaytranadaEndImage.getAttribute('src') !== next) {
+                kaytranadaEndImage.src = next;
+            }
+        }
         const mobileCarouselQuery = window.matchMedia('(max-width: 868px)');
         let imageIndex = 0;
         let kaytranadaPausedByUser = false;
@@ -2287,10 +2338,10 @@
             kaytranadaPausedByUser = true;
             kaytranadaSlotVideo.pause();
 
-            if (mobileCarouselQuery.matches) {
-                kaytranadaVideoSlot.classList.remove('is-playing');
-                kaytranadaVideoSlot.classList.add('is-ended');
-            }
+            // Always reveal the "That's so Armani" still when the video ends,
+            // on every device (not just mobile).
+            kaytranadaVideoSlot.classList.remove('is-playing');
+            kaytranadaVideoSlot.classList.add('is-ended');
         }
 
         function restartKaytranadaVideo() {
@@ -2356,7 +2407,9 @@
 
             clearKaytranadaTapTimer();
             kaytranadaLastTap = 0;
-            // Favour the "That's so Armani" still so the photo appears more often.
+            // Rotate the Armani still between its variants each time it's shown.
+            pickKaytranadaStill();
+            // Favour the still so the photo appears more often.
             const showStill = Math.random() < 0.7;
             if (showStill) {
                 kaytranadaHasEnded = true;
@@ -2372,25 +2425,45 @@
             }
         }
 
-        // When the Vibram film finishes, glide the carousel over to the Armani
-        // slide and present it (still image or video, chosen at random).
-        // Restart the fade-in animation so the Armani slot eases back in (same
-        // effect the Vibram video uses on page load).
-        function fadeInKaytranadaSlot() {
-            if (!kaytranadaVideoSlot) return;
-            kaytranadaVideoSlot.style.animation = 'none';
-            // Force a reflow so the animation can be retriggered.
-            void kaytranadaVideoSlot.offsetWidth;
-            kaytranadaVideoSlot.style.animation = '';
-        }
+        // Elegant, relaxed iOS-style swipe + a brief black hold before the
+        // Armani content reveals.
+        const KAYTRANADA_SWIPE_MS = 720;
+        const KAYTRANADA_BLACK_HOLD_MS = 120;
+        let kaytranadaRevealTimer = null;
 
+        // When the Vibram film finishes, glide the carousel over to the Armani
+        // slide. The slide arrives fully black, then the content fades in: the
+        // still photo eases in slowly; the video snaps in swiftly on purpose.
         function advanceToKaytranadaSlide() {
             if (!imageTrack || kaytranadaSlideIndex < 0) return;
             pauseVibramSlotVideo();
             prepareKaytranadaPresentation();
+
+            const isVideoPresentation = !kaytranadaHasEnded;
+
+            if (kaytranadaRevealTimer) {
+                window.clearTimeout(kaytranadaRevealTimer);
+                kaytranadaRevealTimer = null;
+            }
+
+            // Black out the Armani slide instantly and pick the reveal speed.
+            kaytranadaVideoSlot?.classList.add('is-entering');
+            kaytranadaVideoSlot?.classList.toggle('reveal-swift', isVideoPresentation);
+
+            // Relaxed, decelerating swipe (easeOutQuint) for this one move.
+            imageTrack.style.transition =
+                `transform ${KAYTRANADA_SWIPE_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`;
+
             imageIndex = kaytranadaSlideIndex;
             updateImageCarousel();
-            fadeInKaytranadaSlot();
+
+            // After the swipe settles (plus a short black hold), fade the cover
+            // away to reveal the content, then restore the default transition.
+            kaytranadaRevealTimer = window.setTimeout(() => {
+                kaytranadaRevealTimer = null;
+                kaytranadaVideoSlot?.classList.remove('is-entering');
+                imageTrack.style.transition = '';
+            }, KAYTRANADA_SWIPE_MS + KAYTRANADA_BLACK_HOLD_MS);
         }
 
         function syncCarouselLayout() {
@@ -2934,17 +3007,24 @@
 
         mobileCarouselQuery.addEventListener('change', syncCarouselLayout);
 
-        // On each page load, randomly start on either the Vibram video or the
-        // Giorgio Armani (Kaytranada) video — one or the other, never both.
-        const randomStartSlides = [vibramSlideIndex, kaytranadaSlideIndex]
-            .filter(index => index >= 0);
-        if (randomStartSlides.length) {
-            imageIndex = randomStartSlides[Math.floor(Math.random() * randomStartSlides.length)];
-        }
-        // If we land on the Armani slide, rotate between autoplaying the video
-        // and holding on the "That's so Armani" still image.
-        if (imageIndex === kaytranadaSlideIndex) {
-            prepareKaytranadaPresentation();
+        // On each page load, pick one of three openings so all appear sometimes:
+        //   Armani still photo (most frequent), Armani video, or Vibram video.
+        if (kaytranadaSlideIndex >= 0 && vibramSlideIndex >= 0) {
+            const roll = Math.random();
+            if (roll < 0.45) {
+                imageIndex = kaytranadaSlideIndex;
+                prepareKaytranadaPresentation('still');
+            } else if (roll < 0.75) {
+                imageIndex = kaytranadaSlideIndex;
+                prepareKaytranadaPresentation('video');
+            } else {
+                imageIndex = vibramSlideIndex;
+            }
+        } else if (kaytranadaSlideIndex >= 0) {
+            imageIndex = kaytranadaSlideIndex;
+            prepareKaytranadaPresentation(Math.random() < 0.6 ? 'still' : 'video');
+        } else if (vibramSlideIndex >= 0) {
+            imageIndex = vibramSlideIndex;
         }
         // Jump to the chosen start slide without the sliding animation.
         if (imageTrack) {
