@@ -1,3680 +1,1236 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="color-scheme" content="dark" />
-    <meta name="theme-color" content="#000000" id="theme-color-meta" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black" id="status-bar-meta" />
-    <title>Maude Churchill — Creative Director</title>
-    <script>
-        // Dark mode is permanent — no toggle.
-        document.documentElement.setAttribute('data-theme', 'dark');
-    </script>
-    <style>
-        /* --- SWISS MODERNIST RESET & CORE VARIABLES --- */
-        :root {
-            color-scheme: light;
-            --bg-color: #ffffff;
-            --text-color: #000000;
-            --border-color: #000000;
-            --translucent-bg: rgba(255, 255, 255, 0.85);
-            --muted-text: rgba(0, 0, 0, 0.4);
-            --hover-bg: rgba(0, 0, 0, 0.03);
-            --row-expand-bg: rgba(0, 0, 0, 0.01);
-            --expansion-border: rgba(0, 0, 0, 0.15);
-            --preview-bg: rgba(0, 0, 0, 0.05);
-            --lightbox-overlay: rgba(255, 255, 255, 0.72);
-            --blur-strength: 15px;
-            --brand-font-size: clamp(0.9em, calc(2.1vw - 0.5em), 1.7em);
-            --ui-font-size: clamp(11px, 1vw, 12px);
-            --ticker-height: 14px;
-            --ui-chrome-z: 99999;
-            --swiss-transition: all 0.25s cubic-bezier(0.3, 0, 0.1, 1);
-            --theme-transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-            --stage-width: min(calc(100vw - 48px), calc((100vh - 215px) * 16 / 9));
-        }
-
-        [data-theme="dark"] {
-            color-scheme: dark;
-            --bg-color: #000000;
-            --text-color: #ffffff;
-            --border-color: #ffffff;
-            --translucent-bg: rgba(0, 0, 0, 0.88);
-            --muted-text: rgba(255, 255, 255, 0.4);
-            --hover-bg: rgba(255, 255, 255, 0.05);
-            --row-expand-bg: rgba(255, 255, 255, 0.02);
-            --expansion-border: rgba(255, 255, 255, 0.15);
-            --preview-bg: rgba(255, 255, 255, 0.05);
-            --lightbox-overlay: rgba(0, 0, 0, 0.72);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html {
-            scroll-behavior: smooth;
-            scroll-padding-top: 0;
-            min-height: 100%;
-            min-height: 100dvh;
-            background-color: var(--bg-color);
-            transition: var(--theme-transition);
-        }
-
-        html::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-color: var(--bg-color);
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        body {
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            min-height: 100vh;
-            min-height: 100svh;
-            min-height: 100dvh;
-            min-height: -webkit-fill-available;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            overflow-x: hidden;
-            font-size: 14px;
-            line-height: 1.2;
-            letter-spacing: -0.02em;
-            transition: opacity 0.2s ease-in-out, var(--theme-transition);
-            opacity: 1;
-        }
-
-        body.page-fade {
-            opacity: 0;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            html {
-                scroll-behavior: auto;
-            }
-
-            *,
-            *::before,
-            *::after {
-                transition-duration: 0.001ms !important;
-                animation-duration: 0.001ms !important;
-            }
-        }
-
-        /* --- STRUCTURAL LAYOUT --- */
-        header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            pointer-events: none;
-            z-index: 1000;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: auto 1fr auto;
-            padding: 24px;
-        }
-
-        header a,
-        header .brand-name,
-        header .ig-link {
-            pointer-events: auto;
-        }
-
-        .brand-name {
-            color: var(--text-color);
-            font-family: inherit;
-            font-weight: 500;
-            font-size: var(--brand-font-size);
-            line-height: 0.95;
-            letter-spacing: -0.01em;
-            background: none;
-            border: 0;
-            padding: 0;
-            cursor: pointer;
-            display: inline-block;
-            grid-column: 1;
-            grid-row: 1;
-            align-self: start;
-            justify-self: start;
-        }
-
-        nav ul {
-            list-style: none;
-        }
-
-        nav ul li a {
-            color: var(--text-color);
-            text-decoration: none;
-            text-transform: uppercase;
-            font-weight: 500;
-            font-size: var(--ui-font-size);
-            line-height: 1.2;
-            display: block;
-            margin-bottom: 8px;
-            letter-spacing: 0.02em;
-        }
-
-        nav ul li a:hover, nav ul li a.active {
-            text-decoration: underline;
-            text-underline-offset: 4px;
-        }
-
-        /* Header grid: brand top-left, nav bottom-left, clock bottom-right (desktop) */
-        .header-utilities {
-            display: contents;
-        }
-
-        /* Primary nav lives top-right, stacked under the brand line. */
-        .site-nav {
-            grid-column: 2;
-            grid-row: 1;
-            align-self: start;
-            justify-self: end;
-            text-align: right;
-        }
-
-        .site-nav ul li a {
-            text-align: right;
-        }
-
-        .info-right {
-            grid-column: 2;
-            grid-row: 3;
-            align-self: end;
-            justify-self: end;
-            text-align: right;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 8px;
-            font-size: var(--ui-font-size);
-            position: relative;
-            z-index: var(--ui-chrome-z);
-            pointer-events: auto;
-        }
-
-        .ig-link {
-            font-family: inherit;
-            font-size: var(--ui-font-size);
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.02em;
-            color: var(--text-color);
-            text-decoration: underline;
-            text-underline-offset: 4px;
-        }
-
-        /* --- SECTION ANCHORS --- */
-        section {
-            position: relative;
-            z-index: 1;
-            min-height: 100vh;
-            min-height: 100svh;
-            min-height: 100dvh;
-            padding: 180px 24px 80px 24px;
-            background-color: var(--bg-color);
-        }
-
-        section:last-of-type {
-            margin-bottom: 10vh;
-        }
-
-        #clients {
-            padding-bottom: 40px;
-        }
-
-        #information {
-            padding-top: 90px;
-        }
-
-        .section-title {
-            font-size: 11px;
-            text-transform: uppercase;
-            font-weight: 700;
-            margin-bottom: 40px;
-            letter-spacing: 0.05em;
-            color: var(--muted-text);
-        }
-
-        /* --- INTRO IMAGE SPACE --- */
-        #image-space {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-        }
-
-        #image-space .section-title {
-            display: none;
-        }
-
-        .image-layout {
-            width: var(--stage-width);
-            aspect-ratio: 16 / 9;
-            display: flex;
-            margin: 0 auto;
-            overflow: hidden;
-            cursor: pointer;
-            transition: width 0.35s cubic-bezier(0.3, 0, 0.1, 1), aspect-ratio 0.35s cubic-bezier(0.3, 0, 0.1, 1);
-        }
-
-        /* Desktop: on the Armani (portrait 4:5) slide, shrink the stage to a
-           portrait rectangle sized to the viewport so the image fits the screen
-           nicely instead of stretching across the full 16:9 width. */
-        @media (min-width: 869px) {
-            .image-layout.image-layout--portrait-video {
-                aspect-ratio: 4 / 5;
-                width: min(600px, calc(100vw - 48px), calc((100vh - 160px) * 4 / 5));
-                margin: 0 auto;
-            }
-        }
-
-        @keyframes first-slide-fade-in {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        #vibram-video-slot {
-            opacity: 0;
-            animation: first-slide-fade-in 1.1s cubic-bezier(0.25, 0.1, 0.25, 1) 0.2s forwards;
-        }
-
-        /* Fade the Armani slot in with the same basic fade the Vibram slot uses. */
-        #kaytranada-video-slot {
-            opacity: 0;
-            animation: first-slide-fade-in 1.1s cubic-bezier(0.25, 0.1, 0.25, 1) 0.2s forwards;
-        }
-
-        #vibram-video-slot.image-slot--video .slot-video {
-            opacity: 0;
-        }
-
-        #vibram-video-slot.image-slot--video.is-playing .slot-video {
-            opacity: 1;
-        }
-
-        #vibram-video-slot.is-ended .slot-video {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        #vibram-video-slot .slot-video {
-            object-fit: cover;
-            object-position: center;
-            -webkit-transform: translateZ(0);
-            transform: translateZ(0);
-            -webkit-backface-visibility: hidden;
-            backface-visibility: hidden;
-        }
-
-        .image-track {
-            display: flex;
-            width: 100%;
-            height: 100%;
-            transition: transform 0.35s cubic-bezier(0.3, 0, 0.1, 1);
-        }
-
-        .image-slot {
-            background: var(--preview-bg);
-            color: var(--muted-text);
-            display: flex;
-            align-items: flex-end;
-            justify-content: flex-start;
-            flex: 0 0 100%;
-            aspect-ratio: 16 / 9;
-            overflow: hidden;
-            padding: 12px;
-            text-transform: uppercase;
-            font-size: 11px;
-            letter-spacing: 0.05em;
-        }
-
-        .image-slot img,
-        .image-slot video {
-            display: block;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .image-slot--photo {
-            padding: 0;
-            line-height: 0;
-        }
-
-        .image-slot--video {
-            position: relative;
-        }
-
-        .image-slot--video .slot-poster,
-        .image-slot--video .slot-video {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            transition: opacity 0.35s cubic-bezier(0.3, 0, 0.1, 1);
-        }
-
-        .image-slot--video .slot-poster {
-            opacity: 1;
-        }
-
-        .image-slot--video .slot-video {
-            opacity: 0;
-        }
-
-        .image-slot--video.is-playing .slot-poster {
-            opacity: 0;
-        }
-
-        .image-slot--video.is-playing .slot-video {
-            opacity: 1;
-        }
-
-        .image-slot--carousel-video {
-            padding: 0;
-            line-height: 0;
-            background: #000;
-            position: relative;
-            /* Fill the stage exactly (overrides the base 16/9 slot ratio) so no
-               grey/white background strip is ever exposed behind the media. */
-            aspect-ratio: auto;
-            height: 100%;
-            align-self: stretch;
-        }
-
-        #kaytranada-video-slot.image-slot--video .slot-video {
-            opacity: 0;
-        }
-
-        #kaytranada-video-slot.image-slot--video.is-playing .slot-video {
-            opacity: 1;
-        }
-
-        .kaytranada-end-image {
-            position: absolute;
-            /* Opaque backdrop behind the video (prevents flicker); the whole slot
-               fades in together via the basic Vibram-style fade above. */
-            opacity: 1;
-            pointer-events: none;
-            -webkit-transform: translateZ(0);
-            transform: translateZ(0);
-            -webkit-backface-visibility: hidden;
-            backface-visibility: hidden;
-            transition: opacity 0.35s cubic-bezier(0.3, 0, 0.1, 1);
-        }
-
-        /* Promote carousel media to their own GPU layers and bleed 1px past the
-           slot edges so subpixel gaps never show as hairlines during playback. */
-        #kaytranada-video-slot .slot-video,
-        #kaytranada-video-slot .kaytranada-end-image {
-            inset: -1px;
-            width: calc(100% + 2px);
-            height: calc(100% + 2px);
-            object-fit: cover;
-            object-position: center;
-            -webkit-transform: translateZ(0);
-            transform: translateZ(0);
-            -webkit-backface-visibility: hidden;
-            backface-visibility: hidden;
-        }
-
-        #vibram-video-slot .slot-video {
-            inset: -1px;
-            width: calc(100% + 2px);
-            height: calc(100% + 2px);
-        }
-
-        #kaytranada-video-slot.is-ended .kaytranada-end-image {
-            opacity: 1;
-            pointer-events: auto;
-            cursor: pointer;
-        }
-
-        #kaytranada-video-slot.is-ended .slot-video {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        /* Fallback: show the Armani still while the video can't load / is buffering. */
-        #kaytranada-video-slot.is-video-fallback .kaytranada-end-image {
-            opacity: 1;
-            pointer-events: auto;
-            cursor: pointer;
-        }
-
-        #kaytranada-video-slot.is-video-fallback .slot-video {
-            opacity: 0;
-        }
-
-        /* Black cover used for the cinematic vibram -> armani transition: the
-           slide arrives black, then this layer fades away to reveal the content.
-           Relaxed fade for the still photo; swift fade for the video. */
-        .kaytranada-cover {
-            position: absolute;
-            inset: 0;
-            z-index: 5;
-            background: #000;
-            opacity: 0;
-            pointer-events: none;
-            /* Subtle, light reveal for the still — matches the accordion fade. */
-            transition: opacity 0.45s ease 0.05s;
-        }
-
-        #kaytranada-video-slot.reveal-swift .kaytranada-cover {
-            transition: opacity 0.32s cubic-bezier(0.3, 0, 0.1, 1);
-        }
-
-        #kaytranada-video-slot.is-entering .kaytranada-cover {
-            opacity: 1;
-            transition: none;
-        }
-
-        .image-slot--carousel-video video {
-            object-fit: cover;
-            object-position: center;
-            cursor: pointer;
-        }
-
-        .image-slot--highlight {
-            background: rgb(0, 0, 0);
-            color: #000000;
-        }
-
-        .image-slot--cyan {
-            background: rgb(0, 0, 0);
-            color: #000000;
-        }
-
-        /* --- SELECTED WORK GRID --- */
-        .work-grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            /* grid-gap + fixed fallback first for old Safari/Firefox (no clamp()/gap). */
-            grid-gap: 28px;
-            grid-gap: clamp(20px, 3vw, 36px);
-            gap: clamp(20px, 3vw, 36px);
-            width: var(--stage-width);
-            margin: 0 auto;
-        }
-
-        @media (min-width: 869px) {
-            #selected-work {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                min-height: 100dvh;
-                min-height: 100svh;
-                padding: 24px;
-                box-sizing: border-box;
-            }
-
-            #selected-work .work-grid {
-                flex-shrink: 0;
-            }
-        }
-
-        .work-item {
-            appearance: none;
-            -webkit-appearance: none;
-            width: 100%;
-            /* Legacy-safe aspect ratio: padding-bottom is a % of the element's
-               width, so it sets the height even on old Safari / Firefox that
-               don't support the modern `aspect-ratio` property. 75% = 4:3. */
-            height: 0;
-            padding: 0 0 75%;
-            position: relative;
-            display: block;
-            border: 1px solid var(--border-color);
-            background-color: var(--preview-bg);
-            cursor: pointer;
-            transition: var(--swiss-transition);
-        }
-
-        .work-item-mark {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            -webkit-transform: translate(-50%, -50%);
-            transform: translate(-50%, -50%);
-            width: 33.33%;
-            height: 33.33%;
-            display: flex;
-            display: -webkit-flex;
-            align-items: center;
-            -webkit-align-items: center;
-            justify-content: center;
-            -webkit-justify-content: center;
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            font-weight: 700;
-            font-size: 3em;
-            color: rgb(155, 155, 155);
-            line-height: 1;
-            pointer-events: none;
-        }
-
-        .work-item:hover {
-            background-color: var(--hover-bg);
-        }
-
-        .work-item:focus-visible {
-            outline: 2px solid var(--border-color);
-            outline-offset: 3px;
-        }
-
-        .work-item img,
-        .work-item video {
-            display: none;
-        }
-
-        /* --- WORK LIGHTBOX --- */
-        .work-lightbox {
-            position: fixed;
-            inset: 0;
-            z-index: calc(var(--ui-chrome-z) + 1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: clamp(20px, 4vw, 40px);
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-            transition: opacity 0.3s cubic-bezier(0.3, 0, 0.1, 1), visibility 0.3s cubic-bezier(0.3, 0, 0.1, 1);
-        }
-
-        .work-lightbox.is-open {
-            opacity: 1;
-            visibility: visible;
-            pointer-events: auto;
-        }
-
-        .work-lightbox-backdrop {
-            position: absolute;
-            inset: 0;
-            background-color: var(--lightbox-overlay);
-            backdrop-filter: blur(var(--blur-strength));
-            -webkit-backdrop-filter: blur(var(--blur-strength));
-            cursor: pointer;
-        }
-
-        .work-lightbox-panel {
-            position: relative;
-            z-index: 1;
-            width: min(90vw, calc(85dvh * 16 / 9));
-            max-height: 85dvh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transform: scale(0.96);
-            transition: transform 0.3s cubic-bezier(0.3, 0, 0.1, 1);
-        }
-
-        .work-lightbox.is-open .work-lightbox-panel {
-            transform: scale(1);
-        }
-
-        .work-lightbox-media {
-            width: 100%;
-            max-height: 85dvh;
-            aspect-ratio: 16 / 9;
-            background-color: var(--preview-bg);
-            border: 1px solid var(--border-color);
-            overflow: hidden;
-            line-height: 0;
-        }
-
-        .work-lightbox-media img,
-        .work-lightbox-media video {
-            display: block;
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            background-color: var(--bg-color);
-        }
-
-        .work-lightbox-close {
-            position: absolute;
-            top: clamp(16px, 3vw, 24px);
-            right: clamp(16px, 3vw, 24px);
-            z-index: 2;
-            appearance: none;
-            -webkit-appearance: none;
-            font-family: inherit;
-            font-size: var(--ui-font-size);
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.02em;
-            color: var(--text-color);
-            background: none;
-            border: none;
-            padding: 0;
-            cursor: pointer;
-            text-decoration: underline;
-            text-underline-offset: 4px;
-        }
-
-        /* Titled work tiles (e.g. Vibram, Giorgio Armani, Barbour, Prada Mode) */
-        .work-item--vibram,
-        .work-item--armani,
-        .work-item--barbour,
-        .work-item--prada,
-        .work-item--nike,
-        .work-item--crocs {
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Thumbnail still that sharpens/plays on hover */
-        .work-item .work-item-thumb {
-            display: block;
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 1;
-            filter: blur(0);
-            transform: scale(1);
-            transition: filter 0.4s cubic-bezier(0.3, 0, 0.1, 1), transform 0.4s cubic-bezier(0.3, 0, 0.1, 1);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .work-item--vibram .work-item-thumb {
-            object-position: center 25%;
-        }
-
-        @media (min-width: 869px) {
-            .work-item--armani .work-item-thumb {
-                object-position: center top;
-            }
-        }
-
-        /* Barbour still blurs and zooms on hover */
-        .work-item--barbour:hover .work-item-thumb,
-        .work-item--barbour.is-previewing .work-item-thumb {
-            filter: blur(5px);
-            transform: scale(1.04);
-        }
-
-        /* Muted teaser video that fades in over a still placeholder on hover */
-        .work-item .work-item-hover-video {
-            display: block;
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0;
-            transition: opacity 0.4s cubic-bezier(0.3, 0, 0.1, 1);
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .work-item:hover .work-item-hover-video,
-        .work-item.is-previewing .work-item-hover-video {
-            opacity: 1;
-        }
-
-        /* Hover carousel that crossfades through the Armani gallery images */
-        .work-carousel {
-            position: absolute;
-            inset: 0;
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        .work-item .work-carousel-img {
-            display: block;
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0;
-            transition: opacity 1.2s ease-in-out;
-        }
-
-        .work-item .work-carousel-img.is-active {
-            opacity: 1;
-        }
-
-        /* Fast-cycling carousel variant (e.g. Nike Goadme Hardwear) */
-        .work-item .work-carousel--fast .work-carousel-img {
-            transition: opacity 0.12s linear;
-        }
-
-        @media (min-width: 869px) {
-            .work-item--armani .work-carousel-img {
-                object-position: center top;
-            }
-        }
-
-        .work-item-label {
-            position: absolute;
-            z-index: 2;
-            top: 12px;
-            left: 12px;
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            font-weight: 500;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--muted-text);
-            line-height: 1;
-            pointer-events: none;
-        }
-
-        /* Project lightbox: video left, floating details card */
-        .work-lightbox.is-project .work-lightbox-panel {
-            width: min(92vw, calc(82dvh * 16 / 9));
-            max-height: 82dvh;
-        }
-
-        .work-lightbox-details {
-            position: absolute;
-            top: 50%;
-            right: clamp(12px, 3vw, 32px);
-            transform: translateY(-50%);
-            z-index: 3;
-            width: min(82vw, 320px);
-            padding: clamp(18px, 2.2vw, 28px);
-            background: rgba(20, 20, 20, 0.32);
-            backdrop-filter: blur(16px) saturate(140%);
-            -webkit-backdrop-filter: blur(16px) saturate(140%);
-            border: 1px solid rgba(255, 255, 255, 0.22);
-            border-radius: 2px;
-            color: #ffffff;
-            text-align: left;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
-        }
-
-        .work-lightbox-details[hidden] {
-            display: none;
-        }
-
-        .wl-detail-eyebrow {
-            font-size: 10px;
-            text-transform: uppercase;
-            font-weight: 700;
-            letter-spacing: 0.08em;
-            opacity: 0.6;
-            margin-bottom: 10px;
-        }
-
-        .wl-detail-title {
-            position: relative;
-            font-size: clamp(18px, 2.4vw, 24px);
-            font-weight: 600;
-            letter-spacing: -0.01em;
-            line-height: 1.1;
-            padding-bottom: 16px;
-            margin-bottom: 16px;
-        }
-
-        /* Hairline rule under the title that draws in */
-        .wl-detail-title::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            bottom: 0;
-            width: 100%;
-            height: 1px;
-            background: rgba(255, 255, 255, 0.4);
-            transform: scaleX(0);
-            transform-origin: left center;
-        }
-
-        .wl-detail-list {
-            display: grid;
-            grid-template-columns: auto 1fr;
-            gap: 0 16px;
-            margin: 0 0 18px;
-            font-size: 12px;
-            line-height: 1.3;
-        }
-
-        .wl-detail-list dt,
-        .wl-detail-list dd {
-            padding: 9px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.14);
-        }
-
-        .wl-detail-list dt {
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            opacity: 0.55;
-            font-weight: 600;
-        }
-
-        .wl-detail-list dd {
-            margin: 0;
-            font-weight: 500;
-            text-align: right;
-        }
-
-        .wl-detail-desc {
-            font-size: 13px;
-            line-height: 1.45;
-            opacity: 0.85;
-        }
-
-        .wl-detail-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            margin-top: 16px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            color: #ffffff;
-            text-decoration: none;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
-            padding-bottom: 3px;
-            transition: border-color 0.25s ease, opacity 0.25s ease;
-        }
-
-        .wl-detail-link::after {
-            content: "\2197";
-            font-size: 13px;
-        }
-
-        .wl-detail-link:hover {
-            border-bottom-color: #ffffff;
-        }
-
-        /* --- SWISS REVEAL: project lightbox motion --- */
-        .work-lightbox-details {
-            opacity: 0;
-        }
-
-        .work-lightbox-details::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: #ffffff;
-            transform: scaleX(0);
-            transform-origin: left center;
-        }
-
-        .wl-detail-eyebrow,
-        .wl-detail-title,
-        .wl-detail-list,
-        .wl-detail-desc,
-        .wl-detail-link {
-            opacity: 0;
-            will-change: transform, opacity;
-        }
-
-        .work-lightbox.is-project .work-lightbox-media {
-            opacity: 0;
-        }
-
-        .work-lightbox.is-open.is-project .work-lightbox-media {
-            animation: wl-media-in 0.6s cubic-bezier(0.3, 0, 0.1, 1) both;
-        }
-
-        @keyframes wl-media-in {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-                clip-path: inset(0 0 8% 0);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-                clip-path: inset(0 0 0 0);
-            }
-        }
-
-        .work-lightbox.is-open.is-project .work-lightbox-details {
-            animation: wl-card-in 0.55s cubic-bezier(0.3, 0, 0.1, 1) 0.05s both;
-        }
-
-        .work-lightbox.is-open.is-project .work-lightbox-details::before {
-            animation: wl-line-draw 0.7s cubic-bezier(0.3, 0, 0.1, 1) 0.18s both;
-        }
-
-        .work-lightbox.is-open.is-project .wl-detail-title::after {
-            animation: wl-line-draw 0.7s cubic-bezier(0.3, 0, 0.1, 1) 0.5s both;
-        }
-
-        .work-lightbox.is-open.is-project .wl-detail-eyebrow {
-            animation: wl-text-in 0.5s cubic-bezier(0.3, 0, 0.1, 1) 0.22s both;
-        }
-
-        .work-lightbox.is-open.is-project .wl-detail-title {
-            animation: wl-text-in 0.5s cubic-bezier(0.3, 0, 0.1, 1) 0.3s both;
-        }
-
-        .work-lightbox.is-open.is-project .wl-detail-list {
-            animation: wl-text-in 0.5s cubic-bezier(0.3, 0, 0.1, 1) 0.42s both;
-        }
-
-        .work-lightbox.is-open.is-project .wl-detail-desc {
-            animation: wl-text-in 0.5s cubic-bezier(0.3, 0, 0.1, 1) 0.52s both;
-        }
-
-        .work-lightbox.is-open.is-project .wl-detail-link:not([hidden]) {
-            animation: wl-text-in 0.5s cubic-bezier(0.3, 0, 0.1, 1) 0.6s both;
-        }
-
-        @keyframes wl-card-in {
-            from {
-                opacity: 0;
-                transform: translateY(-50%) translateX(18px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(-50%) translateX(0);
-            }
-        }
-
-        @keyframes wl-line-draw {
-            from {
-                transform: scaleX(0);
-            }
-            to {
-                transform: scaleX(1);
-            }
-        }
-
-        @keyframes wl-text-in {
-            from {
-                opacity: 0;
-                transform: translateY(9px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @media (max-width: 868px) {
-            /* Stack the video and details modal, centered with even space above/below */
-            .work-lightbox.is-project .work-lightbox-panel {
-                flex-direction: column;
-                align-items: stretch;
-                justify-content: center;
-                width: min(92vw, calc(50dvh * 16 / 9));
-                max-height: 92dvh;
-                gap: clamp(14px, 3.5vw, 20px);
-            }
-
-            .work-lightbox.is-project .work-lightbox-media {
-                width: 100%;
-                max-height: 50dvh;
-                flex: 0 0 auto;
-            }
-
-            .work-lightbox.is-project .work-lightbox-details {
-                position: static;
-                top: auto;
-                right: auto;
-                bottom: auto;
-                left: auto;
-                transform: none;
-                width: 100%;
-                flex: 0 0 auto;
-            }
-
-            .work-lightbox.is-open.is-project .work-lightbox-details {
-                animation: wl-card-in-mobile 0.55s cubic-bezier(0.3, 0, 0.1, 1) 0.05s both;
-            }
-
-            .wl-detail-list {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        @keyframes wl-card-in-mobile {
-            from {
-                opacity: 0;
-                transform: translateY(14px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* --- MULTI-IMAGE PROJECT GALLERY (e.g. Armani) --- */
-        .work-lightbox.is-gallery .work-lightbox-panel {
-            width: auto;
-            max-width: 92vw;
-        }
-
-        .work-lightbox.is-gallery .work-lightbox-media {
-            aspect-ratio: 4 / 5;
-            width: auto;
-            height: min(66dvh, 44vw);
-            max-height: 66dvh;
-        }
-
-        .wl-gallery {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-            overflow: hidden;
-        }
-
-        .wl-gallery-img {
-            display: block;
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            background-color: var(--bg-color);
-            animation: wl-text-in 0.4s cubic-bezier(0.3, 0, 0.1, 1) both;
-        }
-
-        .wl-gallery-count {
-            position: absolute;
-            bottom: 12px;
-            left: 12px;
-            z-index: 2;
-            font-size: 10px;
-            font-weight: 600;
-            letter-spacing: 0.08em;
-            color: #ffffff;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            padding: 5px 9px;
-            pointer-events: none;
-        }
-
-        @media (max-width: 868px) {
-            /* Stack the photo above the details modal and size both to the device so they
-               fit comfortably on small screens (e.g. iPhone 15 Pro), with even spacing. */
-            .work-lightbox.is-gallery .work-lightbox-panel {
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                width: min(92vw, 440px);
-                max-width: 92vw;
-                max-height: 92dvh;
-                gap: clamp(12px, 3.2vw, 20px);
-                overflow-y: auto;
-                padding-block: clamp(8px, 2vw, 16px);
-            }
-
-            .work-lightbox.is-gallery .work-lightbox-media {
-                height: 46dvh;
-                width: auto;
-                aspect-ratio: 4 / 5;
-                max-width: 92vw;
-                flex: 0 0 auto;
-                align-self: center;
-            }
-
-            .work-lightbox.is-gallery .work-lightbox-details {
-                position: static;
-                inset: auto;
-                transform: none;
-                width: 100%;
-                flex: 0 0 auto;
-                padding: clamp(16px, 4vw, 22px);
-            }
-
-            .work-lightbox.is-open.is-gallery .work-lightbox-details {
-                animation: wl-card-in-mobile 0.55s cubic-bezier(0.3, 0, 0.1, 1) 0.05s both;
-            }
-        }
-
-        /* Desktop photo gallery: image and details modal side by side (not overlapping) */
-        @media (min-width: 869px) {
-            .work-lightbox.is-gallery .work-lightbox-panel {
-                flex-direction: row;
-                align-items: center;
-                justify-content: center;
-                gap: clamp(24px, 3vw, 56px);
-            }
-
-            .work-lightbox.is-gallery .work-lightbox-details {
-                position: static;
-                inset: auto;
-                transform: none;
-                width: min(340px, 30vw);
-                flex: 0 0 auto;
-            }
-
-            .work-lightbox.is-open.is-gallery .work-lightbox-details {
-                animation-name: wl-card-in-side;
-            }
-        }
-
-        @keyframes wl-card-in-side {
-            from {
-                opacity: 0;
-                transform: translateX(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        /* --- ARCHIVE SYSTEM (EXPANDABLE) --- */
-        .archive-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .archive-row {
-            border-bottom: 1px solid var(--border-color);
-            overflow: hidden;
-            position: relative;
-        }
-
-        #clients .archive-row:not(.header-row) {
-            border-bottom: none;
-            cursor: default;
-        }
-
-        #clients .row-trigger {
-            cursor: default;
-        }
-
-        .archive-row:not(.header-row) {
-            cursor: pointer;
-        }
-
-        .archive-row.header-row {
-            font-weight: 700;
-            text-transform: uppercase;
-            border-bottom: 2px solid var(--border-color);
-            background-color: transparent;
-            z-index: 1;
-        }
-
-        .row-trigger {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr);
-            padding: clamp(10px, 1.4vw, 14px) 0;
-            cursor: pointer;
-            align-items: baseline;
-            transition: background-color 0.1s ease;
-        }
-
-        .header-row .row-trigger {
-            cursor: default;
-        }
-
-        .archive-row:not(.header-row) .row-trigger:hover {
-            background-color: var(--hover-bg);
-        }
-
-        .col-index {
-            font-variant-numeric: tabular-nums;
-            min-width: 0;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .col-title {
-            font-weight: 500;
-            min-width: 0;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        /* Expandable Container Elements */
-        .row-expandable {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s cubic-bezier(0.3, 0, 0.1, 1);
-            background-color: var(--row-expand-bg);
-        }
-
-        .archive-row.expanded .row-expandable {
-            max-height: 1200px;
-        }
-
-        .archive-row.expanded {
-            z-index: 5;
-        }
-
-        .expansion-content {
-            padding: clamp(20px, 4vw, 30px) 0 clamp(28px, 5vw, 40px);
-            display: grid;
-            grid-template-columns: minmax(0, 1.2fr) minmax(0, 5fr);
-            gap: clamp(1.25rem, 3vw, 2.5rem);
-            align-items: start;
-            border-top: 1px dashed var(--expansion-border);
-        }
-
-        .expansion-meta {
-            font-size: 13px;
-            line-height: 1.5;
-            min-width: 0;
-        }
-
-        .expansion-media {
-            width: 100%;
-            min-width: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .preview-image-container {
-            width: 100%;
-            max-width: min(56.25rem, 100%);
-            aspect-ratio: 16 / 9;
-            background-color: var(--preview-bg);
-            border: 1px solid var(--border-color);
-            overflow: hidden;
-            line-height: 0;
-        }
-        
-        .preview-image-container img {
-            display: block;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .preview-image-container--portrait {
-            width: min(37.5rem, 100%);
-            max-width: 100%;
-            flex-shrink: 0;
-        }
-
-        .preview-image-container--portrait img {
-            object-fit: contain;
-            object-position: left top;
-        }
-
-        .preview-image-container--gucci {
-            aspect-ratio: 1160 / 1289;
-        }
-
-        .preview-image-container--north-face {
-            aspect-ratio: 1600 / 1778;
-        }
-
-        .only-description {
-            margin-top: clamp(14px, 3vw, 20px);
-            width: 100%;
-            max-width: min(37.5rem, 100%);
-            font-size: clamp(14px, 2vw, 15px);
-            line-height: 1.4;
-        }
-
-        /* --- INFO SECTION LAYOUT --- */
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: clamp(24px, 5vw, 80px);
-            font-size: 14px;
-            line-height: 1.4;
-            letter-spacing: -0.02em;
-        }
-
-        .info-body p {
-            margin-bottom: 24px;
-            max-width: 700px;
-        }
-
-        .info-body a {
-            color: var(--text-color);
-            text-decoration: underline;
-            text-underline-offset: 3px;
-        }
-
-        .info-links {
-            margin-top: clamp(28px, 4vw, 48px);
-        }
-
-        .info-links p {
-            margin-bottom: 8px;
-        }
-
-        /* --- CLIENTS GRID (dense contact-sheet) --- */
-        .clients-wrap {
-            width: var(--stage-width);
-            margin: 0 auto;
-        }
-
-        .clients-heading {
-            font-size: 11px;
-            text-transform: uppercase;
-            font-weight: 700;
-            letter-spacing: 0.05em;
-            color: var(--muted-text);
-            margin-bottom: 14px;
-        }
-
-        .clients-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            border-top: 1px solid var(--border-color);
-            border-left: 1px solid var(--border-color);
-        }
-
-        .client-name {
-            border-right: 1px solid var(--border-color);
-            border-bottom: 1px solid var(--border-color);
-            padding: clamp(12px, 1.3vw, 18px) 14px;
-            font-size: var(--ui-font-size);
-            text-transform: uppercase;
-            font-weight: 500;
-            letter-spacing: 0.02em;
-            line-height: 1.2;
-            transition: background-color 0.15s ease;
-        }
-
-        .client-name:hover {
-            background-color: var(--hover-bg);
-        }
-
-        /* --- INFO TOGGLE MENU (accordion) --- */
-        .info-section-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            font-weight: 700;
-            letter-spacing: 0.05em;
-            color: var(--muted-text);
-            margin-bottom: 16px;
-        }
-
-        .info-toggles {
-            border-top: 1px solid var(--border-color);
-        }
-
-        .info-toggle {
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .info-toggle-trigger {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            appearance: none;
-            -webkit-appearance: none;
-            background: none;
-            border: none;
-            padding: clamp(12px, 1.4vw, 16px) 0;
-            color: var(--text-color);
-            font-family: inherit;
-            font-size: var(--ui-font-size);
-            font-weight: 500;
-            letter-spacing: 0.02em;
-            text-align: left;
-            cursor: pointer;
-        }
-
-        .info-toggle-trigger:hover {
-            opacity: 0.6;
-        }
-
-        .info-toggle-icon {
-            font-weight: 400;
-            transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
-        }
-
-        .info-toggle.is-open .info-toggle-icon {
-            transform: rotate(135deg);
-        }
-
-        .info-toggle-panel {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .info-toggle-inner {
-            padding: 0 0 clamp(16px, 2.2vw, 22px);
-            font-size: 14px;
-            line-height: 1.5;
-            max-width: 560px;
-            opacity: 0;
-            transform: translateY(-8px);
-            transition: opacity 0.45s ease 0.05s, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .info-toggle.is-open .info-toggle-inner {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* --- CONTACT SECTION (its own block below More) --- */
-        .info-contact {
-            margin-top: clamp(28px, 4vw, 48px);
-        }
-
-        .info-contact p {
-            font-size: 14px;
-            line-height: 1.5;
-            margin-bottom: 8px;
-            max-width: 560px;
-        }
-
-        .info-contact .info-section-label {
-            font-size: 11px;
-            margin-bottom: 16px;
-        }
-
-        .info-contact a {
-            color: var(--text-color);
-            text-decoration: underline;
-            text-underline-offset: 3px;
-        }
-
-        .info-toggle-inner p {
-            margin-bottom: 12px;
-        }
-
-        .info-toggle-inner a {
-            color: var(--text-color);
-            text-decoration: underline;
-            text-underline-offset: 3px;
-        }
-
-        .info-dbac-figure {
-            margin: 14px 0 0;
-            width: 100%;
-            max-width: 100%;
-        }
-
-        .info-dbac-figure img {
-            display: block;
-            width: 75%;
-            max-width: 100%;
-            height: auto;
-        }
-
-        .info-toggle-inner:has(.info-dbac-figure) {
-            max-width: min(640px, 100%);
-        }
-
-        /* --- INFO CLIENTS LIST --- */
-        .info-clients {
-            margin-top: clamp(48px, 6vw, 88px);
-        }
-
-        .info-clients-list {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            columns: 2;
-            column-gap: clamp(16px, 3vw, 32px);
-            border-top: 1px solid var(--border-color);
-            padding-top: clamp(14px, 1.6vw, 18px);
-        }
-
-        .info-clients-list li {
-            break-inside: avoid;
-            font-size: 14px;
-            font-weight: 500;
-            letter-spacing: -0.02em;
-            line-height: 1.2;
-            padding: 6px 0;
-        }
-
-        .mobile-meta-slot {
-            display: none;
-        }
-
-        /* --- RESPONSIVE OPTIMIZATIONS --- */
-        @media (max-width: 868px) {
-            :root {
-                --brand-font-size: clamp(0.975rem, calc(4.68vw + 0.065rem), 1.38125rem);
-                --ui-font-size: clamp(10px, 2.8vw, 12px);
-                --ticker-height: 13px;
-            }
-
-            header {
-                grid-template-columns: minmax(0, 1fr) auto;
-                grid-template-rows: auto;
-                column-gap: 16px;
-                height: 100vh;
-                height: 100dvh;
-                min-height: 0;
-                position: fixed;
-                padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 16px max(16px, env(safe-area-inset-left));
-                background: transparent;
-            }
-
-            .brand-name {
-                max-width: 11ch;
-                text-align: left;
-                line-height: 0.92;
-            }
-
-            .header-utilities {
-                display: flex;
-                flex-direction: column;
-                align-items: flex-end;
-                justify-content: flex-start;
-                gap: 8px;
-                grid-column: 2;
-                grid-row: 1;
-                align-self: start;
-                justify-self: end;
-                text-align: right;
-            }
-
-            .site-nav {
-                grid-column: unset;
-                grid-row: unset;
-                align-self: auto;
-                justify-self: auto;
-                font-size: var(--ui-font-size);
-            }
-
-            .site-nav ul li a {
-                margin-bottom: 4px;
-            }
-
-            .info-right {
-                grid-column: unset;
-                grid-row: unset;
-                align-self: auto;
-                justify-self: auto;
-            }
-
-            .mobile-meta-slot {
-                display: flex;
-                justify-content: flex-end;
-                position: fixed;
-                inset: auto max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) auto;
-                z-index: var(--ui-chrome-z);
-                pointer-events: none;
-                isolation: isolate;
-            }
-
-            .mobile-meta-slot .info-right {
-                position: relative;
-                z-index: var(--ui-chrome-z);
-                align-items: flex-end;
-                gap: 4px;
-                text-align: right;
-                pointer-events: auto;
-            }
-
-            section {
-                padding-top: max(120px, calc(104px + env(safe-area-inset-top)));
-                padding-left: max(16px, env(safe-area-inset-left));
-                padding-right: max(16px, env(safe-area-inset-right));
-                padding-bottom: max(80px, calc(64px + env(safe-area-inset-bottom)));
-            }
-
-            #clients {
-                padding-bottom: max(40px, calc(32px + env(safe-area-inset-bottom)));
-            }
-
-            #information {
-                padding-top: max(60px, calc(52px + env(safe-area-inset-top)));
-            }
-
-            .row-trigger {
-                grid-template-columns: 1fr;
-            }
-
-            .expansion-content {
-                grid-template-columns: 1fr;
-                gap: clamp(16px, 4vw, 24px);
-                padding-bottom: clamp(24px, 6vw, 36px);
-            }
-
-            .preview-image-container--portrait {
-                width: 100%;
-            }
-
-            .info-grid {
-                grid-template-columns: 1fr;
-                gap: clamp(36px, 9vw, 52px);
-            }
-
-            .info-clients {
-                margin-top: clamp(32px, 8vw, 44px);
-                overflow: hidden;
-                max-height: 800px;
-                transition: max-height 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-                            opacity 0.4s ease,
-                            margin 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-            }
-
-            .info-clients-list {
-                columns: 2;
-            }
-
-            /* "More" accordions reveal upward into the freed client-list space. The panel
-               floats above the whole More block (not the individual trigger), so the "More"
-               title and its triggers stay visible, with a gap separating the revealed content
-               from the About/Clients section above. */
-            .info-body {
-                position: relative;
-            }
-
-            .info-toggle {
-                position: static;
-            }
-
-            .info-toggle-panel {
-                position: absolute;
-                left: 0;
-                right: 0;
-                bottom: calc(100% + clamp(20px, 5vw, 32px));
-                z-index: 60;
-                background-color: var(--bg-color);
-            }
-
-            .info-toggle.is-open .info-toggle-panel {
-                box-shadow: 0 16px 30px rgba(0, 0, 0, 0.5);
-            }
-
-            .info-dbac-figure {
-                max-height: min(52vh, 420px);
-                overflow-y: auto;
-                -webkit-overflow-scrolling: touch;
-                overscroll-behavior: contain;
-            }
-
-            /* Keep the client list's space reserved (don't collapse its height) but hide it,
-               so the upward-floating panel reveals into that blank space instead of
-               overlapping the About text above it. */
-            #information.is-more-open .info-clients {
-                opacity: 0;
-                visibility: hidden;
-                pointer-events: none;
-            }
-
-            #clients .info-grid {
-                gap: 0;
-            }
-
-            #clients .row-trigger {
-                padding: clamp(4px, 1.1vw, 8px) 0;
-            }
-
-            /* Two square boxes per row, centered on the page */
-            #selected-work {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-            }
-
-            .work-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-                grid-gap: 12px;
-                grid-gap: clamp(10px, 3vw, 16px);
-                gap: clamp(10px, 3vw, 16px);
-            }
-
-            #selected-work .work-item {
-                /* Rectangular (landscape) tiles fit the mobile page better than
-                   squares. 66% padding-bottom = a 3:2 rectangle. */
-                height: 0;
-                padding: 0 0 66%;
-                aspect-ratio: auto;
-            }
-
-            .image-layout.image-layout--portrait-video {
-                aspect-ratio: 4 / 5;
-                width: min(calc(100vw - 32px), calc((100vh - 200px) * 4 / 5));
-            }
-
-            section#image-space.image-space--vibram-hero {
-                height: 100dvh;
-                height: 100svh;
-                min-height: 100dvh;
-                max-height: 100dvh;
-                padding: 0;
-                margin: 0;
-                overflow: hidden;
-                align-items: stretch;
-                justify-content: stretch;
-                box-sizing: border-box;
-            }
-
-            .image-layout.image-layout--vibram-hero {
-                width: 100%;
-                height: 100%;
-                max-width: none;
-                aspect-ratio: unset;
-                margin: 0;
-                flex: 1 1 auto;
-            }
-
-            .image-layout.image-layout--vibram-hero .image-slot {
-                aspect-ratio: unset;
-                height: 100%;
-                align-self: stretch;
-            }
-
-            .image-layout.image-layout--vibram-hero #vibram-video-slot .slot-video {
-                object-fit: cover;
-                object-position: center;
-            }
-        }
-
-        @media (max-width: 1199px) {
-            :root {
-                --stage-width: min(calc(100vw - 32px), calc((100vh - 200px) * 16 / 9));
-            }
-
-            #image-space {
-                padding: 16px;
-            }
-
-            .image-layout {
-                cursor: pointer;
-            }
-
-            .image-track {
-                flex-direction: row;
-                gap: 0;
-            }
-
-            .image-slot {
-                flex: 0 0 100%;
-                width: 100%;
-            }
-
-            .image-slot--carousel-video.image-slot--video .slot-video,
-            .image-slot--carousel-video .kaytranada-end-image {
-                position: absolute;
-                inset: -1px;
-                width: calc(100% + 2px);
-                height: calc(100% + 2px);
-                min-height: calc(100% + 2px);
-                object-fit: cover;
-                object-position: center;
-            }
-        }
-
-        /* Keep expanded rows layered above the archive table */
-        .archive-table {
-            position: relative;
-            z-index: 1;
-        }
-
-        @media (min-width: 869px) {
-            #clients {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                min-height: 100dvh;
-                min-height: 100svh;
-                padding-top: 120px;
-                padding-bottom: 80px;
-            }
-
-            .info-right {
-                position: fixed;
-                right: 24px;
-                bottom: 24px;
-                z-index: var(--ui-chrome-z);
-            }
-
-            .archive-row.expanded {
-                z-index: 10;
-            }
-
-            .archive-row.expanded .row-expandable {
-                padding-top: 16px;
-                overflow-y: auto;
-            }
-
-            .archive-row:not(.header-row) {
-                z-index: 1;
-            }
-
-            .work-lightbox-panel {
-                width: min(77vw, calc(77dvh * 16 / 9));
-                max-height: 77dvh;
-            }
-
-            .work-lightbox-media {
-                max-height: 77dvh;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>hammercam 3.0</title>
+  <style>
+    :root {
+      --fg: #f5f5f5;
+      --border: rgba(255, 255, 255, 0.28);
+      --muted: rgba(255, 255, 255, 0.7);
+      --muted-light: rgba(255, 255, 255, 0.45);
+      --neon: #c8ff00;
+      --neon-dim: #b8eb00;
+      --danger: #ff7b7b;
+      --radius: 4px;
+      --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+      --safe-t: max(14px, env(safe-area-inset-top, 0px));
+      --safe-r: max(14px, env(safe-area-inset-right, 0px));
+      --safe-b: max(14px, env(safe-area-inset-bottom, 0px));
+      --safe-l: max(14px, env(safe-area-inset-left, 0px));
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      color: var(--fg);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .stage {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: #0a0a0a;
+      overflow: hidden;
+    }
+
+    #video {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #view {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      background: #111;
+      display: none;
+    }
+
+    #view.mirrored { transform: scaleX(-1); }
+    body.is-live #view { display: block; }
+
+    .idle {
+      position: absolute;
+      z-index: 3;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: min(320px, calc(100% - 40px));
+      text-align: center;
+      padding: 28px 22px;
+      background: rgba(12, 12, 12, 0.72);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    body.is-live .idle { display: none; }
+
+    .idle h1 {
+      font: 700 13px/1.2 var(--font-mono);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .idle p {
+      color: var(--muted);
+      line-height: 1.5;
+      margin-bottom: 18px;
+      font-size: 10px;
+    }
+
+    .btn {
+      appearance: none;
+      -webkit-appearance: none;
+      font: 700 11px/1 var(--font-mono);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      min-height: 42px;
+      padding: 0 18px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--fg);
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .btn-primary {
+      background: var(--neon);
+      border-color: var(--neon-dim);
+      color: #0a0a0a;
+      width: 100%;
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: wait;
+    }
+
+    .btn-sm {
+      min-height: 32px;
+      padding: 0 10px;
+      font-size: 10px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .btn-sm.primary {
+      background: var(--neon);
+      border-color: var(--neon-dim);
+      color: #0a0a0a;
+    }
+
+    .hud {
+      position: absolute;
+      z-index: 10;
+      display: none;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    body.is-live .hud { display: flex; }
+
+    .hud > * { pointer-events: auto; }
+
+    .hud-top {
+      top: var(--safe-t);
+      left: var(--safe-l);
+      right: var(--safe-r);
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .hud-bottom {
+      bottom: var(--safe-b);
+      left: var(--safe-l);
+      right: var(--safe-r);
+      display: none;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    body.is-live .hud-bottom {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+    }
+
+    .hud-bottom-left,
+    .hud-bottom-right {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .hud-bottom-left {
+      justify-content: flex-start;
+    }
+
+    .hud-bottom-mid {
+      display: flex;
+      justify-content: center;
+    }
+
+    .hud-bottom-right {
+      justify-content: flex-end;
+    }
+
+    body.chrome-hidden .hud-chrome {
+      display: none !important;
+    }
+
+    body.chrome-hidden .overlay {
+      display: none !important;
+    }
+
+    body.chrome-hidden .hud-top {
+      justify-content: flex-end;
+    }
+
+    .hud-zoom {
+      bottom: calc(var(--safe-b) + 56px);
+      left: 50%;
+      transform: translateX(-50%);
+      gap: 0;
+      align-items: center;
+      background: rgba(10, 10, 10, 0.55);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      overflow: hidden;
+    }
+
+    body.is-live .hud-zoom { display: flex; }
+
+    .hud-zoom .hud-btn {
+      min-width: 40px;
+      min-height: 36px;
+      padding: 0 10px;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      font-size: 10px;
+    }
+
+    .hud-zoom .hud-btn + .hud-btn {
+      border-left: 1px solid var(--border);
+    }
+
+    .hud-zoom .hud-btn.active {
+      background: var(--neon);
+      color: #0a0a0a;
+    }
+
+    .hud-btn {
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: rgba(10, 10, 10, 0.55);
+      color: var(--fg);
+      font: 700 11px/1 var(--font-mono);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      touch-action: manipulation;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hud-btn.icon {
+      width: 44px;
+      padding: 0;
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .hud-btn.primary {
+      background: color-mix(in srgb, var(--neon) 80%, transparent);
+      border-color: var(--neon-dim);
+      color: #0a0a0a;
+    }
+
+    body.controls-open #toggle-controls {
+      background: var(--neon);
+      border-color: var(--neon-dim);
+      color: #0a0a0a;
+    }
+
+    .toast {
+      position: absolute;
+      z-index: 12;
+      left: 50%;
+      top: calc(var(--safe-t) + 52px);
+      bottom: auto;
+      transform: translateX(-50%);
+      max-width: min(90vw, 360px);
+      padding: 8px 12px;
+      background: rgba(0, 0, 0, 0.65);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--muted);
+      font-size: 10px;
+      text-align: center;
+      pointer-events: none;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .toast.error { color: var(--danger); }
+    .toast:empty { display: none; }
+
+    .overlay {
+      position: absolute;
+      z-index: 11;
+      left: var(--safe-l);
+      right: var(--safe-r);
+      bottom: calc(var(--safe-b) + 58px);
+      max-width: 440px;
+      margin: 0 auto;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: rgba(10, 10, 10, 0.72);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      display: none;
+      flex-direction: column;
+      gap: 11px;
+      max-height: min(52dvh, 400px);
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+    }
+
+    body.controls-open .overlay { display: flex; }
+
+    .overlay-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .rail {
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted-light);
+    }
+
+    .badge {
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 5px 8px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .ctrl {
+      display: grid;
+      grid-template-columns: 5.4rem minmax(0, 1fr) 2.6rem;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ctrl label {
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted-light);
+    }
+
+    .ctrl output {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      font-size: 10px;
+    }
+
+    .ctrl input[type="range"] {
+      width: 100%;
+      accent-color: var(--neon-dim);
+      touch-action: none;
+    }
+
+    .ctrl select {
+      width: 100%;
+      padding: 8px;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--fg);
+      font: 10px/1.3 var(--font-mono);
+    }
+  </style>
 </head>
 <body>
+  <div class="stage" id="stage">
+    <video id="video" playsinline webkit-playsinline muted autoplay></video>
+    <canvas id="view" aria-label="dithered camera"></canvas>
 
-    <header>
-        <button type="button" class="brand-name" aria-label="Scroll to top">Maude Churchill</button>
-        <div class="header-utilities">
-            <nav class="site-nav">
-                <ul>
-                    <li class="nav-item--selected-work"><a href="#selected-work" class="nav-link">Selected Work</a></li>
-                    <li><a href="#information" class="nav-link">Information</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
-
-    <section id="image-space" aria-label="Image and photo space">
-        <div class="section-title"></div>
-        <div class="image-layout">
-            <div class="image-track" id="image-track">
-                <div class="image-slot image-slot--photo image-slot--carousel-video image-slot--video" id="vibram-video-slot" data-carousel-video>
-                    <video class="slot-video" playsinline autoplay muted preload="auto" aria-label="Vibram by the Sea">
-                        <source src="https://github.com/ta222222/mc/raw/refs/heads/main/VIBRAM%20BY%20THE%20SEA%201(1).webm" type="video/webm" />
-                    </video>
-                </div>
-                <div class="image-slot image-slot--highlight">Image</div>
-                <div class="image-slot image-slot--photo image-slot--carousel-video image-slot--video" id="kaytranada-video-slot" data-carousel-video>
-                    <img
-                        class="kaytranada-end-image"
-                        src="https://github.com/ta222222/mc/blob/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_HERO_063_4x5_CLAIM-small.jpg?raw=true"
-                        alt="Kaytranada for Giorgio Armani"
-                    />
-                    <video class="slot-video" playsinline preload="metadata" aria-label="Kaytranada">
-                        <source src="https://github.com/ta222222/mc/raw/refs/heads/main/Kaytranada%20(VF1,%204x5,%20H264).webm" type="video/webm" />
-                    </video>
-                    <div class="kaytranada-cover" aria-hidden="true"></div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="selected-work" aria-label="Selected Work">
-        <div class="work-grid">
-            <button type="button" class="work-item work-item--vibram" aria-label="View Vibram by the Sea"
-                data-project-title="Vibram by the Sea"
-                data-project-eyebrow="Selected Work"
-                data-project-year="2025"
-                data-project-client="Vibram"
-                data-project-role="Creative Direction"
-                data-project-format="Short Film"
-                data-project-description="A coastal campaign film for Vibram — exploring grip, terrain and movement where the land meets the sea.">
-                <video class="work-item-thumb" muted loop playsinline preload="auto" aria-hidden="true">
-                    <source src="https://github.com/ta222222/mc/raw/refs/heads/main/TEASER%201.webm" type="video/webm" />
-                </video>
-                <span class="work-item-label" aria-hidden="true">Vibram</span>
-                <video class="slot-video work-full-video" playsinline preload="metadata" muted aria-label="Vibram by the Sea — Teaser">
-                    <source src="https://github.com/ta222222/mc/raw/refs/heads/main/TEASER%201.webm" type="video/webm" />
-                </video>
-            </button>
-            <button type="button" class="work-item work-item--armani" aria-label="View Giorgio Armani featuring Kaytranada"
-                data-project-title="Giorgio Armani"
-                data-project-eyebrow="Campaign"
-                data-project-year="2025"
-                data-project-client="Giorgio Armani"
-                data-project-role="Creative Direction"
-                data-project-talent="Kaytranada"
-                data-project-description="A portrait campaign for Giorgio Armani featuring artist and producer Kaytranada — tailoring, leather and quiet confidence, shot under the line 'That's so Armani.'">
-                <img class="work-item-thumb" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_101_4x5.jpg" alt="Giorgio Armani featuring Kaytranada" />
-                <span class="work-item-label" aria-hidden="true">Giorgio Armani</span>
-                <img class="work-gallery-img" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_101_4x5.jpg" alt="Giorgio Armani featuring Kaytranada" hidden />
-                <img class="work-gallery-img" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_134_4x5.jpg" alt="Giorgio Armani featuring Kaytranada" hidden />
-                <img class="work-gallery-img" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_179_4x5.jpg" alt="Giorgio Armani featuring Kaytranada" hidden />
-                <img class="work-gallery-img" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_HERO_063_4x5_CLAIM-small.jpg" alt="Giorgio Armani featuring Kaytranada — That's so Armani" hidden />
-            </button>
-            <button type="button" class="work-item work-item--barbour" aria-label="View Barbour Heritage+ campaign"
-                data-project-title="Barbour"
-                data-project-eyebrow="Campaign"
-                data-project-year="2024"
-                data-project-client="Barbour"
-                data-project-role="Associate Creative Director"
-                data-project-talent="Bafic & KwolleM"
-                data-project-format="Heritage+ Collection"
-                data-project-description="A heritage campaign for Barbour's Heritage+ collection, in partnership with Hypebeast — exploring heritage, legacy and craft with photographer/director Bafic and producer KwolleM."
-                data-project-link="https://hypebeast.com/2024/9/barbour-bafic-kwollem-heritage-collection-campaign-video"
-                data-project-link-label="Read the editorial on Hypebeast">
-                <img class="work-item-thumb" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/hypebeast%20barbour.jpg" alt="Barbour Heritage+ campaign for Hypebeast" />
-                <span class="work-item-label" aria-hidden="true">Barbour</span>
-            </button>
-            <button type="button" class="work-item work-item--prada" aria-label="View Prada Mode London"
-                data-project-title="Prada Mode London"
-                data-project-eyebrow="Event Film"
-                data-project-year="2025"
-                data-project-client="Prada"
-                data-project-role="Creative Direction"
-                data-project-format="Short Film"
-                data-project-description="Prada Mode's London edition — the brand's travelling members' club bringing art, music and conversation together for a singular cultural moment.">
-                <img class="work-item-thumb" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/prada%20mode%20ldn%20screenshot.png" alt="Prada Mode London" />
-                <video class="work-item-hover-video" muted loop playsinline preload="metadata" aria-hidden="true">
-                    <source src="https://github.com/ta222222/mc/raw/refs/heads/main/prada+mode+london+25.webm" type="video/webm" />
-                </video>
-                <span class="work-item-label" aria-hidden="true">Prada Mode</span>
-                <video class="slot-video work-full-video" playsinline preload="metadata" muted aria-label="Prada Mode London">
-                    <source src="https://github.com/ta222222/mc/raw/refs/heads/main/prada+mode+london+25.webm" type="video/webm" />
-                </video>
-            </button>
-            <button type="button" class="work-item work-item--nike" aria-label="View Nike Goadme Hardwear"
-                data-project-title="Nike Goadme Hardwear"
-                data-project-eyebrow="Campaign"
-                data-project-year="2025"
-                data-project-client="Nike"
-                data-project-role="Creative Direction"
-                data-project-description="Nike Goadme Hardwear — a hardwear campaign spanning archive, athletes and product, shot across a cast of collaborators.">
-                <img class="work-item-thumb" src="https://github.com/ta222222/mc/raw/refs/heads/main/06.webp" alt="Nike Goadme Hardwear" />
-                <span class="work-item-label" aria-hidden="true">Nike Goadme Hardwear</span>
-            </button>
-            <button type="button" class="work-item work-item--crocs" aria-label="View Crocs campaign"
-                data-project-title="Crocs Campaign"
-                data-project-eyebrow="Campaign"
-                data-project-year=""
-                data-project-client="Crocs"
-                data-project-role="Creative Direction"
-                data-project-format="Campaign"
-                data-project-description="A campaign film for Crocs.">
-                <video class="work-item-thumb" muted loop playsinline preload="auto" aria-hidden="true">
-                    <source src="https://github.com/ta222222/mc/raw/refs/heads/main/T_H_CROCS.webm" type="video/webm" />
-                </video>
-                <span class="work-item-label" aria-hidden="true">Crocs</span>
-                <video class="slot-video work-full-video" playsinline preload="metadata" muted aria-label="Crocs Campaign">
-                    <source src="https://github.com/ta222222/mc/raw/refs/heads/main/T_H_CROCS.webm" type="video/webm" />
-                </video>
-            </button>
-        </div>
-    </section>
-
-    <div class="work-lightbox" id="work-lightbox" aria-hidden="true">
-        <button type="button" class="work-lightbox-close" id="work-lightbox-close" aria-label="Close expanded view">Close</button>
-        <div class="work-lightbox-backdrop" id="work-lightbox-backdrop"></div>
-        <div class="work-lightbox-panel">
-            <div class="work-lightbox-media" id="work-lightbox-media"></div>
-            <aside class="work-lightbox-details" id="work-lightbox-details" hidden>
-                <p class="wl-detail-eyebrow" id="wl-detail-eyebrow"></p>
-                <h3 class="wl-detail-title" id="wl-detail-title"></h3>
-                <dl class="wl-detail-list" id="wl-detail-list"></dl>
-                <p class="wl-detail-desc" id="wl-detail-desc"></p>
-                <a class="wl-detail-link" id="wl-detail-link" target="_blank" rel="noopener" hidden></a>
-            </aside>
-        </div>
+    <div class="idle" id="idle">
+      <h1>hammercam 3.0</h1>
+      <p>Fullscreen Floyd–Steinberg camera. Start, then open Controls to tweak the look.</p>
+      <button type="button" class="btn btn-primary" id="start-btn">Start camera</button>
     </div>
 
-    <section id="information">
-        <div class="section-title"></div>
-        <div class="info-grid">
-            <div class="info-body info-body--about">
-                <p class="info-section-label">About</p>
-                <p>Maude Churchill is one of few female creative directors working primarily across music and fashion, creating content campaigns and events from creative conception to delivery.</p>
-                <p>A background in editorial helps her craft stories.
-                    <p>Experience with insights provides a qualitative understanding of the audience.</p>
-                <p>Enough time spent at parties to know what brings people to events + keeps them there.</p>
-                <p>Co-founder of Don't Be A Creep, Maude works directly with music venues and festivals to help safeguard attendees by establishing wellbeing processes and communicating them through visual campaigns.</p>
-                <p>In her spare time Maude DJs for brand events, parties and on the radio</p>
-                <div class="info-links">
-                    <p class="info-section-label">Links</p>
-                    <p><a href="https://ra.co/news/75750" target="_blank" rel="noopener">RA article</a></p>
-                    <p><a href="https://www.buildhollywood.co.uk/features/the-artists-and-djs-de-creeping-festivals/" target="_blank" rel="noopener">Build Hollywood Interview</a></p>
-                </div>
-                <div class="info-clients">
-                    <p class="info-section-label">Clients</p>
-                    <ul class="info-clients-list">
-                        <li>Gucci</li>
-                        <li>Prada</li>
-                        <li>Moncler</li>
-                        <li>Nike</li>
-                        <li>The North Face</li>
-                        <li>Crocs</li>
-                        <li>Stone Island</li>
-                        <li>Loro Piana</li>
-                        <li>PlayStation</li>
-                        <li>Hypebeast</li>
-                        <li>Dazed Studio</li>
-                        <li>Boiler Room</li>
-                        <li>Mixcloud</li>
-                        <li>Depop</li>
-                        <li>Protein</li>
-                        <li>Highsnobiety</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="info-body">
-                <p class="info-section-label">More</p>
-                <div class="info-toggles">
-                    <div class="info-toggle">
-                        <button type="button" class="info-toggle-trigger" aria-expanded="false">
-                            <span>DBAC (Don't Be A Creep)</span>
-                            <span class="info-toggle-icon" aria-hidden="true">+</span>
-                        </button>
-                        <div class="info-toggle-panel">
-                            <div class="info-toggle-inner">
-                                <p>DBAC — Don't Be A Creep — is an initiative dedicated to making nightlife a safe space, for the safety and happiness of all partygoers, ravers and nightlifers.</p>
-                                <p><a href="https://www.instagram.com/dontbeacreep/" target="_blank" rel="noopener">@dontbeacreep (Instagram)</a></p>
-                                <figure class="info-dbac-figure">
-                                    <img
-                                        src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/dbacinstass.png"
-                                        alt="Don't Be A Creep Instagram grid — campaign graphics, merch and event posters"
-                                        loading="lazy"
-                                        decoding="async"
-                                    />
-                                </figure>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="info-toggle">
-                        <button type="button" class="info-toggle-trigger" aria-expanded="false">
-                            <span>DJ Side Project</span>
-                            <span class="info-toggle-icon" aria-hidden="true">+</span>
-                        </button>
-                        <div class="info-toggle-panel">
-                            <div class="info-toggle-inner">
-                                <p>A DJ side project of Maude Churchill and Ella Lucia.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="info-toggle">
-                        <button type="button" class="info-toggle-trigger" aria-expanded="false">
-                            <span>Latest Radio Show(s)</span>
-                            <span class="info-toggle-icon" aria-hidden="true">+</span>
-                        </button>
-                        <div class="info-toggle-panel">
-                            <div class="info-toggle-inner">
-                                <p>A monthly two-hour selection recorded for online radio — part DBAC, part personal diary of whatever's been on rotation.</p>
-                                <p><a href="https://soundcloud.com/loosefm/maude-28-may-26" target="_blank" rel="noopener">Latest show — LOOSE.fm, 28 May '26</a></p>
-                                <p><a href="https://www.mixcloud.com/maudechurchill/" target="_blank" rel="noopener">Browse the full radio archive</a></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="info-contact">
-                    <p class="info-section-label"><span id="contact-typewriter">Contact</span></p>
-                    <p>Projects and general enquiries:</p>
-                    <p><a href="mailto:mc@maudechurchill.com">hello@maudechurchill.com</a></p>
-                    <p><a href="https://www.instagram.com/maudechurchill" target="_blank" rel="noopener">@maudechurchill (Instagram)</a></p>
-                </div>
-            </div>
-        </div>
-    </section>
+    <div class="hud hud-top" id="hud-top">
+      <button type="button" class="hud-btn hud-chrome" id="flip-btn">Flip</button>
+      <button type="button" class="hud-btn icon" id="stop-btn" aria-label="Stop">×</button>
+    </div>
 
-    <script>
-        // Information section toggle menu (accordion).
-        const informationSection = document.getElementById('information');
+    <div class="hud hud-zoom hud-chrome" id="zoom-bar" role="group" aria-label="Camera zoom">
+      <button type="button" class="hud-btn" data-zoom="0.5" title="Ultra-wide / fisheye">0.5</button>
+      <button type="button" class="hud-btn active" data-zoom="1">1×</button>
+      <button type="button" class="hud-btn" data-zoom="2">2×</button>
+      <button type="button" class="hud-btn" data-zoom="4">4×</button>
+      <button type="button" class="hud-btn" data-zoom="6">6×</button>
+    </div>
 
-        function syncMoreOpenState() {
-            if (!informationSection) return;
-            const anyOpen = document.querySelectorAll('.info-toggle.is-open').length > 0;
-            informationSection.classList.toggle('is-more-open', anyOpen);
+    <div class="hud hud-bottom hud-chrome" id="hud-bottom">
+      <div class="hud-bottom-left">
+        <button type="button" class="hud-btn primary" id="snap-btn">Save</button>
+        <button type="button" class="hud-btn" id="snap-png-btn">Snap png</button>
+      </div>
+      <div class="hud-bottom-mid">
+        <button type="button" class="hud-btn" id="toggle-chrome" aria-label="Hide controls">Hide UI</button>
+      </div>
+      <div class="hud-bottom-right">
+        <span class="badge" id="facing-badge">rear</span>
+        <button type="button" class="hud-btn" id="toggle-controls">Controls</button>
+      </div>
+    </div>
+
+    <div class="overlay" id="overlay" aria-hidden="true">
+      <div class="overlay-head">
+        <p class="rail">Output settings</p>
+        <button type="button" class="btn btn-sm" id="hide-controls">Hide</button>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn btn-sm" id="reset-btn">Reset</button>
+        <button type="button" class="btn btn-sm primary" id="snap-btn-2">Snap png</button>
+      </div>
+
+      <div class="ctrl">
+        <label for="preset">Preset</label>
+        <select id="preset">
+          <option value="default">Default</option>
+          <option value="v1">V1 G00D</option>
+          <option value="soft">Soft</option>
+          <option value="hard">Hard</option>
+          <option value="test4444">test4444</option>
+        </select>
+        <span></span>
+      </div>
+      <div class="ctrl">
+        <label for="pixel">Pixel</label>
+        <input type="range" id="pixel" min="0.2" max="3" step="0.01" value="0.75">
+        <output id="pixel-val" for="pixel">0.75</output>
+      </div>
+      <div class="ctrl">
+        <label for="threshold">Threshold</label>
+        <input type="range" id="threshold" min="40" max="215" step="1" value="128">
+        <output id="threshold-val" for="threshold">128</output>
+      </div>
+      <div class="ctrl">
+        <label for="contrast">Contrast</label>
+        <input type="range" id="contrast" min="0.5" max="3" step="0.05" value="1.2">
+        <output id="contrast-val" for="contrast">1.20</output>
+      </div>
+      <div class="ctrl">
+        <label for="strength">Strength</label>
+        <input type="range" id="strength" min="0" max="2" step="0.05" value="1">
+        <output id="strength-val" for="strength">1.00</output>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" aria-live="polite"></div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var presets = {
+        default: { pixel: 0.75, threshold: 128, contrast: 1.2, strength: 1 },
+        v1: { pixel: 0.35, threshold: 40, contrast: 2.25, strength: 0.65 },
+        soft: { pixel: 1.25, threshold: 140, contrast: 0.9, strength: 0.75 },
+        hard: { pixel: 0.9, threshold: 100, contrast: 2.0, strength: 1.25 },
+        test4444: { pixel: 0.22, threshold: 44, contrast: 1.55, strength: 0.11 }
+      };
+
+      var video = document.getElementById('video');
+      var view = document.getElementById('view');
+      var toastEl = document.getElementById('toast');
+      var overlay = document.getElementById('overlay');
+      var facingBadge = document.getElementById('facing-badge');
+      var startBtn = document.getElementById('start-btn');
+      var stopBtn = document.getElementById('stop-btn');
+      var flipBtn = document.getElementById('flip-btn');
+      var snapBtn = document.getElementById('snap-btn');
+      var snapPngBtn = document.getElementById('snap-png-btn');
+      var snapBtn2 = document.getElementById('snap-btn-2');
+      var resetBtn = document.getElementById('reset-btn');
+      var toggleControlsBtn = document.getElementById('toggle-controls');
+      var toggleChromeBtn = document.getElementById('toggle-chrome');
+      var hideControlsBtn = document.getElementById('hide-controls');
+      var stageEl = document.getElementById('stage');
+      var zoomBar = document.getElementById('zoom-bar');
+      var toastTimer = 0;
+      var presetEl = document.getElementById('preset');
+      var pixelEl = document.getElementById('pixel');
+      var thresholdEl = document.getElementById('threshold');
+      var contrastEl = document.getElementById('contrast');
+      var strengthEl = document.getElementById('strength');
+      var pixelVal = document.getElementById('pixel-val');
+      var thresholdVal = document.getElementById('threshold-val');
+      var contrastVal = document.getElementById('contrast-val');
+      var strengthVal = document.getElementById('strength-val');
+
+      var work = document.createElement('canvas');
+      var wctx = work.getContext('2d', { willReadFrequently: true, alpha: false });
+      var vctx = view.getContext('2d', { alpha: false });
+      var exportWork = document.createElement('canvas');
+      var exportOut = document.createElement('canvas');
+      var gray = null;
+
+      var stream = null;
+      var facingMode = 'environment';
+      var running = false;
+      var starting = false;
+      var raf = 0;
+      var processing = false;
+      var adaptiveMaxW = 360;
+      var lockedKey = '';
+      var lastPixel = -1;
+      var zoomFactor = 1;
+      var hardwareZoom = false;
+      var usingUltraDevice = false;
+
+      function settings() {
+        return {
+          pixel: +pixelEl.value,
+          threshold: +thresholdEl.value,
+          contrast: +contrastEl.value,
+          strength: +strengthEl.value
+        };
+      }
+
+      function syncLabels() {
+        var s = settings();
+        pixelVal.textContent = s.pixel.toFixed(2);
+        thresholdVal.textContent = String(s.threshold);
+        contrastVal.textContent = s.contrast.toFixed(2);
+        strengthVal.textContent = s.strength.toFixed(2);
+      }
+
+      function toast(msg, isError) {
+        if (toastTimer) {
+          clearTimeout(toastTimer);
+          toastTimer = 0;
         }
+        toastEl.textContent = msg || '';
+        toastEl.classList.toggle('error', !!isError);
+      }
 
-        const infoToggleTriggers = document.querySelectorAll('.info-toggle-trigger');
+      function toastTemp(msg, ms, isError) {
+        toast(msg, isError);
+        toastTimer = setTimeout(function () {
+          toastEl.textContent = '';
+          toastTimer = 0;
+        }, ms || 1400);
+      }
 
-        function closeInfoToggle(trigger) {
-            const toggle = trigger.closest('.info-toggle');
-            const panel = trigger.nextElementSibling;
-            if (!toggle || !panel) return;
-            trigger.setAttribute('aria-expanded', 'false');
-            toggle.classList.remove('is-open');
-            panel.style.maxHeight = '0px';
+      function setChromeHidden(hidden) {
+        document.body.classList.toggle('chrome-hidden', !!hidden);
+        if (hidden) setControlsOpen(false);
+      }
+
+      function applySettings(s) {
+        pixelEl.value = s.pixel;
+        thresholdEl.value = s.threshold;
+        contrastEl.value = s.contrast;
+        strengthEl.value = s.strength;
+        syncLabels();
+      }
+
+      function setControlsOpen(open) {
+        document.body.classList.toggle('controls-open', open);
+        toggleControlsBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        overlay.setAttribute('aria-hidden', open ? 'false' : 'true');
+      }
+
+      function syncFacingUi() {
+        var rear = facingMode === 'environment';
+        facingBadge.textContent = rear ? 'rear' : 'front';
+        view.classList.toggle('mirrored', !rear);
+      }
+
+      function syncZoomUi() {
+        var buttons = zoomBar.querySelectorAll('[data-zoom]');
+        for (var i = 0; i < buttons.length; i++) {
+          var btn = buttons[i];
+          btn.classList.toggle('active', Math.abs(+btn.getAttribute('data-zoom') - zoomFactor) < 0.001);
         }
+      }
 
-        infoToggleTriggers.forEach(trigger => {
-            const toggle = trigger.closest('.info-toggle');
-            const panel = trigger.nextElementSibling;
-            if (!toggle || !panel) return;
+      function getTrack() {
+        return stream && stream.getVideoTracks()[0] ? stream.getVideoTracks()[0] : null;
+      }
 
-            const syncPanelHeight = () => {
-                if (trigger.getAttribute('aria-expanded') === 'true') {
-                    panel.style.maxHeight = `${panel.scrollHeight}px`;
-                }
-            };
-
-            panel.querySelectorAll('img').forEach(img => {
-                if (img.complete) return;
-                img.addEventListener('load', syncPanelHeight);
-            });
-
-            trigger.addEventListener('click', () => {
-                const isOpen = trigger.getAttribute('aria-expanded') === 'true';
-
-                // Accordion: only one item open at a time — close any other open item first.
-                if (!isOpen) {
-                    infoToggleTriggers.forEach(other => {
-                        if (other !== trigger && other.getAttribute('aria-expanded') === 'true') {
-                            closeInfoToggle(other);
-                        }
-                    });
-                }
-
-                trigger.setAttribute('aria-expanded', String(!isOpen));
-                toggle.classList.toggle('is-open', !isOpen);
-                panel.style.maxHeight = isOpen ? '0px' : `${panel.scrollHeight}px`;
-                syncMoreOpenState();
-            });
-        });
-
-        // "Contact" typewriter: slow type → backspace → fast type → blink (3.33s) → rest, every 33s.
-        (function contactTypewriter() {
-            const el = document.getElementById('contact-typewriter');
-            if (!el) return;
-
-            const word = 'Contact';
-            const SLOW = 145;
-            const ERASE = 80;
-            const FAST = 45;
-            const BLINK_DURATION = 3330;
-            const BLINK_EVERY = 470;
-            const CYCLE = 33000;
-
-            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-                el.textContent = word;
-                return;
-            }
-
-            let timers = [];
-
-            function wait(ms) {
-                return new Promise(resolve => {
-                    timers.push(window.setTimeout(resolve, ms));
-                });
-            }
-
-            function clearTimers() {
-                timers.forEach(window.clearTimeout);
-                timers = [];
-            }
-
-            function paint(text, showCursor) {
-                el.textContent = text + (showCursor ? '\u200A|' : '\u200A\u00A0');
-            }
-
-            async function type(speed) {
-                for (let i = 1; i <= word.length; i++) {
-                    paint(word.slice(0, i), true);
-                    await wait(speed);
-                }
-            }
-
-            async function erase(speed) {
-                for (let i = word.length - 1; i >= 0; i--) {
-                    paint(word.slice(0, i), true);
-                    await wait(speed);
-                }
-            }
-
-            async function blink(duration, every) {
-                let elapsed = 0;
-                let on = false;
-                while (elapsed < duration) {
-                    paint(word, on);
-                    on = !on;
-                    await wait(every);
-                    elapsed += every;
-                }
-            }
-
-            async function runSequence() {
-                clearTimers();
-                paint('', true);
-                await type(SLOW);
-                await wait(320);
-                await erase(ERASE);
-                await wait(140);
-                await type(FAST);
-                await blink(BLINK_DURATION, BLINK_EVERY);
-                el.textContent = word;
-            }
-
-            runSequence();
-            window.setInterval(runSequence, CYCLE);
-        })();
-
-        // Keep nav in the header on mobile while placing the IG link at bottom right.
-        const headerUtilities = document.querySelector('.header-utilities');
-        const headerMeta = document.getElementById('header-meta');
-        const mobileMetaSlot = document.getElementById('mobile-meta-slot');
-        const mobileMetaQuery = window.matchMedia('(max-width: 868px)');
-
-        function placeHeaderMeta(event) {
-            if (!headerMeta || !headerUtilities || !mobileMetaSlot) return;
-
-            const target = event.matches ? mobileMetaSlot : headerUtilities;
-            if (headerMeta.parentElement !== target) {
-                target.appendChild(headerMeta);
-            }
+      function getZoomCaps(track) {
+        if (!track || !track.getCapabilities) return null;
+        try {
+          var caps = track.getCapabilities();
+          return caps && caps.zoom ? caps.zoom : null;
+        } catch (e) {
+          return null;
         }
-
-        placeHeaderMeta(mobileMetaQuery);
-        mobileMetaQuery.addEventListener('change', placeHeaderMeta);
-
-        // Image carousel — left half goes previous, right half goes next.
-        const imageSpace = document.getElementById('image-space');
-        const imageLayout = document.querySelector('.image-layout');
-        const imageTrack = document.getElementById('image-track');
-        const vibramVideoSlot = document.getElementById('vibram-video-slot');
-        const vibramSlotVideo = vibramVideoSlot?.querySelector('.slot-video');
-        const vibramSlideIndex = vibramVideoSlot && imageTrack
-            ? Array.from(imageTrack.children).indexOf(vibramVideoSlot)
-            : -1;
-        const kaytranadaVideoSlot = document.getElementById('kaytranada-video-slot');
-        const kaytranadaSlotVideo = kaytranadaVideoSlot?.querySelector('.slot-video');
-        const kaytranadaEndImage = kaytranadaVideoSlot?.querySelector('.kaytranada-end-image');
-        const kaytranadaSlideIndex = kaytranadaVideoSlot && imageTrack
-            ? Array.from(imageTrack.children).indexOf(kaytranadaVideoSlot)
-            : -1;
-
-        // Armani stills to rotate between whenever the photo is shown.
-        const kaytranadaStillSources = [
-            'https://github.com/ta222222/mc/blob/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_HERO_063_4x5_CLAIM-small.jpg?raw=true',
-            'https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_179_4x5.jpg'
-        ];
-        // Preload both so swapping never flashes.
-        kaytranadaStillSources.forEach(src => { const img = new Image(); img.src = src; });
-
-        // Pick a random Armani still and apply it to the slot's image.
-        function pickKaytranadaStill() {
-            if (!kaytranadaEndImage) return;
-            const next = kaytranadaStillSources[
-                Math.floor(Math.random() * kaytranadaStillSources.length)
-            ];
-            if (kaytranadaEndImage.getAttribute('src') !== next) {
-                kaytranadaEndImage.src = next;
-            }
-        }
-        const mobileCarouselQuery = window.matchMedia('(max-width: 868px)');
-        let imageIndex = 0;
-        let kaytranadaPausedByUser = false;
-        let kaytranadaHasEnded = false;
-        let kaytranadaTapTimer = null;
-        let kaytranadaLastTap = 0;
-        const kaytranadaTapDelay = 280;
-        let kaytranadaStallTimer = null;
-        const kaytranadaStallDelay = 2500;
-        let kaytranadaReadyHandler = null;
-        let vibramPausedByUser = false;
-        let vibramHasEnded = false;
-        let vibramTapTimer = null;
-        let vibramLastTap = 0;
-        const vibramTapDelay = 280;
-
-        function clearKaytranadaTapTimer() {
-            if (kaytranadaTapTimer) {
-                window.clearTimeout(kaytranadaTapTimer);
-                kaytranadaTapTimer = null;
-            }
-        }
-
-        function clearVibramTapTimer() {
-            if (vibramTapTimer) {
-                window.clearTimeout(vibramTapTimer);
-                vibramTapTimer = null;
-            }
-        }
-
-        function resetVibramSlot() {
-            if (!vibramVideoSlot || !vibramSlotVideo) return;
-
-            vibramHasEnded = false;
-            vibramPausedByUser = false;
-            vibramLastTap = 0;
-            clearVibramTapTimer();
-            vibramVideoSlot.classList.remove('is-playing', 'is-ended');
-            vibramSlotVideo.pause();
-            vibramSlotVideo.currentTime = 0;
-            vibramSlotVideo.muted = true;
-        }
-
-        function showVibramEndState() {
-            if (!vibramVideoSlot || !vibramSlotVideo) return;
-            if (imageIndex !== vibramSlideIndex) return;
-            advanceToKaytranadaSlide();
-        }
-
-        function restartVibramVideo() {
-            if (!vibramVideoSlot || !vibramSlotVideo) return;
-
-            vibramHasEnded = false;
-            vibramPausedByUser = false;
-            vibramLastTap = 0;
-            clearVibramTapTimer();
-            vibramVideoSlot.classList.remove('is-ended');
-            playVibramSlotVideo({ restart: true });
-        }
-
-        function clearKaytranadaStallTimer() {
-            if (kaytranadaStallTimer) {
-                window.clearTimeout(kaytranadaStallTimer);
-                kaytranadaStallTimer = null;
-            }
-        }
-
-        // Show the "That's so Armani" still in place of the video.
-        function showKaytranadaFallback() {
-            clearKaytranadaStallTimer();
-            kaytranadaVideoSlot?.classList.add('is-video-fallback');
-        }
-
-        // Hide the fallback once the video is actually playing again.
-        function hideKaytranadaFallback() {
-            clearKaytranadaStallTimer();
-            kaytranadaVideoSlot?.classList.remove('is-video-fallback');
-        }
-
-        // After a short grace period, reveal the still if the video still hasn't
-        // buffered enough to play smoothly (bad / slow connection).
-        function scheduleKaytranadaFallback() {
-            if (kaytranadaStallTimer) return;
-            kaytranadaStallTimer = window.setTimeout(() => {
-                kaytranadaStallTimer = null;
-                if (!kaytranadaSlotVideo || kaytranadaSlotVideo.readyState < 3) {
-                    showKaytranadaFallback();
-                }
-            }, kaytranadaStallDelay);
-        }
-
-        function resetKaytranadaSlot() {
-            if (!kaytranadaVideoSlot || !kaytranadaSlotVideo) return;
-
-            kaytranadaHasEnded = false;
-            kaytranadaPausedByUser = false;
-            kaytranadaLastTap = 0;
-            clearKaytranadaTapTimer();
-            clearKaytranadaStallTimer();
-            kaytranadaVideoSlot.classList.remove('is-playing', 'is-ended', 'is-video-fallback');
-            kaytranadaSlotVideo.pause();
-            kaytranadaSlotVideo.currentTime = 0;
-            kaytranadaSlotVideo.muted = true;
-        }
-
-        function showKaytranadaEndState() {
-            if (!kaytranadaVideoSlot || !kaytranadaSlotVideo) return;
-
-            kaytranadaHasEnded = true;
-            kaytranadaPausedByUser = true;
-            kaytranadaSlotVideo.pause();
-
-            // Always reveal the "That's so Armani" still when the video ends,
-            // on every device (not just mobile).
-            kaytranadaVideoSlot.classList.remove('is-playing');
-            kaytranadaVideoSlot.classList.add('is-ended');
-        }
-
-        function restartKaytranadaVideo() {
-            if (!kaytranadaVideoSlot || !kaytranadaSlotVideo) return;
-
-            kaytranadaHasEnded = false;
-            kaytranadaPausedByUser = false;
-            kaytranadaLastTap = 0;
-            clearKaytranadaTapTimer();
-            kaytranadaVideoSlot.classList.remove('is-ended');
-            playKaytranadaSlotVideo({ restart: true });
-        }
-
-        // Clicking the "That's so Armani" still: crossfade to the video and play.
-        // If the clip isn't buffered yet (still loading / slow connection), keep
-        // the photo up and fade the video in only once it can actually play.
-        function triggerKaytranadaPlayback() {
-            if (!kaytranadaVideoSlot || !kaytranadaSlotVideo) return;
-
-            const video = kaytranadaSlotVideo;
-            clearKaytranadaTapTimer();
-            clearKaytranadaStallTimer();
-            kaytranadaLastTap = 0;
-            kaytranadaHasEnded = false;
-            kaytranadaPausedByUser = false;
-
-            if (kaytranadaReadyHandler) {
-                video.removeEventListener('playing', kaytranadaReadyHandler);
-                video.removeEventListener('canplay', kaytranadaReadyHandler);
-                kaytranadaReadyHandler = null;
-            }
-
-            const crossfadeToVideo = () => {
-                kaytranadaVideoSlot.classList.remove('is-ended', 'is-video-fallback');
-                kaytranadaVideoSlot.classList.add('is-playing');
-            };
-
-            video.currentTime = 0;
-
-            // readyState >= 3 (HAVE_FUTURE_DATA) means it can play now.
-            if (video.readyState >= 3) {
-                crossfadeToVideo();
-            } else {
-                kaytranadaReadyHandler = () => {
-                    video.removeEventListener('playing', kaytranadaReadyHandler);
-                    video.removeEventListener('canplay', kaytranadaReadyHandler);
-                    kaytranadaReadyHandler = null;
-                    crossfadeToVideo();
-                };
-                video.addEventListener('playing', kaytranadaReadyHandler);
-                video.addEventListener('canplay', kaytranadaReadyHandler);
-            }
-
-            autoplaySlotVideo(video, { sound: true });
-        }
-
-        // Randomly decide how the Armani (Kaytranada) slide should appear when
-        // it becomes the active slide: either autoplay the video, or hold on the
-        // "That's so Armani" still image. Sets state only — syncCarouselVideos()
-        // then plays the video (or leaves the still showing) accordingly.
-        function prepareKaytranadaPresentation() {
-            if (!kaytranadaVideoSlot || !kaytranadaSlotVideo) return;
-
-            clearKaytranadaTapTimer();
-            kaytranadaLastTap = 0;
-            // Rotate the Armani still between its variants each time it's shown.
-            pickKaytranadaStill();
-            // Favour the still so the photo appears more often.
-            const showStill = Math.random() < 0.7;
-            if (showStill) {
-                kaytranadaHasEnded = true;
-                kaytranadaPausedByUser = true;
-                kaytranadaSlotVideo.pause();
-                kaytranadaSlotVideo.muted = true;
-                kaytranadaVideoSlot.classList.remove('is-playing');
-                kaytranadaVideoSlot.classList.add('is-ended');
-            } else {
-                kaytranadaHasEnded = false;
-                kaytranadaPausedByUser = false;
-                kaytranadaVideoSlot.classList.remove('is-ended');
-            }
-        }
-
-        // Elegant, relaxed iOS-style swipe + a brief black hold before the
-        // Armani content reveals.
-        const KAYTRANADA_SWIPE_MS = 720;
-        const KAYTRANADA_BLACK_HOLD_MS = 120;
-        let kaytranadaRevealTimer = null;
-
-        // When the Vibram film finishes, glide the carousel over to the Armani
-        // slide. The slide arrives fully black, then the content fades in: the
-        // still photo eases in slowly; the video snaps in swiftly on purpose.
-        function advanceToKaytranadaSlide() {
-            if (!imageTrack || kaytranadaSlideIndex < 0) return;
-            pauseVibramSlotVideo();
-            prepareKaytranadaPresentation();
-
-            const isVideoPresentation = !kaytranadaHasEnded;
-
-            if (kaytranadaRevealTimer) {
-                window.clearTimeout(kaytranadaRevealTimer);
-                kaytranadaRevealTimer = null;
-            }
-
-            // Black out the Armani slide instantly and pick the reveal speed.
-            kaytranadaVideoSlot?.classList.add('is-entering');
-            kaytranadaVideoSlot?.classList.toggle('reveal-swift', isVideoPresentation);
-
-            // Relaxed, decelerating swipe (easeOutQuint) for this one move.
-            imageTrack.style.transition =
-                `transform ${KAYTRANADA_SWIPE_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`;
-
-            imageIndex = kaytranadaSlideIndex;
-            updateImageCarousel();
-
-            // After the swipe settles (plus a short black hold), fade the cover
-            // away to reveal the content, then restore the default transition.
-            kaytranadaRevealTimer = window.setTimeout(() => {
-                kaytranadaRevealTimer = null;
-                kaytranadaVideoSlot?.classList.remove('is-entering');
-                imageTrack.style.transition = '';
-            }, KAYTRANADA_SWIPE_MS + KAYTRANADA_BLACK_HOLD_MS);
-        }
-
-        function syncCarouselLayout() {
-            if (!imageLayout) return;
-            const onVibram = imageIndex === vibramSlideIndex;
-            // The Armani slide is portrait (4:5); use the portrait stage on every
-            // device so the image fits instead of being letterboxed in 16:9.
-            const showPortrait = imageIndex === kaytranadaSlideIndex;
-            const showVibramHero = onVibram && mobileCarouselQuery.matches;
-            imageLayout.classList.toggle('image-layout--portrait-video', showPortrait);
-            imageLayout.classList.toggle('image-layout--vibram-hero', showVibramHero);
-            imageSpace?.classList.toggle('image-space--vibram-hero', showVibramHero);
-            imageLayout.style.aspectRatio = showPortrait ? '4 / 5' : '';
-        }
-
-        // Reliably autostart a slot video on both mobile and desktop. Muted
-        // playback is the only mode browsers always allow to autoplay, so we
-        // start muted to guarantee the video begins, then (on desktop) try to
-        // restore sound without ever interrupting playback.
-        function autoplaySlotVideo(video, { sound = false } = {}) {
-            if (!video) return;
-
-            const wantSound = sound && !mobileCarouselQuery.matches;
-            const restoreSound = () => {
-                video.muted = false;
-                const replay = video.play();
-                if (replay && replay.catch) {
-                    replay.catch(() => {
-                        video.muted = true;
-                        video.play().catch(() => {});
-                    });
-                }
-            };
-
-            video.muted = true;
-            const started = video.play();
-            if (started && started.then) {
-                started.then(() => {
-                    if (wantSound) restoreSound();
-                }).catch(() => {
-                    video.muted = true;
-                    video.play().catch(() => {});
-                });
-            } else if (wantSound) {
-                restoreSound();
-            }
-        }
-
-        function playVibramSlotVideo({ restart = false } = {}) {
-            if (!vibramSlotVideo || !vibramVideoSlot) return;
-
-            const shouldRestart = restart || vibramHasEnded;
-            vibramHasEnded = false;
-            vibramPausedByUser = false;
-            vibramLastTap = 0;
-            clearVibramTapTimer();
-            vibramVideoSlot.classList.remove('is-ended');
-            vibramVideoSlot.classList.add('is-playing');
-            if (shouldRestart) {
-                vibramSlotVideo.currentTime = 0;
-            }
-            // Force autostart everywhere; sound is restored on desktop if allowed.
-            autoplaySlotVideo(vibramSlotVideo, { sound: true });
-        }
-
-        function pauseVibramSlotVideo() {
-            if (!vibramSlotVideo) return;
-            vibramSlotVideo.pause();
-            vibramSlotVideo.muted = true;
-        }
-
-        function playKaytranadaSlotVideo({ restart = false } = {}) {
-            if (!kaytranadaSlotVideo || !kaytranadaVideoSlot) return;
-
-            const shouldRestart = restart || kaytranadaHasEnded;
-            kaytranadaHasEnded = false;
-            kaytranadaPausedByUser = false;
-            kaytranadaLastTap = 0;
-            clearKaytranadaTapTimer();
-            kaytranadaVideoSlot.classList.remove('is-ended');
-            kaytranadaVideoSlot.classList.add('is-playing');
-            if (shouldRestart) {
-                kaytranadaSlotVideo.currentTime = 0;
-            }
-            // Force autostart everywhere; sound is restored on desktop if allowed.
-            autoplaySlotVideo(kaytranadaSlotVideo, { sound: true });
-            // If playback can't get going (slow/no connection), fall back to the still.
-            if (kaytranadaSlotVideo.readyState < 3) {
-                scheduleKaytranadaFallback();
-            }
-        }
-
-        function pauseKaytranadaSlotVideo() {
-            if (!kaytranadaSlotVideo) return;
-            kaytranadaSlotVideo.pause();
-            kaytranadaSlotVideo.muted = true;
-        }
-
-        function updateImageCarousel() {
-            if (!imageTrack) return;
-            imageTrack.style.transform = `translateX(-${imageIndex * 100}%)`;
-            syncCarouselLayout();
-            syncCarouselVideos();
-        }
-
-        function syncCarouselVideos() {
-            if (imageIndex === vibramSlideIndex) {
-                if (!vibramPausedByUser && !vibramHasEnded) {
-                    playVibramSlotVideo({ restart: true });
-                }
-            } else {
-                resetVibramSlot();
-            }
-
-            if (imageIndex === kaytranadaSlideIndex) {
-                if (!kaytranadaPausedByUser && !kaytranadaHasEnded) {
-                    playKaytranadaSlotVideo({ restart: true });
-                }
-            } else {
-                resetKaytranadaSlot();
-            }
-        }
-
-        function goToPreviousSlide() {
-            if (!imageTrack) return;
-            if (imageIndex === vibramSlideIndex) {
-                pauseVibramSlotVideo();
-            }
-            if (imageIndex === kaytranadaSlideIndex) {
-                pauseKaytranadaSlotVideo();
-            }
-            imageIndex = (imageIndex - 1 + imageTrack.children.length) % imageTrack.children.length;
-            updateImageCarousel();
-        }
-
-        function goToNextSlide() {
-            if (!imageTrack) return;
-            if (imageIndex === vibramSlideIndex) {
-                pauseVibramSlotVideo();
-            }
-            if (imageIndex === kaytranadaSlideIndex) {
-                pauseKaytranadaSlotVideo();
-            }
-            imageIndex = (imageIndex + 1) % imageTrack.children.length;
-            updateImageCarousel();
-        }
-
-        kaytranadaSlotVideo?.addEventListener('ended', showKaytranadaEndState);
-        vibramSlotVideo?.addEventListener('ended', showVibramEndState);
-
-        // Show the Armani still as a fallback when the video errors or buffers,
-        // and hide it again as soon as the video resumes playing.
-        kaytranadaSlotVideo?.addEventListener('error', showKaytranadaFallback);
-        kaytranadaSlotVideo?.addEventListener('stalled', scheduleKaytranadaFallback);
-        kaytranadaSlotVideo?.addEventListener('waiting', scheduleKaytranadaFallback);
-        kaytranadaSlotVideo?.addEventListener('playing', hideKaytranadaFallback);
-        kaytranadaSlotVideo?.addEventListener('canplaythrough', hideKaytranadaFallback);
-
-        function getCarouselPointerX(event) {
-            if (event.changedTouches?.length) {
-                return event.changedTouches[0].clientX;
-            }
-            return event.clientX;
-        }
-
-        function getCarouselPointerY(event) {
-            if (event.changedTouches?.length) {
-                return event.changedTouches[0].clientY;
-            }
-            return event.clientY;
-        }
-
-        function getContainedVideoRect(video) {
-            const elementRect = video.getBoundingClientRect();
-            const videoWidth = video.videoWidth;
-            const videoHeight = video.videoHeight;
-
-            if (!videoWidth || !videoHeight) {
-                return elementRect;
-            }
-
-            const elementWidth = elementRect.width;
-            const elementHeight = elementRect.height;
-            const videoAspect = videoWidth / videoHeight;
-            const elementAspect = elementWidth / elementHeight;
-            let renderedWidth;
-            let renderedHeight;
-            let offsetX = 0;
-            let offsetY = 0;
-
-            if (videoAspect > elementAspect) {
-                renderedWidth = elementWidth;
-                renderedHeight = elementWidth / videoAspect;
-                offsetY = (elementHeight - renderedHeight) / 2;
-            } else {
-                renderedHeight = elementHeight;
-                renderedWidth = elementHeight * videoAspect;
-                offsetX = (elementWidth - renderedWidth) / 2;
-            }
-
-            return {
-                left: elementRect.left + offsetX,
-                right: elementRect.left + offsetX + renderedWidth,
-                top: elementRect.top + offsetY,
-                bottom: elementRect.top + offsetY + renderedHeight,
-                width: renderedWidth,
-                height: renderedHeight
-            };
-        }
-
-        function getContainedImageRect(img) {
-            const elementRect = img.getBoundingClientRect();
-            const naturalWidth = img.naturalWidth;
-            const naturalHeight = img.naturalHeight;
-
-            if (!naturalWidth || !naturalHeight) {
-                return elementRect;
-            }
-
-            const elementWidth = elementRect.width;
-            const elementHeight = elementRect.height;
-            const imageAspect = naturalWidth / naturalHeight;
-            const elementAspect = elementWidth / elementHeight;
-            let renderedWidth;
-            let renderedHeight;
-            let offsetX = 0;
-            let offsetY = 0;
-
-            if (imageAspect > elementAspect) {
-                renderedWidth = elementWidth;
-                renderedHeight = elementWidth / imageAspect;
-                offsetY = (elementHeight - renderedHeight) / 2;
-            } else {
-                renderedHeight = elementHeight;
-                renderedWidth = elementHeight * imageAspect;
-                offsetX = (elementWidth - renderedWidth) / 2;
-            }
-
-            return {
-                left: elementRect.left + offsetX,
-                right: elementRect.left + offsetX + renderedWidth,
-                top: elementRect.top + offsetY,
-                bottom: elementRect.top + offsetY + renderedHeight,
-                width: renderedWidth,
-                height: renderedHeight
-            };
-        }
-
-        function isPointInRect(x, y, rect) {
-            return x >= rect.left
-                && x <= rect.right
-                && y >= rect.top
-                && y <= rect.bottom;
-        }
-
-        function getVibramVideoRect() {
-            return getContainedVideoRect(vibramSlotVideo);
-        }
-
-        function handleVibramEndedMobileInteraction(event) {
-            const clientX = getCarouselPointerX(event);
-            const clientY = getCarouselPointerY(event);
-            const videoRect = getVibramVideoRect();
-            const isOnVideo = isPointInRect(clientX, clientY, videoRect);
-            const now = Date.now();
-
-            if (isOnVideo && now - vibramLastTap < vibramTapDelay) {
-                clearVibramTapTimer();
-                vibramLastTap = 0;
-                restartVibramVideo();
-                return true;
-            }
-
-            if (isOnVideo) {
-                vibramLastTap = now;
-            } else {
-                vibramLastTap = 0;
-            }
-
-            clearVibramTapTimer();
-            vibramTapTimer = window.setTimeout(() => {
-                vibramTapTimer = null;
-                vibramLastTap = 0;
-                goToNextSlide();
-            }, vibramTapDelay);
-
+      }
+
+      async function tryApplyHardwareZoom(track, factor) {
+        var zoom = getZoomCaps(track);
+        if (!zoom) return false;
+        var z = Math.min(zoom.max, Math.max(zoom.min, factor));
+        try {
+          await track.applyConstraints({ advanced: [{ zoom: z }] });
+          return true;
+        } catch (e1) {
+          try {
+            await track.applyConstraints({ zoom: z });
             return true;
+          } catch (e2) {
+            return false;
+          }
+        }
+      }
+
+      async function findUltraWideDeviceId() {
+        try {
+          var devices = await navigator.mediaDevices.enumerateDevices();
+          var cams = devices.filter(function (d) { return d.kind === 'videoinput'; });
+          for (var i = 0; i < cams.length; i++) {
+            var label = (cams[i].label || '').toLowerCase();
+            if (/ultra|wide|0\.5|fisheye/.test(label) && !/tele|front|user|face/.test(label)) {
+              return cams[i].deviceId;
+            }
+          }
+        } catch (e) { /* ignore */ }
+        return null;
+      }
+
+      async function setZoom(factor) {
+        zoomFactor = factor;
+        syncZoomUi();
+        hardwareZoom = false;
+
+        // Leaving dedicated ultra-wide device — restore main camera
+        if (usingUltraDevice && factor !== 0.5) {
+          usingUltraDevice = false;
+          if (running && !starting) {
+            await startCamera();
+            return;
+          }
         }
 
-        function handleVibramSlideInteraction(event) {
-            if (mobileCarouselQuery.matches && vibramHasEnded) {
-                return handleVibramEndedMobileInteraction(event);
-            }
+        var track = getTrack();
+        if (track) {
+          hardwareZoom = await tryApplyHardwareZoom(track, factor);
+          if (hardwareZoom) {
+            usingUltraDevice = false;
+            toastTemp((factor === 0.5 ? '0.5× ultra' : factor + '×'), 900);
+            return;
+          }
+        }
 
-            if (!vibramSlotVideo) return false;
-
-            const videoRect = getVibramVideoRect();
-            const clientX = getCarouselPointerX(event);
-            const clientY = getCarouselPointerY(event);
-            const isOnVideo = isPointInRect(clientX, clientY, videoRect);
-
-            if (isOnVideo) {
-                if (vibramHasEnded) {
-                    playVibramSlotVideo({ restart: true });
-                } else if (vibramSlotVideo.paused) {
-                    playVibramSlotVideo();
-                } else {
-                    vibramPausedByUser = true;
-                    pauseVibramSlotVideo();
+        // 0.5× without zoom API: try dedicated ultra-wide camera
+        if (factor === 0.5 && facingMode === 'environment') {
+          var ultraId = await findUltraWideDeviceId();
+          if (ultraId && running && !starting) {
+            try {
+              starting = true;
+              var wasLive = running;
+              running = false;
+              stopStreamOnly();
+              stream = await navigator.mediaDevices.getUserMedia({
+                audio: false,
+                video: {
+                  deviceId: { exact: ultraId },
+                  width: { ideal: 1920 },
+                  height: { ideal: 1080 },
+                  frameRate: { ideal: 30, max: 30 }
                 }
-                return true;
+              });
+              await stabilizeTrack(stream);
+              video.srcObject = stream;
+              await video.play();
+              running = true;
+              starting = false;
+              hardwareZoom = true;
+              usingUltraDevice = true;
+              lockedKey = '';
+              if (wasLive) loop();
+              toastTemp('0.5× ultra-wide', 900);
+              return;
+            } catch (e) {
+              starting = false;
+              usingUltraDevice = false;
+              if (!stream) {
+                try { await startCamera(); } catch (e2) { /* ignore */ }
+              }
             }
-
-            if (clientX < videoRect.left || clientY < videoRect.top) {
-                goToPreviousSlide();
-                return true;
-            }
-
-            if (clientX > videoRect.right || clientY > videoRect.bottom) {
-                goToNextSlide();
-                return true;
-            }
-
-            const layoutRect = imageLayout.getBoundingClientRect();
-            const x = clientX - layoutRect.left;
-            if (x < layoutRect.width / 2) goToPreviousSlide();
-            else goToNextSlide();
-            return true;
+          }
         }
 
-        function handleKaytranadaEndedMobileInteraction(event) {
-            const clientX = getCarouselPointerX(event);
-            const clientY = getCarouselPointerY(event);
-            const imageRect = kaytranadaEndImage ? getContainedImageRect(kaytranadaEndImage) : null;
-            const isOnImage = imageRect ? isPointInRect(clientX, clientY, imageRect) : false;
+        toastTemp((factor === 0.5 ? '0.5×' : factor + '×') + ' · digital', 900);
+      }
 
-            // Tapping the still fades in and plays the Armani video.
-            if (isOnImage) {
-                clearKaytranadaTapTimer();
-                kaytranadaLastTap = 0;
-                triggerKaytranadaPlayback();
-                return true;
-            }
+      function drawVideoFrame(ctx, destW, destH) {
+        var vw = video.videoWidth || destW;
+        var vh = video.videoHeight || destH;
+        ctx.imageSmoothingEnabled = false;
 
-            // Taps in the surrounding margins navigate the carousel.
-            const layoutRect = imageLayout.getBoundingClientRect();
-            const x = clientX - layoutRect.left;
-            if (x < layoutRect.width / 2) goToPreviousSlide();
-            else goToNextSlide();
-            return true;
+        // Hardware zoom already applied to stream — draw full frame
+        if (hardwareZoom || zoomFactor <= 1) {
+          // Slight digital widen simulation when 0.5 has no ultra cam: letterbox-scale in
+          if (!hardwareZoom && zoomFactor < 1) {
+            // Soft “wide” crop invert: scale source up then crop edges differently —
+            // without ultra lens, draw full frame (best available)
+            ctx.drawImage(video, 0, 0, destW, destH);
+            return;
+          }
+          ctx.drawImage(video, 0, 0, destW, destH);
+          return;
         }
 
-        function handleKaytranadaSlideInteraction(event) {
-            if (mobileCarouselQuery.matches && kaytranadaHasEnded) {
-                return handleKaytranadaEndedMobileInteraction(event);
-            }
+        // Center crop digital zoom
+        var factor = zoomFactor;
+        var cw = vw / factor;
+        var ch = vh / factor;
+        var sx = (vw - cw) / 2;
+        var sy = (vh - ch) / 2;
+        ctx.drawImage(video, sx, sy, cw, ch, 0, 0, destW, destH);
+      }
 
-            if (!kaytranadaSlotVideo) return false;
+      function setRunningUi(isOn) {
+        document.body.classList.toggle('is-live', isOn);
+        if (!isOn) {
+          setControlsOpen(false);
+          setChromeHidden(false);
+        }
+      }
 
-            const clientX = getCarouselPointerX(event);
-            const clientY = getCarouselPointerY(event);
+      // Fast FS on luminance buffer — same look, smoother on iPhone
+      function ditherGray(data, width, height, opts) {
+        var len = width * height;
+        if (!gray || gray.length !== len) gray = new Float32Array(len);
 
-            // While the Armani still is on screen (chosen on load, ended, or shown
-            // as a load/connection fallback), clicking the photo fades in + plays
-            // the video; clicks beyond the photo navigate the carousel.
-            const stillShowing = kaytranadaVideoSlot.classList.contains('is-ended')
-                || kaytranadaVideoSlot.classList.contains('is-video-fallback');
-            if (stillShowing) {
-                const imageRect = kaytranadaEndImage
-                    ? getContainedImageRect(kaytranadaEndImage)
-                    : getContainedVideoRect(kaytranadaSlotVideo);
-                if (isPointInRect(clientX, clientY, imageRect)) {
-                    triggerKaytranadaPlayback();
-                    return true;
-                }
-                if (clientX < imageRect.left) {
-                    goToPreviousSlide();
-                    return true;
-                }
-                if (clientX > imageRect.right) {
-                    goToNextSlide();
-                    return true;
-                }
-                const stillLayoutRect = imageLayout.getBoundingClientRect();
-                if (clientX - stillLayoutRect.left < stillLayoutRect.width / 2) goToPreviousSlide();
-                else goToNextSlide();
-                return true;
-            }
+        var contrast = opts.contrast;
+        var threshold = opts.threshold;
+        var strength = opts.strength;
+        var mid = 128;
+        var i, x, y, idx, g, v, err, n;
 
-            const videoRect = getContainedVideoRect(kaytranadaSlotVideo);
-            const isOnVideo = clientX >= videoRect.left
-                && clientX <= videoRect.right
-                && clientY >= videoRect.top
-                && clientY <= videoRect.bottom;
-
-            if (isOnVideo) {
-                if (kaytranadaHasEnded) {
-                    triggerKaytranadaPlayback();
-                } else if (kaytranadaSlotVideo.paused) {
-                    playKaytranadaSlotVideo();
-                } else {
-                    kaytranadaPausedByUser = true;
-                    pauseKaytranadaSlotVideo();
-                }
-                return true;
-            }
-
-            if (clientX < videoRect.left) {
-                goToPreviousSlide();
-                return true;
-            }
-
-            if (clientX > videoRect.right) {
-                goToNextSlide();
-                return true;
-            }
-
-            const layoutRect = imageLayout.getBoundingClientRect();
-            const x = clientX - layoutRect.left;
-            if (x < layoutRect.width / 2) goToPreviousSlide();
-            else goToNextSlide();
-            return true;
+        for (i = 0; i < len; i++) {
+          idx = i * 4;
+          g = data[idx] * 0.299 + data[idx + 1] * 0.587 + data[idx + 2] * 0.114;
+          g = (g - mid) * contrast + mid;
+          gray[i] = g < 0 ? 0 : g > 255 ? 255 : g;
         }
 
-        function handleImageLayoutInteraction(event) {
-            if (!imageLayout || !imageTrack) return;
+        for (y = 0; y < height; y++) {
+          for (x = 0; x < width; x++) {
+            i = y * width + x;
+            g = gray[i];
+            v = g < threshold ? 0 : 255;
+            err = (g - v) * strength;
+            gray[i] = v;
 
-            if (imageIndex === vibramSlideIndex) {
-                handleVibramSlideInteraction(event);
-                return;
+            if (x + 1 < width) gray[i + 1] += err * (7 / 16);
+            if (y + 1 < height) {
+              if (x > 0) gray[i + width - 1] += err * (3 / 16);
+              gray[i + width] += err * (5 / 16);
+              if (x + 1 < width) gray[i + width + 1] += err * (1 / 16);
             }
-
-            if (imageIndex === kaytranadaSlideIndex) {
-                handleKaytranadaSlideInteraction(event);
-                return;
-            }
-
-            const rect = imageLayout.getBoundingClientRect();
-            const x = getCarouselPointerX(event) - rect.left;
-            const isLeftHalf = x < rect.width / 2;
-
-            if (isLeftHalf) goToPreviousSlide();
-            else goToNextSlide();
+          }
         }
 
-        let carouselTouchHandled = false;
+        for (i = 0; i < len; i++) {
+          v = gray[i] < 128 ? 0 : 255;
+          idx = i * 4;
+          data[idx] = data[idx + 1] = data[idx + 2] = v;
+        }
+      }
 
-        imageLayout?.addEventListener('click', (event) => {
-            if (carouselTouchHandled) return;
-            handleImageLayoutInteraction(event);
+      function processFrame() {
+        if (!running || video.readyState < 2) return;
+
+        var t0 = performance.now();
+
+        try {
+          var s = settings();
+          var scale = Math.max(0.2, s.pixel);
+          var vw = video.videoWidth || 640;
+          var vh = video.videoHeight || 480;
+
+          if (s.pixel !== lastPixel) {
+            lastPixel = s.pixel;
+            adaptiveMaxW = 360;
+            lockedKey = '';
+          }
+
+          // Fine look with adaptive cap so Pro Max stays fluid
+          var maxW = Math.min(480, Math.max(220, adaptiveMaxW | 0));
+          var w = Math.min(maxW, Math.max(1, Math.round(vw / scale)));
+          var h = Math.max(1, Math.round(vh * (w / vw)));
+          var chunk = Math.max(1, Math.round(scale));
+          var outW = w * chunk;
+          var outH = h * chunk;
+          var key = w + 'x' + h + ':' + outW + 'x' + outH;
+
+          // Only resize when size actually changes — resizing clears canvas (flicker/freeze feel)
+          if (key !== lockedKey) {
+            lockedKey = key;
+            if (work.width !== w || work.height !== h) {
+              work.width = w;
+              work.height = h;
+            }
+            if (view.width !== outW || view.height !== outH) {
+              view.width = outW;
+              view.height = outH;
+            }
+          }
+
+          wctx.imageSmoothingEnabled = false;
+          drawVideoFrame(wctx, w, h);
+          var imageData = wctx.getImageData(0, 0, w, h);
+          ditherGray(imageData.data, w, h, s);
+          wctx.putImageData(imageData, 0, 0);
+
+          vctx.imageSmoothingEnabled = false;
+          vctx.drawImage(work, 0, 0, outW, outH);
+        } catch (err) {
+          toast('Render error', true);
+          console.error(err);
+        }
+
+        var dt = performance.now() - t0;
+        if (dt > 26) adaptiveMaxW = Math.max(220, adaptiveMaxW - 30);
+        else if (dt < 12) adaptiveMaxW = Math.min(480, adaptiveMaxW + 16);
+      }
+
+      function loop() {
+        if (!running) return;
+        raf = requestAnimationFrame(loop);
+        if (processing) return;
+        processing = true;
+        try {
+          processFrame();
+        } finally {
+          processing = false;
+        }
+      }
+
+      function stopStreamOnly() {
+        if (raf) {
+          cancelAnimationFrame(raf);
+          raf = 0;
+        }
+        if (stream) {
+          stream.getTracks().forEach(function (t) { t.stop(); });
+          stream = null;
+        }
+        video.srcObject = null;
+      }
+
+      function stopCamera() {
+        running = false;
+        starting = false;
+        processing = false;
+        stopStreamOnly();
+        setRunningUi(false);
+        startBtn.disabled = false;
+        startBtn.textContent = 'Start camera';
+        toast('Stopped — tap Start camera');
+      }
+
+      function stabilizeTrack(mediaStream) {
+        var track = mediaStream.getVideoTracks()[0];
+        if (!track || !track.applyConstraints) return Promise.resolve();
+        return track.applyConstraints({
+          frameRate: { ideal: 30, max: 30 },
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
+        }).catch(function () {
+          return track.applyConstraints({
+            frameRate: { ideal: 30, max: 30 }
+          }).catch(function () { /* ignore */ });
         });
+      }
 
-        imageLayout?.addEventListener('touchend', (event) => {
-            carouselTouchHandled = true;
-            handleImageLayoutInteraction(event);
-            event.preventDefault();
-            window.setTimeout(() => {
-                carouselTouchHandled = false;
-            }, 400);
-        }, { passive: false });
-
-        /*
-        function playFirstSlotVideo() {
-            if (!firstImageSlot || !firstSlotVideo) return;
-            firstImageSlot.classList.add('is-playing');
-            firstSlotVideo.currentTime = 0;
-            firstSlotVideo.play().catch(() => {});
-        }
-
-        function pauseFirstSlotVideo() {
-            if (!firstImageSlot || !firstSlotVideo) return;
-            firstImageSlot.classList.remove('is-playing');
-            firstSlotVideo.pause();
-            firstSlotVideo.currentTime = 0;
-        }
-
-        firstSlotVideo?.addEventListener('ended', () => {
-            pauseFirstSlotVideo();
-        });
-
-        let firstSlotTapTimer = null;
-        let firstSlotLastTap = 0;
-        let firstSlotTouchHandled = false;
-        const firstSlotTapDelay = 280;
-
-        function clearFirstSlotTapTimer() {
-            if (firstSlotTapTimer) {
-                window.clearTimeout(firstSlotTapTimer);
-                firstSlotTapTimer = null;
+      async function getStream() {
+        var attempts = [
+          {
+            audio: false,
+            video: {
+              facingMode: { ideal: facingMode },
+              width: { ideal: 1920 },
+              height: { ideal: 1080 },
+              frameRate: { ideal: 30, max: 30 }
             }
-        }
-
-        function triggerFirstSlotVideo(event) {
-            event?.stopPropagation();
-            clearFirstSlotTapTimer();
-            firstSlotLastTap = 0;
-            suppressCarouselClick = true;
-            playFirstSlotVideo();
-            window.setTimeout(() => {
-                suppressCarouselClick = false;
-            }, 400);
-        }
-
-        function scheduleFirstSlotCarouselAdvance(event) {
-            event?.stopPropagation();
-            clearFirstSlotTapTimer();
-            firstSlotTapTimer = window.setTimeout(() => {
-                firstSlotTapTimer = null;
-                firstSlotLastTap = 0;
-                advanceImageCarousel();
-            }, firstSlotTapDelay);
-        }
-
-        function markFirstSlotTouchHandled() {
-            firstSlotTouchHandled = true;
-            window.setTimeout(() => {
-                firstSlotTouchHandled = false;
-            }, 450);
-        }
-
-        firstImageSlot?.addEventListener('dblclick', triggerFirstSlotVideo);
-
-        firstImageSlot?.addEventListener('click', (event) => {
-            event.stopPropagation();
-            if (suppressCarouselClick || firstSlotTouchHandled) return;
-            scheduleFirstSlotCarouselAdvance(event);
-        });
-
-        firstImageSlot?.addEventListener('touchend', (event) => {
-            markFirstSlotTouchHandled();
-            const now = Date.now();
-            if (now - firstSlotLastTap < firstSlotTapDelay) {
-                event.preventDefault();
-                triggerFirstSlotVideo(event);
-                return;
+          },
+          {
+            audio: false,
+            video: {
+              facingMode: facingMode,
+              width: { ideal: 1280 },
+              height: { ideal: 720 },
+              frameRate: { ideal: 30, max: 30 }
             }
-            firstSlotLastTap = now;
-            scheduleFirstSlotCarouselAdvance(event);
-        });
-        */
-
-        mobileCarouselQuery.addEventListener('change', syncCarouselLayout);
-
-        // On each page load, pick one of three openings so all appear sometimes:
-        //   Armani still photo (most frequent), Armani video, or Vibram video.
-        if (kaytranadaSlideIndex >= 0 && vibramSlideIndex >= 0) {
-            const roll = Math.random();
-            if (roll < 0.45) {
-                imageIndex = kaytranadaSlideIndex;
-                prepareKaytranadaPresentation('still');
-            } else if (roll < 0.75) {
-                imageIndex = kaytranadaSlideIndex;
-                prepareKaytranadaPresentation('video');
-            } else {
-                imageIndex = vibramSlideIndex;
-            }
-        } else if (kaytranadaSlideIndex >= 0) {
-            imageIndex = kaytranadaSlideIndex;
-            prepareKaytranadaPresentation(Math.random() < 0.6 ? 'still' : 'video');
-        } else if (vibramSlideIndex >= 0) {
-            imageIndex = vibramSlideIndex;
-        }
-        // Jump to the chosen start slide without the sliding animation.
-        if (imageTrack) {
-            const prevTransition = imageTrack.style.transition;
-            imageTrack.style.transition = 'none';
-            updateImageCarousel();
-            // Force a reflow so the transition removal applies before restoring it.
-            void imageTrack.offsetWidth;
-            imageTrack.style.transition = prevTransition;
-        } else {
-            updateImageCarousel();
-        }
-
-        // 3. Smooth section navigation
-        const navLinks = document.querySelectorAll('.nav-link');
-        const infoSection = document.getElementById('information');
-        const desktopMq = window.matchMedia('(min-width: 869px)');
-        const sectionOrder = ['image-space', 'selected-work', 'information']
-            .map(id => document.getElementById(id))
-            .filter(Boolean);
-
-        // Selected Work lightbox
-        const workItems = document.querySelectorAll('.work-item');
-        const workLightbox = document.getElementById('work-lightbox');
-        const workLightboxMedia = document.getElementById('work-lightbox-media');
-        const workLightboxClose = document.getElementById('work-lightbox-close');
-        const workLightboxBackdrop = document.getElementById('work-lightbox-backdrop');
-        const workLightboxDetails = document.getElementById('work-lightbox-details');
-        const wlDetailEyebrow = document.getElementById('wl-detail-eyebrow');
-        const wlDetailTitle = document.getElementById('wl-detail-title');
-        const wlDetailList = document.getElementById('wl-detail-list');
-        const wlDetailDesc = document.getElementById('wl-detail-desc');
-        const wlDetailLink = document.getElementById('wl-detail-link');
-        let activeWorkVideo = null;
-
-        function clearWorkLightboxMedia() {
-            if (activeWorkVideo) {
-                activeWorkVideo.pause();
-                activeWorkVideo = null;
-            }
-            if (workLightboxMedia) {
-                workLightboxMedia.innerHTML = '';
-            }
-            workLightbox?.classList.remove('is-gallery');
-        }
-
-        function buildWorkGallery(sources) {
-            const wrap = document.createElement('div');
-            wrap.className = 'wl-gallery';
-
-            const imgEl = document.createElement('img');
-            imgEl.className = 'wl-gallery-img';
-            imgEl.alt = '';
-            wrap.appendChild(imgEl);
-
-            const count = document.createElement('div');
-            count.className = 'wl-gallery-count';
-            wrap.appendChild(count);
-
-            let idx = 0;
-
-            function render() {
-                imgEl.src = sources[idx];
-                count.textContent = `${idx + 1} / ${sources.length}`;
-                imgEl.style.animation = 'none';
-                void imgEl.offsetWidth;
-                imgEl.style.animation = '';
-            }
-
-            function go(dir) {
-                idx = (idx + dir + sources.length) % sources.length;
-                render();
-            }
-
-            wrap.addEventListener('click', (event) => {
-                if (sources.length < 2) return;
-                const rect = wrap.getBoundingClientRect();
-                const x = event.clientX - rect.left;
-                go(x < rect.width / 2 ? -1 : 1);
-            });
-
-            render();
-            return wrap;
-        }
-
-        function hideWorkLightboxDetails() {
-            if (!workLightboxDetails) return;
-            workLightbox?.classList.remove('is-project');
-            workLightboxDetails.hidden = true;
-            if (wlDetailEyebrow) wlDetailEyebrow.textContent = '';
-            if (wlDetailTitle) wlDetailTitle.textContent = '';
-            if (wlDetailList) wlDetailList.innerHTML = '';
-            if (wlDetailDesc) wlDetailDesc.textContent = '';
-            if (wlDetailLink) {
-                wlDetailLink.hidden = true;
-                wlDetailLink.removeAttribute('href');
-                wlDetailLink.textContent = '';
-            }
-        }
-
-        function renderWorkLightboxDetails(item) {
-            if (!workLightboxDetails) return false;
-
-            const data = item.dataset || {};
-            if (!data.projectTitle) return false;
-
-            if (wlDetailEyebrow) wlDetailEyebrow.textContent = data.projectEyebrow || 'Selected Work';
-            if (wlDetailTitle) wlDetailTitle.textContent = data.projectTitle;
-
-            if (wlDetailList) {
-                wlDetailList.innerHTML = '';
-                const fields = [
-                    ['Year', data.projectYear],
-                    ['Client', data.projectClient],
-                    ['Role', data.projectRole],
-                    ['Format', data.projectFormat],
-                    ['Featuring', data.projectTalent]
-                ];
-                fields.forEach(([label, value]) => {
-                    if (!value) return;
-                    const dt = document.createElement('dt');
-                    dt.textContent = label;
-                    const dd = document.createElement('dd');
-                    dd.textContent = value;
-                    wlDetailList.append(dt, dd);
-                });
-            }
-
-            if (wlDetailDesc) wlDetailDesc.textContent = data.projectDescription || '';
-
-            if (wlDetailLink) {
-                if (data.projectLink) {
-                    wlDetailLink.href = data.projectLink;
-                    wlDetailLink.textContent = data.projectLinkLabel || 'View editorial';
-                    wlDetailLink.hidden = false;
-                } else {
-                    wlDetailLink.hidden = true;
-                    wlDetailLink.removeAttribute('href');
-                    wlDetailLink.textContent = '';
-                }
-            }
-
-            workLightboxDetails.hidden = false;
-            workLightbox?.classList.add('is-project');
-            return true;
-        }
-
-        function openWorkLightbox(item) {
-            if (!workLightbox || !workLightboxMedia || !item) return;
-
-            clearWorkLightboxMedia();
-            hideWorkLightboxDetails();
-
-            const galleryImgs = item.querySelectorAll('.work-gallery-img');
-            const video = item.querySelector('.work-full-video')
-                || item.querySelector('video:not(.work-item-thumb)');
-            const img = item.querySelector('img:not(.work-item-thumb)') || item.querySelector('img');
-
-            if (galleryImgs.length) {
-                const sources = Array.from(galleryImgs).map(node => node.getAttribute('src'));
-                workLightboxMedia.appendChild(buildWorkGallery(sources));
-                workLightbox.classList.add('is-gallery');
-            } else if (video) {
-                const clone = video.cloneNode(true);
-                clone.removeAttribute('hidden');
-                clone.controls = true;
-                clone.muted = false;
-                clone.setAttribute('playsinline', '');
-                workLightboxMedia.appendChild(clone);
-                activeWorkVideo = clone;
-                clone.play().catch(() => {});
-            } else if (img) {
-                const clone = img.cloneNode(true);
-                clone.removeAttribute('hidden');
-                workLightboxMedia.appendChild(clone);
-            }
-
-            renderWorkLightboxDetails(item);
-
-            workLightbox.classList.add('is-open');
-            workLightbox.setAttribute('aria-hidden', 'false');
-            document.body.style.overflow = 'hidden';
-            workLightboxClose?.focus();
-        }
-
-        function closeWorkLightbox() {
-            if (!workLightbox) return;
-            workLightbox.classList.remove('is-open');
-            workLightbox.setAttribute('aria-hidden', 'true');
-            document.body.style.overflow = '';
-            clearWorkLightboxMedia();
-            hideWorkLightboxDetails();
-        }
-
-        workItems.forEach(item => {
-            item.addEventListener('click', () => openWorkLightbox(item));
-        });
-
-        // Hover-to-play teaser thumbnails on work tiles.
-        document.querySelectorAll('.work-item-thumb').forEach(thumb => {
-            const host = thumb.closest('.work-item');
-            if (!host) return;
-
-            const playThumb = () => {
-                host.classList.add('is-previewing');
-                if (typeof thumb.play === 'function') thumb.play().catch(() => {});
-            };
-            const stopThumb = () => {
-                host.classList.remove('is-previewing');
-                if (typeof thumb.pause === 'function') thumb.pause();
-                if ('currentTime' in thumb) thumb.currentTime = 0;
-            };
-
-            host.addEventListener('mouseenter', playThumb);
-            host.addEventListener('mouseleave', stopThumb);
-            host.addEventListener('focus', playThumb);
-            host.addEventListener('blur', stopThumb);
-        });
-
-        // Muted teaser videos that play over a still placeholder on hover.
-        document.querySelectorAll('.work-item-hover-video').forEach(video => {
-            const host = video.closest('.work-item');
-            if (!host) return;
-
-            const playPreview = () => {
-                video.muted = true;
-                video.play().catch(() => {});
-            };
-            const stopPreview = () => {
-                video.pause();
-                video.currentTime = 0;
-            };
-
-            host.addEventListener('mouseenter', playPreview);
-            host.addEventListener('mouseleave', stopPreview);
-            host.addEventListener('focus', playPreview);
-            host.addEventListener('blur', stopPreview);
-        });
-
-        // Armani tile: on hover, slowly crossfade through all gallery images,
-        // then reset back to the first image when the pointer leaves.
-        document.querySelectorAll('.work-item--armani').forEach(host => {
-            const sources = Array.from(host.querySelectorAll('.work-gallery-img'))
-                .map(node => node.getAttribute('src'))
-                .filter(Boolean);
-            if (sources.length < 2) return;
-
-            const carousel = document.createElement('div');
-            carousel.className = 'work-carousel';
-            carousel.setAttribute('aria-hidden', 'true');
-
-            const layers = sources.map((src, i) => {
-                const layer = document.createElement('img');
-                layer.className = 'work-carousel-img' + (i === 0 ? ' is-active' : '');
-                layer.src = src;
-                layer.alt = '';
-                layer.loading = 'lazy';
-                carousel.appendChild(layer);
-                return layer;
-            });
-
-            const thumb = host.querySelector('.work-item-thumb');
-            if (thumb && thumb.parentNode) {
-                thumb.parentNode.insertBefore(carousel, thumb.nextSibling);
-            } else {
-                host.appendChild(carousel);
-            }
-
-            let index = 0;
-            let timer = null;
-
-            const setActive = (next) => {
-                layers[index].classList.remove('is-active');
-                index = next;
-                layers[index].classList.add('is-active');
-            };
-
-            const startCarousel = () => {
-                if (timer) return;
-                setActive((index + 1) % layers.length);
-                timer = setInterval(() => {
-                    setActive((index + 1) % layers.length);
-                }, 1800);
-            };
-            const stopCarousel = () => {
-                if (timer) { clearInterval(timer); timer = null; }
-                setActive(0);
-            };
-
-            host.addEventListener('mouseenter', startCarousel);
-            host.addEventListener('mouseleave', stopCarousel);
-            host.addEventListener('focus', startCarousel);
-            host.addEventListener('blur', stopCarousel);
-        });
-
-        // Nike Goadme Hardwear: quick image carousel on hover. The images aren't
-        // in the repo yet — drop the real files in (or add more filenames to the
-        // array) and they'll be injected automatically using the prefix below.
-        const NIKE_HARDWEAR_PREFIX = 'https://github.com/ta222222/mc/raw/refs/heads/main/';
-        const NIKE_HARDWEAR_IMAGES = [
-            '06.webp', // nike
-            '02.webp', // nike
-            'BLACKATLANTICANDNICOLEGREENWOOD.png',
-            'HARDWEAR_2_BRENNAN-WOJTYLA_1.jpg',
-            'HARDWEAR_3_FOAM_2.jpg',
-            'HARDWEAR_4_MATTIA-GUARNERA_2.jpg',
-            'HARDWEAR_5_BLACKATLANTICNET_4.jpg',
-            'HARDWEAR_5_BLACKATLANTICNET_6.jpg',
-            'HARDWEAR_7_FP_1.jpg',
-            'HARDWEAR_7_FP_2.jpg',
-            'LUYU-MING.png',
-            'LUYU-MING1.png',
-            'MATTIAGUARNERA.png',
-            'NOLICENCEARCHIVE2.png',
-            'NOLICENCEARCHIVE3.png',
-            'OUTSIDE BILLBOARD .png',
-            'SPIKE1.png',
-            'SPIKE2.png',
-            'SPIKE3.png',
-            'SPIKE4.png',
-            'SPIKE5.png',
-            'SPIKE6.png',
-            'SPIKE7.png'
+          },
+          {
+            audio: false,
+            video: true
+          }
         ];
 
-        document.querySelectorAll('.work-item--nike').forEach(host => {
-            const sources = NIKE_HARDWEAR_IMAGES
-                .filter(Boolean)
-                .map(name => NIKE_HARDWEAR_PREFIX + encodeURIComponent(name));
-            if (sources.length < 2) return;
+        var lastErr = null;
+        for (var i = 0; i < attempts.length; i++) {
+          try {
+            var mediaStream = await navigator.mediaDevices.getUserMedia(attempts[i]);
+            await stabilizeTrack(mediaStream);
+            return mediaStream;
+          } catch (err) {
+            lastErr = err;
+          }
+        }
+        throw lastErr || new Error('getUserMedia failed');
+      }
 
-            const carousel = document.createElement('div');
-            carousel.className = 'work-carousel work-carousel--fast';
-            carousel.setAttribute('aria-hidden', 'true');
+      async function startCamera() {
+        if (starting) return;
 
-            const layers = sources.map((src, i) => {
-                const layer = document.createElement('img');
-                layer.className = 'work-carousel-img' + (i === 0 ? ' is-active' : '');
-                layer.src = src;
-                layer.alt = '';
-                layer.loading = 'lazy';
-                carousel.appendChild(layer);
-                return layer;
+        if (!window.isSecureContext && location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+          toast('Camera needs HTTPS or localhost (not plain Wi‑Fi http / file).', true);
+          return;
+        }
+
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          toast('Camera API unavailable in this browser.', true);
+          return;
+        }
+
+        starting = true;
+        startBtn.disabled = true;
+        startBtn.textContent = 'Starting…';
+        toast('Requesting camera…');
+
+        try {
+          // Keep canvas up during flip reclaim
+          var wasLive = running;
+          running = false;
+          stopStreamOnly();
+
+          stream = await getStream();
+          video.srcObject = stream;
+          video.setAttribute('playsinline', '');
+          video.muted = true;
+
+          await video.play();
+
+          // Wait briefly for dimensions
+          if (!video.videoWidth) {
+            await new Promise(function (resolve) {
+              var done = function () {
+                video.removeEventListener('loadeddata', done);
+                resolve();
+              };
+              video.addEventListener('loadeddata', done);
+              setTimeout(resolve, 800);
             });
+          }
 
-            const thumb = host.querySelector('.work-item-thumb');
-            if (thumb && thumb.parentNode) {
-                thumb.parentNode.insertBefore(carousel, thumb.nextSibling);
-            } else {
-                host.appendChild(carousel);
+          running = true;
+          starting = false;
+          processing = false;
+          adaptiveMaxW = 360;
+          lockedKey = '';
+          lastPixel = -1;
+          syncFacingUi();
+          setRunningUi(true);
+          startBtn.textContent = 'Start camera';
+          // Re-apply selected zoom on the new track
+          await setZoom(zoomFactor);
+          toastTemp('Live', 900);
+          loop();
+
+          if (!wasLive) setControlsOpen(false);
+        } catch (err) {
+          starting = false;
+          running = false;
+          stopStreamOnly();
+          setRunningUi(false);
+          startBtn.disabled = false;
+          startBtn.textContent = 'Start camera';
+          var name = err && err.name ? err.name : '';
+          if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
+            toast('Camera permission denied. Allow camera in Safari settings.', true);
+          } else if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
+            toast('No camera found on this device.', true);
+          } else {
+            toast('Could not start camera. Use HTTPS and allow permission.', true);
+          }
+          console.error(err);
+        }
+      }
+
+      async function flipCamera() {
+        if (!running || starting) return;
+        facingMode = facingMode === 'environment' ? 'user' : 'environment';
+        syncFacingUi();
+        toastTemp('Switching…', 900);
+        await startCamera();
+      }
+
+      function downloadPng(url, filename) {
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.rel = 'noopener';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      }
+
+      function canvasToBlob(canvas) {
+        return new Promise(function (resolve, reject) {
+          if (!canvas.toBlob) {
+            try {
+              var data = canvas.toDataURL('image/png');
+              var bin = atob(data.split(',')[1]);
+              var arr = new Uint8Array(bin.length);
+              for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+              resolve(new Blob([arr], { type: 'image/png' }));
+            } catch (e) {
+              reject(e);
             }
-
-            let index = 0;
-            let timer = null;
-
-            const setActive = (next) => {
-                layers[index].classList.remove('is-active');
-                index = next;
-                layers[index].classList.add('is-active');
-            };
-
-            const startCarousel = () => {
-                if (timer) return;
-                setActive((index + 1) % layers.length);
-                timer = setInterval(() => {
-                    setActive((index + 1) % layers.length);
-                }, 320);
-            };
-            const stopCarousel = () => {
-                if (timer) { clearInterval(timer); timer = null; }
-                setActive(0);
-            };
-
-            host.addEventListener('mouseenter', startCarousel);
-            host.addEventListener('mouseleave', stopCarousel);
-            host.addEventListener('focus', startCarousel);
-            host.addEventListener('blur', stopCarousel);
+            return;
+          }
+          canvas.toBlob(function (blob) {
+            if (blob) resolve(blob);
+            else reject(new Error('encode failed'));
+          }, 'image/png');
         });
+      }
 
-        workLightboxClose?.addEventListener('click', closeWorkLightbox);
-        workLightboxBackdrop?.addEventListener('click', closeWorkLightbox);
+      function renderSharpExport() {
+        var s = settings();
+        var scale = Math.max(0.2, s.pixel);
+        var vw = video.videoWidth || 1280;
+        var vh = video.videoHeight || 720;
 
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && workLightbox?.classList.contains('is-open')) {
-                closeWorkLightbox();
+        // High-res dither for export (sharper than live preview canvas)
+        var maxW = 1600;
+        var w = Math.min(maxW, Math.max(1, Math.round(vw / scale)));
+        var h = Math.max(1, Math.round(vh * (w / vw)));
+
+        // Integer nearest-neighbor upscale so pixels stay crisp (~2–3k wide)
+        var targetW = Math.max(1600, w * 3);
+        var exportChunk = Math.max(2, Math.round(targetW / w));
+        var outW = w * exportChunk;
+        var outH = h * exportChunk;
+
+        if (exportWork.width !== w || exportWork.height !== h) {
+          exportWork.width = w;
+          exportWork.height = h;
+        }
+        var ectx = exportWork.getContext('2d', { willReadFrequently: true, alpha: false });
+        ectx.imageSmoothingEnabled = false;
+        drawVideoFrame(ectx, w, h);
+        var imageData = ectx.getImageData(0, 0, w, h);
+        ditherGray(imageData.data, w, h, s);
+        // Force opaque blacks/whites
+        var data = imageData.data;
+        for (var i = 0; i < data.length; i += 4) {
+          var v = data[i] < 128 ? 0 : 255;
+          data[i] = data[i + 1] = data[i + 2] = v;
+          data[i + 3] = 255;
+        }
+        ectx.putImageData(imageData, 0, 0);
+
+        if (exportOut.width !== outW || exportOut.height !== outH) {
+          exportOut.width = outW;
+          exportOut.height = outH;
+        }
+        var octx = exportOut.getContext('2d', { alpha: false });
+        octx.imageSmoothingEnabled = false;
+        octx.fillStyle = '#000';
+        octx.fillRect(0, 0, outW, outH);
+        octx.drawImage(exportWork, 0, 0, outW, outH);
+        return exportOut;
+      }
+
+      async function snap() {
+        if (!running || video.readyState < 2) {
+          toast('Nothing to save yet');
+          return;
+        }
+
+        var filename = 'hammercam-' + Date.now() + '.png';
+        toast('Rendering sharp PNG…');
+
+        try {
+          var canvas = renderSharpExport();
+          var blob = await canvasToBlob(canvas);
+          var file = new File([blob], filename, { type: 'image/png' });
+
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            try {
+              await navigator.share({ files: [file], title: 'hammercam' });
+              toastTemp('Shared — Save Image for Photos', 1600);
+              return;
+            } catch (shareErr) {
+              if (shareErr && shareErr.name === 'AbortError') {
+                toastTemp('Save cancelled', 1200);
+                return;
+              }
             }
-        });
+          }
 
-        function setActiveNav(targetId) {
-            navLinks.forEach(link => {
-                if (link.getAttribute('href') === `#${targetId}`) {
-                    link.classList.add('active');
-                } else {
-                    link.classList.remove('active');
-                }
-            });
+          var url = URL.createObjectURL(blob);
+          downloadPng(url, filename);
+          setTimeout(function () { URL.revokeObjectURL(url); }, 2500);
+          toastTemp('Saved sharp PNG', 1600);
+        } catch (err) {
+          console.error(err);
+          try {
+            var fallback = renderSharpExport();
+            downloadPng(fallback.toDataURL('image/png'), filename);
+            toastTemp('Saved sharp PNG', 1600);
+          } catch (err2) {
+            toast('Could not save PNG', true);
+          }
         }
+      }
 
-        function getSectionScrollTop(section) {
-            return window.scrollY + section.getBoundingClientRect().top;
+      [pixelEl, thresholdEl, contrastEl, strengthEl].forEach(function (el) {
+        el.addEventListener('input', syncLabels);
+      });
+
+      presetEl.addEventListener('change', function () {
+        var key = presetEl.value;
+        if (key && presets[key]) applySettings(presets[key]);
+      });
+
+      startBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        startCamera();
+      });
+      stopBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        stopCamera();
+      });
+      flipBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        flipCamera();
+      });
+      zoomBar.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-zoom]');
+        if (!btn) return;
+        e.preventDefault();
+        setZoom(+btn.getAttribute('data-zoom'));
+      });
+      snapBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        snap();
+      });
+      snapPngBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        snap();
+      });
+      snapBtn2.addEventListener('click', function (e) {
+        e.preventDefault();
+        snap();
+      });
+      toggleControlsBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        setControlsOpen(!document.body.classList.contains('controls-open'));
+      });
+      toggleChromeBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        setChromeHidden(true);
+        toastTemp('Tap screen to show UI', 1600);
+      });
+      hideControlsBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        setControlsOpen(false);
+      });
+      stageEl.addEventListener('click', function (e) {
+        if (!document.body.classList.contains('chrome-hidden')) return;
+        if (e.target.closest('button, a, input, select, label, .overlay')) return;
+        setChromeHidden(false);
+      });
+      resetBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        presetEl.value = 'default';
+        applySettings(presets.default);
+        toastTemp('Reset to default', 1200);
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          if (document.body.classList.contains('chrome-hidden')) setChromeHidden(false);
+          else if (document.body.classList.contains('controls-open')) setControlsOpen(false);
+          else if (running) stopCamera();
         }
+      });
 
-        function scrollSectionToStart(section) {
-            window.scrollTo({ top: getSectionScrollTop(section), behavior: 'smooth' });
-        }
-
-        function isInformationAligned() {
-            if (!infoSection) return false;
-            return Math.abs(infoSection.getBoundingClientRect().top) <= 2;
-        }
-
-        function isAtPageBottom() {
-            return window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
-        }
-
-        // The Information section now holds About, Clients, More and Contact, so it can be
-        // taller than the viewport. Only snap its top into view when the whole section fits;
-        // otherwise snapping up would hide the newly added bottom content (Contact).
-        function informationFitsViewport() {
-            if (!infoSection) return false;
-            return infoSection.getBoundingClientRect().height <= window.innerHeight + 2;
-        }
-
-        let bottomSnapTimer = null;
-        let snapReleaseTimer = null;
-        let isSnapping = false;
-        let hasUserScrolled = false;
-
-        function shouldSnapInformationOnMobile() {
-            if (!hasUserScrolled || !infoSection || isInformationAligned()) return false;
-            if (!informationFitsViewport()) return false;
-            return isAtPageBottom();
-        }
-
-        function releaseSnapLock() {
-            isSnapping = false;
-            evaluateBrandTrigger();
-        }
-
-        function snapInformationOnMobile() {
-            if (desktopMq.matches || !infoSection || isSnapping || !shouldSnapInformationOnMobile()) return;
-            isSnapping = true;
-            window.scrollTo({ top: getSectionScrollTop(infoSection), behavior: 'smooth' });
-            clearTimeout(snapReleaseTimer);
-            snapReleaseTimer = setTimeout(releaseSnapLock, 480);
-        }
-
-        const brandName = document.querySelector('.brand-name');
-        const infoBodies = document.querySelectorAll('#information .info-body');
-        let evaluateBrandTrigger = () => {};
-
-        if (brandName && infoBodies.length) {
-            const finalTitle = 'Maude Churchill';
-            const altTitles = ['Main Character', 'Magic Child', 'Mood Curator', 'Music Chooser'];
-            const fullyVisibleBodies = new Set();
-            let brandCycleStarted = false;
-            let dwellTimer = null;
-
-            function isInfoReady() {
-                const allBodiesVisible = fullyVisibleBodies.size === infoBodies.length;
-                if (!allBodiesVisible) return false;
-                if (desktopMq.matches) return true;
-                return isInformationAligned() || isAtPageBottom();
-            }
-
-            function startBrandCycle() {
-                if (brandCycleStarted) return;
-                brandCycleStarted = true;
-                let tick = 0;
-
-                const brandCycle = setInterval(() => {
-                    if (tick < 6) {
-                        brandName.textContent = altTitles[tick % altTitles.length];
-                    } else {
-                        const reveal = tick - 5;
-                        brandName.textContent = finalTitle.slice(0, reveal);
-                    }
-
-                    tick += 1;
-                    if (tick > finalTitle.length + 5) clearInterval(brandCycle);
-                }, 99);
-            }
-
-            evaluateBrandTrigger = function () {
-                if (brandCycleStarted) return;
-
-                if (isInfoReady()) {
-                    if (!dwellTimer) {
-                        dwellTimer = setTimeout(() => {
-                            dwellTimer = null;
-                            if (isInfoReady()) startBrandCycle();
-                        }, 3000);
-                    }
-                } else if (dwellTimer) {
-                    clearTimeout(dwellTimer);
-                    dwellTimer = null;
-                }
-            };
-
-            infoBodies.forEach(body => {
-                const bodyObserver = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.intersectionRatio >= 1) {
-                            fullyVisibleBodies.add(body);
-                        } else {
-                            fullyVisibleBodies.delete(body);
-                        }
-                    });
-                    evaluateBrandTrigger();
-                }, { threshold: 1 });
-
-                bodyObserver.observe(body);
-            });
-        }
-
-        function onPageScroll() {
-            hasUserScrolled = true;
-            evaluateBrandTrigger();
-            if (desktopMq.matches || isSnapping) return;
-            clearTimeout(bottomSnapTimer);
-            bottomSnapTimer = setTimeout(snapInformationOnMobile, 120);
-        }
-
-        window.addEventListener('scroll', onPageScroll, { passive: true });
-        window.addEventListener('scrollend', releaseSnapLock, { passive: true });
-        window.addEventListener('resize', evaluateBrandTrigger);
-
-        brandName?.addEventListener('click', () => {
-            setActiveNav('image-space');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-
-        function navigateToSection(targetSection) {
-            if (!targetSection) return;
-
-            setActiveNav(targetSection.id);
-            scrollSectionToStart(targetSection);
-        }
-
-        function isSpaceNavigationAllowed(event) {
-            if (event.code !== 'Space' || event.repeat) return false;
-            if (workLightbox?.classList.contains('is-open')) return false;
-            if (event.target.closest('input, textarea, select, [contenteditable="true"]')) return false;
-            return sectionOrder.length > 0;
-        }
-
-        function handleSpaceSectionNavigation(event) {
-            if (!isSpaceNavigationAllowed(event)) return;
-
-            event.preventDefault();
-            event.stopPropagation();
-
-            const currentIndex = sectionOrder.reduce((closestIndex, section, index) => {
-                const currentDistance = Math.abs(section.getBoundingClientRect().top);
-                const closestDistance = Math.abs(sectionOrder[closestIndex].getBoundingClientRect().top);
-                return currentDistance < closestDistance ? index : closestIndex;
-            }, 0);
-            const nextSection = sectionOrder[(currentIndex + 1) % sectionOrder.length];
-            navigateToSection(nextSection);
-        }
-        
-        navLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const targetId = this.getAttribute('href');
-                const targetSection = document.querySelector(targetId);
-                navigateToSection(targetSection);
-            });
-        });
-
-        document.addEventListener('keydown', handleSpaceSectionNavigation, true);
-        document.addEventListener('keyup', (event) => {
-            if (!isSpaceNavigationAllowed(event)) return;
-            event.preventDefault();
-            event.stopPropagation();
-        }, true);
-
-        // Intersection Observer to highlight current active layout on scroll
-        const sections = document.querySelectorAll('section');
-        const options = { rootMargin: "-20% 0px -60% 0px" };
-        
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const id = entry.target.getAttribute('id');
-                    setActiveNav(id);
-                }
-            });
-        }, options);
-
-        sections.forEach(sec => observer.observe(sec));
-    </script>
+      applySettings(presets.default);
+      presetEl.value = 'default';
+      syncZoomUi();
+      setRunningUi(false);
+      setControlsOpen(false);
+      toast('Fullscreen ready — tap Start camera');
+    })();
+  </script>
 </body>
 </html>
