@@ -1494,6 +1494,23 @@
             text-underline-offset: 3px;
         }
 
+        .info-dbac-figure {
+            margin: 14px 0 0;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .info-dbac-figure img {
+            display: block;
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .info-toggle-inner:has(.info-dbac-figure) {
+            max-width: min(640px, 100%);
+        }
+
         /* --- INFO CLIENTS LIST --- */
         .info-clients {
             margin-top: clamp(48px, 6vw, 88px);
@@ -1669,6 +1686,13 @@
 
             .info-toggle.is-open .info-toggle-panel {
                 box-shadow: 0 16px 30px rgba(0, 0, 0, 0.5);
+            }
+
+            .info-dbac-figure {
+                max-height: min(52vh, 420px);
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                overscroll-behavior: contain;
             }
 
             /* Keep the client list's space reserved (don't collapse its height) but hide it,
@@ -2031,6 +2055,14 @@
                             <div class="info-toggle-inner">
                                 <p>DBAC — Don't Be A Creep — is an initiative dedicated to making nightlife a safe space, for the safety and happiness of all partygoers, ravers and nightlifers.</p>
                                 <p><a href="https://www.instagram.com/dontbeacreep/" target="_blank" rel="noopener">@dontbeacreep (Instagram)</a></p>
+                                <figure class="info-dbac-figure">
+                                    <img
+                                        src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/dbacinstass.png"
+                                        alt="Don't Be A Creep Instagram grid — campaign graphics, merch and event posters"
+                                        loading="lazy"
+                                        decoding="async"
+                                    />
+                                </figure>
                             </div>
                         </div>
                     </div>
@@ -2094,6 +2126,17 @@
             const toggle = trigger.closest('.info-toggle');
             const panel = trigger.nextElementSibling;
             if (!toggle || !panel) return;
+
+            const syncPanelHeight = () => {
+                if (trigger.getAttribute('aria-expanded') === 'true') {
+                    panel.style.maxHeight = `${panel.scrollHeight}px`;
+                }
+            };
+
+            panel.querySelectorAll('img').forEach(img => {
+                if (img.complete) return;
+                img.addEventListener('load', syncPanelHeight);
+            });
 
             trigger.addEventListener('click', () => {
                 const isOpen = trigger.getAttribute('aria-expanded') === 'true';
