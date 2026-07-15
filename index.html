@@ -156,6 +156,7 @@
     .hud > * { pointer-events: auto; }
 
     .hud-top {
+      position: absolute;
       top: var(--safe-t);
       left: var(--safe-l);
       right: var(--safe-r);
@@ -164,6 +165,7 @@
     }
 
     .hud-bottom {
+      position: absolute;
       bottom: var(--safe-b);
       left: var(--safe-l);
       right: var(--safe-r);
@@ -211,31 +213,43 @@
     }
 
     .hud-zoom {
-      bottom: calc(var(--safe-b) + 56px);
+      position: absolute;
+      z-index: 16;
       left: 50%;
+      bottom: calc(var(--safe-b) + 84px);
       transform: translateX(-50%);
+      display: none !important;
       gap: 0;
       align-items: center;
-      background: rgba(10, 10, 10, 0.55);
+      background: rgba(10, 10, 10, 0.72);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       overflow: hidden;
+      pointer-events: auto;
+      max-width: calc(100vw - 24px);
     }
 
-    body.is-live .hud-zoom { display: flex; }
+    body.is-live .hud-zoom {
+      display: flex !important;
+    }
+
+    body.chrome-hidden .hud-zoom {
+      display: none !important;
+    }
 
     .hud-zoom .hud-btn {
-      min-width: 40px;
-      min-height: 36px;
-      padding: 0 10px;
+      min-width: 44px;
+      min-height: 40px;
+      padding: 0 11px;
       border: none;
       border-radius: 0;
       background: transparent;
       backdrop-filter: none;
       -webkit-backdrop-filter: none;
-      font-size: 10px;
+      font-size: 11px;
+      letter-spacing: 0.04em;
     }
 
     .hud-zoom .hud-btn + .hud-btn {
@@ -314,8 +328,7 @@
       z-index: 11;
       left: var(--safe-l);
       right: var(--safe-r);
-      bottom: calc(var(--safe-b) + 58px);
-      max-width: 440px;
+      bottom: calc(var(--safe-b) + 100px);
       margin: 0 auto;
       padding: 14px;
       border: 1px solid var(--border);
@@ -542,8 +555,10 @@
       var lockedKey = '';
       var lastPixel = -1;
       var zoomFactor = 1;
-      var hardwareZoom = false;
-      var usingUltraDevice = false;
+      var zoomAnim = 1;
+      var fisheyeBuf = null;
+      var fisheyeTmp = document.createElement('canvas');
+      var fisheyeCtx = fisheyeTmp.getContext('2d', { willReadFrequently: true, alpha: false });
 
       function settings() {
         return {
@@ -612,142 +627,83 @@
         }
       }
 
-      function getTrack() {
-        return stream && stream.getVideoTracks()[0] ? stream.getVideoTracks()[0] : null;
-      }
-
-      function getZoomCaps(track) {
-        if (!track || !track.getCapabilities) return null;
-        try {
-          var caps = track.getCapabilities();
-          return caps && caps.zoom ? caps.zoom : null;
-        } catch (e) {
-          return null;
-        }
-      }
-
-      async function tryApplyHardwareZoom(track, factor) {
-        var zoom = getZoomCaps(track);
-        if (!zoom) return false;
-        var z = Math.min(zoom.max, Math.max(zoom.min, factor));
-        try {
-          await track.applyConstraints({ advanced: [{ zoom: z }] });
-          return true;
-        } catch (e1) {
-          try {
-            await track.applyConstraints({ zoom: z });
-            return true;
-          } catch (e2) {
-            return false;
-          }
-        }
-      }
-
-      async function findUltraWideDeviceId() {
-        try {
-          var devices = await navigator.mediaDevices.enumerateDevices();
-          var cams = devices.filter(function (d) { return d.kind === 'videoinput'; });
-          for (var i = 0; i < cams.length; i++) {
-            var label = (cams[i].label || '').toLowerCase();
-            if (/ultra|wide|0\.5|fisheye/.test(label) && !/tele|front|user|face/.test(label)) {
-              return cams[i].deviceId;
-            }
-          }
-        } catch (e) { /* ignore */ }
-        return null;
-      }
-
-      async function setZoom(factor) {
+      function setZoom(factor) {
         zoomFactor = factor;
         syncZoomUi();
-        hardwareZoom = false;
-
-        // Leaving dedicated ultra-wide device — restore main camera
-        if (usingUltraDevice && factor !== 0.5) {
-          usingUltraDevice = false;
-          if (running && !starting) {
-            await startCamera();
-            return;
-          }
-        }
-
-        var track = getTrack();
-        if (track) {
-          hardwareZoom = await tryApplyHardwareZoom(track, factor);
-          if (hardwareZoom) {
-            usingUltraDevice = false;
-            toastTemp((factor === 0.5 ? '0.5× ultra' : factor + '×'), 900);
-            return;
-          }
-        }
-
-        // 0.5× without zoom API: try dedicated ultra-wide camera
-        if (factor === 0.5 && facingMode === 'environment') {
-          var ultraId = await findUltraWideDeviceId();
-          if (ultraId && running && !starting) {
-            try {
-              starting = true;
-              var wasLive = running;
-              running = false;
-              stopStreamOnly();
-              stream = await navigator.mediaDevices.getUserMedia({
-                audio: false,
-                video: {
-                  deviceId: { exact: ultraId },
-                  width: { ideal: 1920 },
-                  height: { ideal: 1080 },
-                  frameRate: { ideal: 30, max: 30 }
-                }
-              });
-              await stabilizeTrack(stream);
-              video.srcObject = stream;
-              await video.play();
-              running = true;
-              starting = false;
-              hardwareZoom = true;
-              usingUltraDevice = true;
-              lockedKey = '';
-              if (wasLive) loop();
-              toastTemp('0.5× ultra-wide', 900);
-              return;
-            } catch (e) {
-              starting = false;
-              usingUltraDevice = false;
-              if (!stream) {
-                try { await startCamera(); } catch (e2) { /* ignore */ }
-              }
-            }
-          }
-        }
-
-        toastTemp((factor === 0.5 ? '0.5×' : factor + '×') + ' · digital', 900);
+        toastTemp(factor === 0.5 ? '0.5× wide' : factor + '×', 800);
       }
 
+      // Pure JS zoom — center crop for 1×+, faux fisheye wide for 0.5×
       function drawVideoFrame(ctx, destW, destH) {
         var vw = video.videoWidth || destW;
         var vh = video.videoHeight || destH;
+        if (vw < 2 || vh < 2) return;
+
+        // Smooth toward selected zoom (iPhone-like)
+        zoomAnim += (zoomFactor - zoomAnim) * 0.22;
+        if (Math.abs(zoomAnim - zoomFactor) < 0.004) zoomAnim = zoomFactor;
+
+        var z = zoomAnim;
         ctx.imageSmoothingEnabled = false;
 
-        // Hardware zoom already applied to stream — draw full frame
-        if (hardwareZoom || zoomFactor <= 1) {
-          // Slight digital widen simulation when 0.5 has no ultra cam: letterbox-scale in
-          if (!hardwareZoom && zoomFactor < 1) {
-            // Soft “wide” crop invert: scale source up then crop edges differently —
-            // without ultra lens, draw full frame (best available)
-            ctx.drawImage(video, 0, 0, destW, destH);
-            return;
-          }
-          ctx.drawImage(video, 0, 0, destW, destH);
+        if (z >= 0.98) {
+          var factor = Math.max(1, z);
+          var cw = vw / factor;
+          var ch = vh / factor;
+          var sx = (vw - cw) * 0.5;
+          var sy = (vh - ch) * 0.5;
+          ctx.drawImage(video, sx, sy, cw, ch, 0, 0, destW, destH);
           return;
         }
 
-        // Center crop digital zoom
-        var factor = zoomFactor;
-        var cw = vw / factor;
-        var ch = vh / factor;
-        var sx = (vw - cw) / 2;
-        var sy = (vh - ch) / 2;
-        ctx.drawImage(video, sx, sy, cw, ch, 0, 0, destW, destH);
+        // 0.5×: digital “ultra-wide” — full frame + barrel fisheye
+        drawFisheyeVideo(ctx, destW, destH, 0.42 + (1 - z) * 0.35);
+      }
+
+      function drawFisheyeVideo(ctx, destW, destH, strength) {
+        if (fisheyeTmp.width !== destW || fisheyeTmp.height !== destH) {
+          fisheyeTmp.width = destW;
+          fisheyeTmp.height = destH;
+        }
+        fisheyeCtx.imageSmoothingEnabled = false;
+        fisheyeCtx.drawImage(video, 0, 0, destW, destH);
+
+        var src = fisheyeCtx.getImageData(0, 0, destW, destH);
+        var out = ctx.createImageData(destW, destH);
+        var sdata = src.data;
+        var odata = out.data;
+        var cx = (destW - 1) * 0.5;
+        var cy = (destH - 1) * 0.5;
+        var maxR = Math.sqrt(cx * cx + cy * cy) || 1;
+        var k = strength;
+        var x, y, dx, dy, r, rN, rSrc, theta, sx, sy, ix, iy, idx, sidx;
+
+        for (y = 0; y < destH; y++) {
+          for (x = 0; x < destW; x++) {
+            dx = x - cx;
+            dy = y - cy;
+            r = Math.sqrt(dx * dx + dy * dy);
+            rN = r / maxR;
+            rSrc = r * (1 + k * rN * rN);
+            if (r < 0.0001) {
+              sx = cx;
+              sy = cy;
+            } else {
+              theta = Math.atan2(dy, dx);
+              sx = cx + Math.cos(theta) * rSrc;
+              sy = cy + Math.sin(theta) * rSrc;
+            }
+            ix = sx < 0 ? 0 : sx > destW - 1 ? destW - 1 : sx | 0;
+            iy = sy < 0 ? 0 : sy > destH - 1 ? destH - 1 : sy | 0;
+            idx = (y * destW + x) * 4;
+            sidx = (iy * destW + ix) * 4;
+            odata[idx] = sdata[sidx];
+            odata[idx + 1] = sdata[sidx + 1];
+            odata[idx + 2] = sdata[sidx + 2];
+            odata[idx + 3] = 255;
+          }
+        }
+        ctx.putImageData(out, 0, 0);
       }
 
       function setRunningUi(isOn) {
@@ -998,7 +954,7 @@
           setRunningUi(true);
           startBtn.textContent = 'Start camera';
           // Re-apply selected zoom on the new track
-          await setZoom(zoomFactor);
+          setZoom(zoomFactor);
           toastTemp('Live', 900);
           loop();
 
