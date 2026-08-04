@@ -95,9 +95,78 @@
             opacity: 0;
         }
 
+        /* --- SITE LOADER --- */
+        body.is-loading {
+            overflow: hidden;
+        }
+
+        body.is-loading:not(.is-loaded) > :not(.site-loader) {
+            opacity: 0;
+        }
+
+        body.is-loaded > :not(.site-loader) {
+            opacity: 1;
+            transition: opacity 0.45s cubic-bezier(0.3, 0, 0.1, 1);
+        }
+
+        .site-loader {
+            position: fixed;
+            inset: 0;
+            z-index: calc(var(--ui-chrome-z) + 10);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-color);
+            transition: opacity 0.55s cubic-bezier(0.3, 0, 0.1, 1), visibility 0.55s;
+            pointer-events: all;
+        }
+
+        .site-loader.is-done {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.4s cubic-bezier(0.3, 0, 0.1, 1), visibility 0.4s;
+        }
+
+        .site-loader__inner {
+            width: min(240px, 56vw);
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+        }
+
+        .site-loader__percent {
+            font-size: var(--ui-font-size);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted-text);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .site-loader__bar-track {
+            height: 1px;
+            background-color: var(--expansion-border);
+            overflow: hidden;
+        }
+
+        .site-loader__bar-fill {
+            height: 100%;
+            width: 0%;
+            background-color: var(--text-color);
+            transition: width 0.32s cubic-bezier(0.3, 0, 0.1, 1);
+        }
+
         @media (prefers-reduced-motion: reduce) {
             html {
                 scroll-behavior: auto;
+            }
+
+            .site-loader,
+            .site-loader__bar-fill,
+            body.is-loaded > :not(.site-loader) {
+                transition-duration: 0.001ms !important;
             }
 
             *,
@@ -1858,7 +1927,16 @@
         }
     </style>
 </head>
-<body>
+<body class="is-loading">
+
+    <div class="site-loader" id="site-loader" aria-live="polite" aria-busy="true">
+        <div class="site-loader__inner">
+            <div class="site-loader__percent" id="site-loader-percent">0%</div>
+            <div class="site-loader__bar-track" aria-hidden="true">
+                <div class="site-loader__bar-fill" id="site-loader-fill"></div>
+            </div>
+        </div>
+    </div>
 
     <header>
         <button type="button" class="brand-name" aria-label="Scroll to top">Maude Churchill</button>
@@ -3675,6 +3753,96 @@
         }, options);
 
         sections.forEach(sec => observer.observe(sec));
+
+        // Landing loader: key steps with intermediates, brief hold at 77, sprint to 99, then reveal.
+        (function initSiteLoader() {
+            const STEPS = [0, 11, 22, 28, 33, 44, 55, 66, 72, 77, 80, 88, 94, 99];
+            const HOLD_AT = 77;
+            const HOLD_MS = 90;
+            const loader = document.getElementById('site-loader');
+            const fill = document.getElementById('site-loader-fill');
+            const percentEl = document.getElementById('site-loader-percent');
+            const body = document.body;
+            let finished = false;
+
+            if (!loader || !fill || !percentEl) {
+                body.classList.remove('is-loading');
+                return;
+            }
+
+            const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            function setProgress(value) {
+                fill.style.width = value + '%';
+                percentEl.textContent = value + '%';
+            }
+
+            function finish() {
+                if (finished) return;
+                finished = true;
+                body.classList.add('is-loaded');
+                loader.classList.add('is-done');
+                loader.setAttribute('aria-busy', 'false');
+                body.classList.remove('is-loading');
+                window.setTimeout(function () {
+                    loader.remove();
+                }, 450);
+            }
+
+            if (reducedMotion) {
+                setProgress(99);
+                requestAnimationFrame(finish);
+                return;
+            }
+
+            let step = 0;
+            let pageLoaded = document.readyState === 'complete';
+
+            window.addEventListener('load', function () {
+                pageLoaded = true;
+                if (step >= STEPS.length - 1) {
+                    requestAnimationFrame(finish);
+                }
+            }, { once: true });
+
+            function stepDelay(from, to) {
+                if (to >= 80) return 110;
+                if (to <= 33) return 150;
+                if (to <= 55) return 170;
+                return 185;
+            }
+
+            function revealWhenReady() {
+                if (pageLoaded) {
+                    requestAnimationFrame(finish);
+                    return;
+                }
+                window.setTimeout(finish, 280);
+            }
+
+            function advance() {
+                if (finished || step >= STEPS.length - 1) return;
+
+                step += 1;
+                const value = STEPS[step];
+                setProgress(value);
+
+                if (value >= 99) {
+                    revealWhenReady();
+                    return;
+                }
+
+                if (value === HOLD_AT) {
+                    window.setTimeout(advance, HOLD_MS);
+                    return;
+                }
+
+                window.setTimeout(advance, stepDelay(STEPS[step - 1], value));
+            }
+
+            setProgress(STEPS[0]);
+            window.setTimeout(advance, 120);
+        })();
     </script>
 </body>
 </html>
