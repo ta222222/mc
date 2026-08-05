@@ -12,7 +12,7 @@
         document.documentElement.setAttribute('data-theme', 'dark');
     </script>
     <style>
-        /* --- SWISS MODERNIST RESET & CORE VARIABLES --- */
+        /* --- code by @yungethernet --- */
         :root {
             color-scheme: light;
             --bg-color: #ffffff;
@@ -2065,6 +2065,39 @@
                     <source src="https://github.com/ta222222/mc/raw/refs/heads/main/T_H_CROCS.webm" type="video/webm" />
                 </video>
             </button>
+            <button type="button" class="work-item work-item--placeholder" aria-label="View project seven"
+                data-project-title=""
+                data-project-eyebrow="Selected Work"
+                data-project-year=""
+                data-project-client=""
+                data-project-role=""
+                data-project-format=""
+                data-project-description="">
+                <span class="work-item-mark" aria-hidden="true">+</span>
+                <span class="work-item-label" aria-hidden="true">&nbsp;</span>
+            </button>
+            <button type="button" class="work-item work-item--placeholder" aria-label="View project eight"
+                data-project-title=""
+                data-project-eyebrow="Selected Work"
+                data-project-year=""
+                data-project-client=""
+                data-project-role=""
+                data-project-format=""
+                data-project-description="">
+                <span class="work-item-mark" aria-hidden="true">+</span>
+                <span class="work-item-label" aria-hidden="true">&nbsp;</span>
+            </button>
+            <button type="button" class="work-item work-item--placeholder" aria-label="View project nine"
+                data-project-title=""
+                data-project-eyebrow="Selected Work"
+                data-project-year=""
+                data-project-client=""
+                data-project-role=""
+                data-project-format=""
+                data-project-description="">
+                <span class="work-item-mark" aria-hidden="true">+</span>
+                <span class="work-item-label" aria-hidden="true">&nbsp;</span>
+            </button>
         </div>
     </section>
 
@@ -3357,6 +3390,7 @@
         }
 
         workItems.forEach(item => {
+            if (item.classList.contains('work-item--placeholder')) return;
             item.addEventListener('click', () => openWorkLightbox(item));
         });
 
