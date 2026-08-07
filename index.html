@@ -612,8 +612,7 @@
         /* --- SELECTED WORK GRID --- */
         .work-grid {
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            /* grid-gap + fixed fallback first for old Safari/Firefox (no clamp()/gap). */
+grid-template-columns: minmax(0, 1fr);
             grid-gap: 28px;
             grid-gap: clamp(20px, 3vw, 36px);
             gap: clamp(20px, 3vw, 36px);
