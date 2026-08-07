@@ -368,6 +368,11 @@
             animation: first-slide-fade-in 1.1s cubic-bezier(0.25, 0.1, 0.25, 1) 0.2s forwards;
         }
 
+        #barbour-video-slot {
+            opacity: 0;
+            animation: first-slide-fade-in 1.1s cubic-bezier(0.25, 0.1, 0.25, 1) 0.2s forwards;
+        }
+
         #vibram-video-slot.image-slot--video .slot-video {
             opacity: 0;
         }
@@ -388,6 +393,12 @@
             transform: translateZ(0);
             -webkit-backface-visibility: hidden;
             backface-visibility: hidden;
+        }
+
+        #barbour-video-slot .slot-video,
+        #barbour-video-slot .slot-poster {
+            object-fit: cover;
+            object-position: center;
         }
 
         .image-track {
@@ -1928,7 +1939,16 @@
                         <source src="https://github.com/ta222222/mc/raw/refs/heads/main/VIBRAM%20BY%20THE%20SEA%201(1).webm" type="video/webm" />
                     </video>
                 </div>
-                <div class="image-slot image-slot--highlight">Image</div>
+                <div class="image-slot image-slot--photo image-slot--carousel-video image-slot--video" id="barbour-video-slot" data-carousel-video>
+                    <img
+                        class="slot-poster"
+                        src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/hypebeast%20barbour.jpg"
+                        alt="Barbour Heritage+ campaign for Hypebeast"
+                    />
+                    <video class="slot-video" playsinline preload="metadata" muted aria-label="Barbour Heritage+ campaign">
+                        <source src="https://github.com/ta222222/mc/raw/refs/heads/main/16X9_HYPEBEAST_X_BARBOUR_90_ONLINE_CLEAN-compressed.mp4" type="video/mp4" />
+                    </video>
+                </div>
                 <div class="image-slot image-slot--photo image-slot--carousel-video image-slot--video" id="kaytranada-video-slot" data-carousel-video>
                     <img
                         class="kaytranada-end-image"
@@ -1990,6 +2010,9 @@
                 data-project-link-label="Read the editorial on Hypebeast">
                 <img class="work-item-thumb" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/hypebeast%20barbour.jpg" alt="Barbour Heritage+ campaign for Hypebeast" />
                 <span class="work-item-label" aria-hidden="true">Barbour</span>
+                <video class="slot-video work-full-video" playsinline preload="metadata" muted aria-label="Barbour Heritage+ campaign">
+                    <source src="https://github.com/ta222222/mc/raw/refs/heads/main/16X9_HYPEBEAST_X_BARBOUR_90_ONLINE_CLEAN-compressed.mp4" type="video/mp4" />
+                </video>
             </button>
             <button type="button" class="work-item work-item--prada" aria-label="View Prada Mode London"
                 data-project-title="Prada Mode London"
@@ -2347,6 +2370,11 @@
         const kaytranadaSlideIndex = kaytranadaVideoSlot && imageTrack
             ? Array.from(imageTrack.children).indexOf(kaytranadaVideoSlot)
             : -1;
+        const barbourVideoSlot = document.getElementById('barbour-video-slot');
+        const barbourSlotVideo = barbourVideoSlot?.querySelector('.slot-video');
+        const barbourSlideIndex = barbourVideoSlot && imageTrack
+            ? Array.from(imageTrack.children).indexOf(barbourVideoSlot)
+            : -1;
 
         // Armani stills to rotate between whenever the photo is shown.
         const kaytranadaStillSources = [
@@ -2381,6 +2409,8 @@
         let vibramTapTimer = null;
         let vibramLastTap = 0;
         const vibramTapDelay = 280;
+        let barbourPausedByUser = false;
+        let barbourHasEnded = false;
 
         function clearKaytranadaTapTimer() {
             if (kaytranadaTapTimer) {
@@ -2675,6 +2705,37 @@
             vibramSlotVideo.muted = true;
         }
 
+        function resetBarbourSlot() {
+            if (!barbourVideoSlot || !barbourSlotVideo) return;
+
+            barbourHasEnded = false;
+            barbourPausedByUser = false;
+            barbourVideoSlot.classList.remove('is-playing', 'is-ended');
+            barbourSlotVideo.pause();
+            barbourSlotVideo.currentTime = 0;
+            barbourSlotVideo.muted = true;
+        }
+
+        function playBarbourSlotVideo({ restart = false } = {}) {
+            if (!barbourSlotVideo || !barbourVideoSlot) return;
+
+            const shouldRestart = restart || barbourHasEnded;
+            barbourHasEnded = false;
+            barbourPausedByUser = false;
+            barbourVideoSlot.classList.remove('is-ended');
+            barbourVideoSlot.classList.add('is-playing');
+            if (shouldRestart) {
+                barbourSlotVideo.currentTime = 0;
+            }
+            autoplaySlotVideo(barbourSlotVideo, { sound: true });
+        }
+
+        function pauseBarbourSlotVideo() {
+            if (!barbourSlotVideo) return;
+            barbourSlotVideo.pause();
+            barbourSlotVideo.muted = true;
+        }
+
         function playKaytranadaSlotVideo({ restart = false } = {}) {
             if (!kaytranadaSlotVideo || !kaytranadaVideoSlot) return;
 
@@ -2725,6 +2786,14 @@
             } else {
                 resetKaytranadaSlot();
             }
+
+            if (imageIndex === barbourSlideIndex) {
+                if (!barbourPausedByUser && !barbourHasEnded) {
+                    playBarbourSlotVideo({ restart: true });
+                }
+            } else {
+                resetBarbourSlot();
+            }
         }
 
         function goToPreviousSlide() {
@@ -2734,6 +2803,9 @@
             }
             if (imageIndex === kaytranadaSlideIndex) {
                 pauseKaytranadaSlotVideo();
+            }
+            if (imageIndex === barbourSlideIndex) {
+                pauseBarbourSlotVideo();
             }
             imageIndex = (imageIndex - 1 + imageTrack.children.length) % imageTrack.children.length;
             updateImageCarousel();
@@ -2747,12 +2819,24 @@
             if (imageIndex === kaytranadaSlideIndex) {
                 pauseKaytranadaSlotVideo();
             }
+            if (imageIndex === barbourSlideIndex) {
+                pauseBarbourSlotVideo();
+            }
             imageIndex = (imageIndex + 1) % imageTrack.children.length;
             updateImageCarousel();
         }
 
         kaytranadaSlotVideo?.addEventListener('ended', showKaytranadaEndState);
         vibramSlotVideo?.addEventListener('ended', showVibramEndState);
+        barbourSlotVideo?.addEventListener('ended', () => {
+            if (!barbourVideoSlot || !barbourSlotVideo) return;
+            if (imageIndex !== barbourSlideIndex) return;
+            barbourHasEnded = true;
+            barbourPausedByUser = true;
+            barbourVideoSlot.classList.remove('is-playing');
+            barbourVideoSlot.classList.add('is-ended');
+            barbourSlotVideo.pause();
+        });
 
         // Show the Armani still as a fallback when the video errors or buffers,
         // and hide it again as soon as the video resumes playing.
@@ -2934,6 +3018,43 @@
             return true;
         }
 
+        function handleBarbourSlideInteraction(event) {
+            if (!barbourSlotVideo) return false;
+
+            const videoRect = getContainedVideoRect(barbourSlotVideo);
+            const clientX = getCarouselPointerX(event);
+            const clientY = getCarouselPointerY(event);
+            const isOnVideo = isPointInRect(clientX, clientY, videoRect);
+
+            if (isOnVideo) {
+                if (barbourHasEnded) {
+                    playBarbourSlotVideo({ restart: true });
+                } else if (barbourSlotVideo.paused) {
+                    playBarbourSlotVideo();
+                } else {
+                    barbourPausedByUser = true;
+                    pauseBarbourSlotVideo();
+                }
+                return true;
+            }
+
+            if (clientX < videoRect.left || clientY < videoRect.top) {
+                goToPreviousSlide();
+                return true;
+            }
+
+            if (clientX > videoRect.right || clientY > videoRect.bottom) {
+                goToNextSlide();
+                return true;
+            }
+
+            const layoutRect = imageLayout.getBoundingClientRect();
+            const x = clientX - layoutRect.left;
+            if (x < layoutRect.width / 2) goToPreviousSlide();
+            else goToNextSlide();
+            return true;
+        }
+
         function handleKaytranadaEndedMobileInteraction(event) {
             const clientX = getCarouselPointerX(event);
             const clientY = getCarouselPointerY(event);
@@ -3038,6 +3159,11 @@
 
             if (imageIndex === kaytranadaSlideIndex) {
                 handleKaytranadaSlideInteraction(event);
+                return;
+            }
+
+            if (imageIndex === barbourSlideIndex) {
+                handleBarbourSlideInteraction(event);
                 return;
             }
 
