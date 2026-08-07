@@ -396,9 +396,38 @@
         }
 
         #barbour-video-slot .slot-video,
-        #barbour-video-slot .slot-poster {
+        #barbour-video-slot .barbour-end-image {
+            inset: -1px;
+            width: calc(100% + 2px);
+            height: calc(100% + 2px);
             object-fit: cover;
             object-position: center;
+        }
+
+        #barbour-video-slot.image-slot--video .slot-video {
+            opacity: 0;
+        }
+
+        #barbour-video-slot.image-slot--video.is-playing .slot-video {
+            opacity: 1;
+        }
+
+        .barbour-end-image {
+            position: absolute;
+            opacity: 1;
+            pointer-events: none;
+            transition: opacity 0.35s cubic-bezier(0.3, 0, 0.1, 1);
+        }
+
+        #barbour-video-slot.is-ended .barbour-end-image {
+            opacity: 1;
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        #barbour-video-slot.is-ended .slot-video {
+            opacity: 0;
+            pointer-events: none;
         }
 
         .image-track {
@@ -1865,6 +1894,18 @@
         }
 
         @media (min-width: 869px) {
+            :root {
+                --section-breathe: 36rem; /* ~6in at 16px root */
+            }
+
+            #image-space {
+                margin-bottom: var(--section-breathe);
+            }
+
+            #selected-work {
+                margin-bottom: var(--section-breathe);
+            }
+
             #clients {
                 display: flex;
                 flex-direction: column;
@@ -1941,7 +1982,7 @@
                 </div>
                 <div class="image-slot image-slot--photo image-slot--carousel-video image-slot--video" id="barbour-video-slot" data-carousel-video>
                     <img
-                        class="slot-poster"
+                        class="barbour-end-image"
                         src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/hypebeast%20barbour.jpg"
                         alt="Barbour Heritage+ campaign for Hypebeast"
                     />
@@ -2010,6 +2051,7 @@
                 data-project-link-label="Read the editorial on Hypebeast">
                 <img class="work-item-thumb" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/hypebeast%20barbour.jpg" alt="Barbour Heritage+ campaign for Hypebeast" />
                 <span class="work-item-label" aria-hidden="true">Barbour</span>
+                <img class="work-gallery-img" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/hypebeast%20barbour.jpg" alt="Barbour Heritage+ campaign for Hypebeast" hidden />
                 <video class="slot-video work-full-video" playsinline preload="metadata" muted aria-label="Barbour Heritage+ campaign">
                     <source src="https://github.com/ta222222/mc/raw/refs/heads/main/16X9_HYPEBEAST_X_BARBOUR_90_ONLINE_CLEAN-compressed.mp4" type="video/mp4" />
                 </video>
@@ -2372,6 +2414,7 @@
             : -1;
         const barbourVideoSlot = document.getElementById('barbour-video-slot');
         const barbourSlotVideo = barbourVideoSlot?.querySelector('.slot-video');
+        const barbourEndImage = barbourVideoSlot?.querySelector('.barbour-end-image');
         const barbourSlideIndex = barbourVideoSlot && imageTrack
             ? Array.from(imageTrack.children).indexOf(barbourVideoSlot)
             : -1;
@@ -2572,15 +2615,18 @@
         // it becomes the active slide: either autoplay the video, or hold on the
         // "That's so Armani" still image. Sets state only — syncCarouselVideos()
         // then plays the video (or leaves the still showing) accordingly.
-        function prepareKaytranadaPresentation() {
+        function prepareKaytranadaPresentation(mode) {
             if (!kaytranadaVideoSlot || !kaytranadaSlotVideo) return;
 
             clearKaytranadaTapTimer();
             kaytranadaLastTap = 0;
             // Rotate the Armani still between its variants each time it's shown.
             pickKaytranadaStill();
-            // Favour the still so the photo appears more often.
-            const showStill = Math.random() < 0.7;
+            const showStill = mode === 'still'
+                ? true
+                : mode === 'video'
+                    ? false
+                    : Math.random() < 0.7;
             if (showStill) {
                 kaytranadaHasEnded = true;
                 kaytranadaPausedByUser = true;
@@ -2593,6 +2639,39 @@
                 kaytranadaPausedByUser = false;
                 kaytranadaVideoSlot.classList.remove('is-ended');
             }
+        }
+
+        function prepareBarbourPresentation(mode) {
+            if (!barbourVideoSlot || !barbourSlotVideo) return;
+
+            const showStill = mode === 'still'
+                ? true
+                : mode === 'video'
+                    ? false
+                    : Math.random() < 0.65;
+            if (showStill) {
+                barbourHasEnded = true;
+                barbourPausedByUser = true;
+                barbourSlotVideo.pause();
+                barbourSlotVideo.muted = true;
+                barbourVideoSlot.classList.remove('is-playing');
+                barbourVideoSlot.classList.add('is-ended');
+            } else {
+                barbourHasEnded = false;
+                barbourPausedByUser = false;
+                barbourVideoSlot.classList.remove('is-ended');
+            }
+        }
+
+        function triggerBarbourPlayback() {
+            if (!barbourVideoSlot || !barbourSlotVideo) return;
+
+            barbourHasEnded = false;
+            barbourPausedByUser = false;
+            barbourSlotVideo.currentTime = 0;
+            barbourVideoSlot.classList.remove('is-ended');
+            barbourVideoSlot.classList.add('is-playing');
+            autoplaySlotVideo(barbourSlotVideo, { sound: true });
         }
 
         // Elegant, relaxed iOS-style swipe + a brief black hold before the
@@ -3021,9 +3100,33 @@
         function handleBarbourSlideInteraction(event) {
             if (!barbourSlotVideo) return false;
 
-            const videoRect = getContainedVideoRect(barbourSlotVideo);
             const clientX = getCarouselPointerX(event);
             const clientY = getCarouselPointerY(event);
+
+            const stillShowing = barbourVideoSlot.classList.contains('is-ended');
+            if (stillShowing) {
+                const imageRect = barbourEndImage
+                    ? getContainedImageRect(barbourEndImage)
+                    : getContainedVideoRect(barbourSlotVideo);
+                if (isPointInRect(clientX, clientY, imageRect)) {
+                    triggerBarbourPlayback();
+                    return true;
+                }
+                if (clientX < imageRect.left) {
+                    goToPreviousSlide();
+                    return true;
+                }
+                if (clientX > imageRect.right) {
+                    goToNextSlide();
+                    return true;
+                }
+                const stillLayoutRect = imageLayout.getBoundingClientRect();
+                if (clientX - stillLayoutRect.left < stillLayoutRect.width / 2) goToPreviousSlide();
+                else goToNextSlide();
+                return true;
+            }
+
+            const videoRect = getContainedVideoRect(barbourSlotVideo);
             const isOnVideo = isPointInRect(clientX, clientY, videoRect);
 
             if (isOnVideo) {
@@ -3273,9 +3376,26 @@
 
         mobileCarouselQuery.addEventListener('change', syncCarouselLayout);
 
-        // On each page load, pick one of three openings so all appear sometimes:
-        //   Armani still photo (most frequent), Armani video, or Vibram video.
-        if (kaytranadaSlideIndex >= 0 && vibramSlideIndex >= 0) {
+        // On each page load, pick one opening so Vibram, Barbour and Armani all
+        // appear sometimes — photo or video where relevant.
+        if (kaytranadaSlideIndex >= 0 && vibramSlideIndex >= 0 && barbourSlideIndex >= 0) {
+            const roll = Math.random();
+            if (roll < 0.28) {
+                imageIndex = kaytranadaSlideIndex;
+                prepareKaytranadaPresentation('still');
+            } else if (roll < 0.46) {
+                imageIndex = kaytranadaSlideIndex;
+                prepareKaytranadaPresentation('video');
+            } else if (roll < 0.62) {
+                imageIndex = vibramSlideIndex;
+            } else if (roll < 0.80) {
+                imageIndex = barbourSlideIndex;
+                prepareBarbourPresentation('still');
+            } else {
+                imageIndex = barbourSlideIndex;
+                prepareBarbourPresentation('video');
+            }
+        } else if (kaytranadaSlideIndex >= 0 && vibramSlideIndex >= 0) {
             const roll = Math.random();
             if (roll < 0.45) {
                 imageIndex = kaytranadaSlideIndex;
@@ -3283,6 +3403,17 @@
             } else if (roll < 0.75) {
                 imageIndex = kaytranadaSlideIndex;
                 prepareKaytranadaPresentation('video');
+            } else {
+                imageIndex = vibramSlideIndex;
+            }
+        } else if (barbourSlideIndex >= 0 && vibramSlideIndex >= 0) {
+            const roll = Math.random();
+            if (roll < 0.34) {
+                imageIndex = barbourSlideIndex;
+                prepareBarbourPresentation('still');
+            } else if (roll < 0.67) {
+                imageIndex = barbourSlideIndex;
+                prepareBarbourPresentation('video');
             } else {
                 imageIndex = vibramSlideIndex;
             }
@@ -3449,11 +3580,7 @@
                 || item.querySelector('video:not(.work-item-thumb)');
             const img = item.querySelector('img:not(.work-item-thumb)') || item.querySelector('img');
 
-            if (galleryImgs.length) {
-                const sources = Array.from(galleryImgs).map(node => node.getAttribute('src'));
-                workLightboxMedia.appendChild(buildWorkGallery(sources));
-                workLightbox.classList.add('is-gallery');
-            } else if (video) {
+            if (video) {
                 const clone = video.cloneNode(true);
                 clone.removeAttribute('hidden');
                 clone.controls = true;
@@ -3462,6 +3589,10 @@
                 workLightboxMedia.appendChild(clone);
                 activeWorkVideo = clone;
                 clone.play().catch(() => {});
+            } else if (galleryImgs.length) {
+                const sources = Array.from(galleryImgs).map(node => node.getAttribute('src'));
+                workLightboxMedia.appendChild(buildWorkGallery(sources));
+                workLightbox.classList.add('is-gallery');
             } else if (img) {
                 const clone = img.cloneNode(true);
                 clone.removeAttribute('hidden');
