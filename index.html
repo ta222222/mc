@@ -11,6 +11,10 @@
         // Dark mode is permanent — no toggle.
         document.documentElement.setAttribute('data-theme', 'dark');
     </script>
+    <script>
+        // Set to false when the site is ready to launch.
+        window.CONSTRUCTION_MODE = true;
+    </script>
     <style>
         /* --- site design & code by @yungethernet --- */
         :root {
@@ -93,6 +97,28 @@
 
         body.page-fade {
             opacity: 0;
+        }
+
+        /* --- CONSTRUCTION OVERLAY --- */
+        body.is-construction {
+            overflow: hidden;
+        }
+
+        .construction-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 999999;
+            background-color: #000000;
+            pointer-events: all;
+            display: none;
+        }
+
+        body.is-construction .construction-overlay {
+            display: block;
+        }
+
+        body.is-construction > :not(.construction-overlay) {
+            display: none !important;
         }
 
         /* --- SITE LOADER --- */
@@ -729,8 +755,7 @@
             width: 100%;
             max-height: 85dvh;
             aspect-ratio: 16 / 9;
-            background-color: var(--preview-bg);
-            border: 1px solid var(--border-color);
+            background-color: #000000;
             overflow: hidden;
             line-height: 0;
         }
@@ -741,7 +766,7 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
-            background-color: var(--bg-color);
+            background-color: #000000;
         }
 
         .work-lightbox-close {
@@ -1939,7 +1964,16 @@
         }
     </style>
 </head>
-<body class="is-loading">
+<body>
+<script>
+    if (window.CONSTRUCTION_MODE) {
+        document.body.classList.add('is-construction');
+    } else {
+        document.body.classList.add('is-loading');
+    }
+</script>
+
+    <div class="construction-overlay" id="construction-overlay" aria-hidden="false"></div>
 
     <div class="site-loader" id="site-loader" aria-hidden="true" aria-busy="true"></div>
 
@@ -2262,6 +2296,7 @@
     </section>
 
     <script>
+        if (!window.CONSTRUCTION_MODE) {
         // --- Media assets (source of truth for Giorgio Armani ads and related work) ---
         const MEDIA_ASSETS = {
             giorgioArmani: {
@@ -4369,6 +4404,7 @@
                 }, { once: true });
             }
         })();
+        }
     </script>
 </body>
 </html>
