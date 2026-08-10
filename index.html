@@ -113,10 +113,7 @@
             position: fixed;
             inset: 0;
             z-index: calc(var(--ui-chrome-z) + 10);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: var(--bg-color);
+            background-color: #000000;
             transition: opacity 0.55s cubic-bezier(0.3, 0, 0.1, 1), visibility 0.55s;
             pointer-events: all;
         }
@@ -128,43 +125,12 @@
             transition: opacity 0.4s cubic-bezier(0.3, 0, 0.1, 1), visibility 0.4s;
         }
 
-        .site-loader__inner {
-            width: min(240px, 56vw);
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            gap: 10px;
-        }
-
-        .site-loader__percent {
-            font-size: var(--ui-font-size);
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--muted-text);
-            font-variant-numeric: tabular-nums;
-        }
-
-        .site-loader__bar-track {
-            height: 1px;
-            background-color: var(--expansion-border);
-            overflow: hidden;
-        }
-
-        .site-loader__bar-fill {
-            height: 100%;
-            width: 0%;
-            background-color: var(--text-color);
-            transition: width 0.32s cubic-bezier(0.3, 0, 0.1, 1);
-        }
-
         @media (prefers-reduced-motion: reduce) {
             html {
                 scroll-behavior: auto;
             }
 
             .site-loader,
-            .site-loader__bar-fill,
             body.is-loaded > :not(.site-loader) {
                 transition-duration: 0.001ms !important;
             }
@@ -362,8 +328,10 @@
             animation: first-slide-fade-in 1.1s cubic-bezier(0.25, 0.1, 0.25, 1) 0.2s forwards;
         }
 
-        /* Fade the Armani slot in with the same basic fade the Vibram slot uses. */
-        #kaytranada-video-slot {
+        /* Fade the Armani ad slots in with the same basic fade the Vibram slot uses. */
+        #kaytranada-video-slot,
+        #archie-video-slot,
+        #soojoo-video-slot {
             opacity: 0;
             animation: first-slide-fade-in 1.1s cubic-bezier(0.25, 0.1, 0.25, 1) 0.2s forwards;
         }
@@ -506,15 +474,20 @@
             align-self: stretch;
         }
 
-        #kaytranada-video-slot.image-slot--video .slot-video {
+        #kaytranada-video-slot.image-slot--video .slot-video,
+        #archie-video-slot.image-slot--video .slot-video,
+        #soojoo-video-slot.image-slot--video .slot-video {
             opacity: 0;
         }
 
-        #kaytranada-video-slot.image-slot--video.is-playing .slot-video {
+        #kaytranada-video-slot.image-slot--video.is-playing .slot-video,
+        #archie-video-slot.image-slot--video.is-playing .slot-video,
+        #soojoo-video-slot.image-slot--video.is-playing .slot-video {
             opacity: 1;
         }
 
-        .kaytranada-end-image {
+        .kaytranada-end-image,
+        .armani-end-image {
             position: absolute;
             /* Opaque backdrop behind the video (prevents flicker); the whole slot
                fades in together via the basic Vibram-style fade above. */
@@ -530,7 +503,11 @@
         /* Promote carousel media to their own GPU layers and bleed 1px past the
            slot edges so subpixel gaps never show as hairlines during playback. */
         #kaytranada-video-slot .slot-video,
-        #kaytranada-video-slot .kaytranada-end-image {
+        #kaytranada-video-slot .kaytranada-end-image,
+        #archie-video-slot .slot-video,
+        #archie-video-slot .armani-end-image,
+        #soojoo-video-slot .slot-video,
+        #soojoo-video-slot .armani-end-image {
             inset: -1px;
             width: calc(100% + 2px);
             height: calc(100% + 2px);
@@ -548,32 +525,41 @@
             height: calc(100% + 2px);
         }
 
-        #kaytranada-video-slot.is-ended .kaytranada-end-image {
+        #kaytranada-video-slot.is-ended .kaytranada-end-image,
+        #archie-video-slot.is-ended .armani-end-image,
+        #soojoo-video-slot.is-ended .armani-end-image {
             opacity: 1;
             pointer-events: auto;
             cursor: pointer;
         }
 
-        #kaytranada-video-slot.is-ended .slot-video {
+        #kaytranada-video-slot.is-ended .slot-video,
+        #archie-video-slot.is-ended .slot-video,
+        #soojoo-video-slot.is-ended .slot-video {
             opacity: 0;
             pointer-events: none;
         }
 
         /* Fallback: show the Armani still while the video can't load / is buffering. */
-        #kaytranada-video-slot.is-video-fallback .kaytranada-end-image {
+        #kaytranada-video-slot.is-video-fallback .kaytranada-end-image,
+        #archie-video-slot.is-video-fallback .armani-end-image,
+        #soojoo-video-slot.is-video-fallback .armani-end-image {
             opacity: 1;
             pointer-events: auto;
             cursor: pointer;
         }
 
-        #kaytranada-video-slot.is-video-fallback .slot-video {
+        #kaytranada-video-slot.is-video-fallback .slot-video,
+        #archie-video-slot.is-video-fallback .slot-video,
+        #soojoo-video-slot.is-video-fallback .slot-video {
             opacity: 0;
         }
 
         /* Black cover used for the cinematic vibram -> armani transition: the
            slide arrives black, then this layer fades away to reveal the content.
            Relaxed fade for the still photo; swift fade for the video. */
-        .kaytranada-cover {
+        .kaytranada-cover,
+        .armani-ad-cover {
             position: absolute;
             inset: 0;
             z-index: 5;
@@ -584,11 +570,15 @@
             transition: opacity 0.45s ease 0.05s;
         }
 
-        #kaytranada-video-slot.reveal-swift .kaytranada-cover {
+        #kaytranada-video-slot.reveal-swift .kaytranada-cover,
+        #archie-video-slot.reveal-swift .armani-ad-cover,
+        #soojoo-video-slot.reveal-swift .armani-ad-cover {
             transition: opacity 0.32s cubic-bezier(0.3, 0, 0.1, 1);
         }
 
-        #kaytranada-video-slot.is-entering .kaytranada-cover {
+        #kaytranada-video-slot.is-entering .kaytranada-cover,
+        #archie-video-slot.is-entering .armani-ad-cover,
+        #soojoo-video-slot.is-entering .armani-ad-cover {
             opacity: 1;
             transition: none;
         }
@@ -778,6 +768,7 @@
         /* Titled work tiles (e.g. Vibram, Giorgio Armani, Barbour, Prada Mode) */
         .work-item--vibram,
         .work-item--armani,
+        .work-item--armani-soojoo,
         .work-item--barbour,
         .work-item--prada,
         .work-item--nike,
@@ -1875,7 +1866,8 @@
             }
 
             .image-slot--carousel-video.image-slot--video .slot-video,
-            .image-slot--carousel-video .kaytranada-end-image {
+            .image-slot--carousel-video .kaytranada-end-image,
+            .image-slot--carousel-video .armani-end-image {
                 position: absolute;
                 inset: -1px;
                 width: calc(100% + 2px);
@@ -1949,14 +1941,7 @@
 </head>
 <body class="is-loading">
 
-    <div class="site-loader" id="site-loader" aria-live="polite" aria-busy="true">
-        <div class="site-loader__inner">
-            <div class="site-loader__percent" id="site-loader-percent">0%</div>
-            <div class="site-loader__bar-track" aria-hidden="true">
-                <div class="site-loader__bar-fill" id="site-loader-fill"></div>
-            </div>
-        </div>
-    </div>
+    <div class="site-loader" id="site-loader" aria-hidden="true" aria-busy="true"></div>
 
     <header>
         <button type="button" class="brand-name" aria-label="Scroll to top">Maude Churchill</button>
@@ -1989,16 +1974,38 @@
                         <source src="https://github.com/ta222222/mc/raw/refs/heads/main/16X9_HYPEBEAST_X_BARBOUR_90_ONLINE_CLEAN-compressed.mp4" type="video/mp4" />
                     </video>
                 </div>
-                <div class="image-slot image-slot--photo image-slot--carousel-video image-slot--video" id="kaytranada-video-slot" data-carousel-video>
+                <div class="image-slot image-slot--photo image-slot--carousel-video image-slot--video armani-ad-slot" id="kaytranada-video-slot" data-carousel-video>
                     <img
                         class="kaytranada-end-image"
-                        src="https://github.com/ta222222/mc/blob/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_HERO_063_4x5_CLAIM-small.jpg?raw=true"
+                        src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_HERO_063_4x5_CLAIM-small.jpg"
                         alt="Kaytranada for Giorgio Armani"
                     />
-                    <video class="slot-video" playsinline preload="metadata" aria-label="Kaytranada">
+                    <video class="slot-video" playsinline preload="metadata" aria-label="Kaytranada for Giorgio Armani">
                         <source src="https://github.com/ta222222/mc/raw/refs/heads/main/Kaytranada%20(VF1,%204x5,%20H264).webm" type="video/webm" />
                     </video>
                     <div class="kaytranada-cover" aria-hidden="true"></div>
+                </div>
+                <div class="image-slot image-slot--photo image-slot--carousel-video image-slot--video armani-ad-slot" id="archie-video-slot" data-carousel-video>
+                    <img
+                        class="armani-end-image"
+                        src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_ARCHIERENAUX_HERO_001_4x5_CLAIM-small.jpg"
+                        alt="Archie Renaux for Giorgio Armani"
+                    />
+                    <video class="slot-video" playsinline preload="metadata" aria-label="Archie Renaux for Giorgio Armani">
+                        <source src="https://github.com/ta222222/mc/raw/refs/heads/main/Archie%20(VF1,%204x5,%20H264).webm" type="video/webm" />
+                    </video>
+                    <div class="armani-ad-cover" aria-hidden="true"></div>
+                </div>
+                <div class="image-slot image-slot--photo image-slot--carousel-video image-slot--video armani-ad-slot" id="soojoo-video-slot" data-carousel-video>
+                    <img
+                        class="armani-end-image"
+                        src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_SOOJOO_HERO_040_4x5_CLAIM-small.jpg"
+                        alt="Soo Joo for Giorgio Armani"
+                    />
+                    <video class="slot-video" playsinline preload="metadata" aria-label="Soo Joo for Giorgio Armani">
+                        <source src="https://github.com/ta222222/mc/raw/refs/heads/main/Soo%20Joo%20(VF1%2C%204x5%2C%20H264).webm" type="video/webm" />
+                    </video>
+                    <div class="armani-ad-cover" aria-hidden="true"></div>
                 </div>
             </div>
         </div>
@@ -2022,20 +2029,23 @@
                     <source src="https://github.com/ta222222/mc/raw/refs/heads/main/TEASER%201.webm" type="video/webm" />
                 </video>
             </button>
-            <button type="button" class="work-item work-item--armani" aria-label="View Giorgio Armani featuring Kaytranada"
+            <button type="button" class="work-item work-item--armani" aria-label="View Giorgio Armani campaign"
                 data-project-title="Giorgio Armani"
                 data-project-eyebrow="Campaign"
                 data-project-year="2025"
                 data-project-client="Giorgio Armani"
                 data-project-role="Creative Direction"
-                data-project-talent="Kaytranada"
-                data-project-description="A portrait campaign for Giorgio Armani featuring artist and producer Kaytranada — tailoring, leather and quiet confidence, shot under the line 'That's so Armani.'">
+                data-project-talent="Kaytranada, Archie Renaux & Soo Joo"
+                data-project-description="Portrait ads for Giorgio Armani featuring Kaytranada, Archie Renaux and Soo Joo — tailoring, leather and quiet confidence, shot under the line 'That's so Armani.'">
                 <img class="work-item-thumb" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_101_4x5.jpg" alt="Giorgio Armani featuring Kaytranada" />
                 <span class="work-item-label" aria-hidden="true">Giorgio Armani</span>
                 <img class="work-gallery-img" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_101_4x5.jpg" alt="Giorgio Armani featuring Kaytranada" hidden />
                 <img class="work-gallery-img" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_134_4x5.jpg" alt="Giorgio Armani featuring Kaytranada" hidden />
                 <img class="work-gallery-img" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_179_4x5.jpg" alt="Giorgio Armani featuring Kaytranada" hidden />
                 <img class="work-gallery-img" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_HERO_063_4x5_CLAIM-small.jpg" alt="Giorgio Armani featuring Kaytranada — That's so Armani" hidden />
+                <img class="work-gallery-img" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_ARCHIERENAUX_HERO_001_4x5_CLAIM-small.jpg" alt="Giorgio Armani featuring Archie Renaux" hidden />
+                <img class="work-gallery-img" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_SOOJOO_HERO_040_4x5_CLAIM-small.jpg" alt="Giorgio Armani featuring Soo Joo" hidden />
+                <img class="work-gallery-img" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_SOOJOO_052_3x2.jpg" alt="Giorgio Armani featuring Soo Joo" hidden />
             </button>
             <button type="button" class="work-item work-item--barbour" aria-label="View Barbour Heritage+ campaign"
                 data-project-title="Barbour"
@@ -2098,16 +2108,21 @@
                     <source src="https://github.com/ta222222/mc/raw/refs/heads/main/T_H_CROCS.webm" type="video/webm" />
                 </video>
             </button>
-            <button type="button" class="work-item work-item--placeholder" aria-label="View project seven"
-                data-project-title=""
-                data-project-eyebrow="Selected Work"
-                data-project-year=""
-                data-project-client=""
-                data-project-role=""
-                data-project-format=""
-                data-project-description="">
-                <span class="work-item-mark" aria-hidden="true">+</span>
-                <span class="work-item-label" aria-hidden="true">&nbsp;</span>
+            <button type="button" class="work-item work-item--armani-soojoo" aria-label="View Giorgio Armani featuring Soo Joo"
+                data-project-title="Giorgio Armani"
+                data-project-eyebrow="Campaign"
+                data-project-year="2025"
+                data-project-client="Giorgio Armani"
+                data-project-role="Creative Direction"
+                data-project-talent="Soo Joo"
+                data-project-description="A portrait ad for Giorgio Armani featuring model Soo Joo — tailoring, leather and quiet confidence, shot under the line 'That's so Armani.'">
+                <img class="work-item-thumb" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_SOOJOO_052_3x2.jpg" alt="Giorgio Armani featuring Soo Joo" />
+                <span class="work-item-label" aria-hidden="true">Giorgio Armani</span>
+                <img class="work-gallery-img" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_SOOJOO_HERO_040_4x5_CLAIM-small.jpg" alt="Giorgio Armani featuring Soo Joo — That's so Armani" hidden />
+                <img class="work-gallery-img" src="https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_SOOJOO_052_3x2.jpg" alt="Giorgio Armani featuring Soo Joo" hidden />
+                <video class="slot-video work-full-video" playsinline preload="metadata" muted aria-label="Soo Joo for Giorgio Armani">
+                    <source src="https://github.com/ta222222/mc/raw/refs/heads/main/Soo%20Joo%20(VF1%2C%204x5%2C%20H264).webm" type="video/webm" />
+                </video>
             </button>
             <button type="button" class="work-item work-item--placeholder" aria-label="View project eight"
                 data-project-title=""
@@ -2247,6 +2262,41 @@
     </section>
 
     <script>
+        // --- Media assets (source of truth for Giorgio Armani ads and related work) ---
+        const MEDIA_ASSETS = {
+            giorgioArmani: {
+                kaytranada: {
+                    video: 'https://github.com/ta222222/mc/raw/refs/heads/main/Kaytranada%20(VF1,%204x5,%20H264).webm',
+                    hero: 'https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_HERO_063_4x5_CLAIM-small.jpg',
+                    gallery: [
+                        'https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_101_4x5.jpg',
+                        'https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_134_4x5.jpg',
+                        'https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_179_4x5.jpg',
+                        'https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_HERO_063_4x5_CLAIM-small.jpg'
+                    ],
+                    stills: [
+                        'https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_HERO_063_4x5_CLAIM-small.jpg',
+                        'https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_179_4x5.jpg'
+                    ]
+                },
+                archie: {
+                    video: 'https://github.com/ta222222/mc/raw/refs/heads/main/Archie%20(VF1,%204x5,%20H264).webm',
+                    hero: 'https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_ARCHIERENAUX_HERO_001_4x5_CLAIM-small.jpg',
+                    stills: [
+                        'https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_ARCHIERENAUX_HERO_001_4x5_CLAIM-small.jpg'
+                    ]
+                },
+                sooJoo: {
+                    video: 'https://github.com/ta222222/mc/raw/refs/heads/main/Soo%20Joo%20(VF1%2C%204x5%2C%20H264).webm',
+                    hero: 'https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_SOOJOO_HERO_040_4x5_CLAIM-small.jpg',
+                    landscape: 'https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_SOOJOO_052_3x2.jpg',
+                    stills: [
+                        'https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_SOOJOO_HERO_040_4x5_CLAIM-small.jpg'
+                    ]
+                }
+            }
+        };
+
         // Information section toggle menu (accordion).
         const informationSection = document.getElementById('information');
 
@@ -2417,14 +2467,30 @@
         const barbourSlideIndex = barbourVideoSlot && imageTrack
             ? Array.from(imageTrack.children).indexOf(barbourVideoSlot)
             : -1;
+        const archieVideoSlot = document.getElementById('archie-video-slot');
+        const archieSlotVideo = archieVideoSlot?.querySelector('.slot-video');
+        const archieEndImage = archieVideoSlot?.querySelector('.armani-end-image');
+        const archieSlideIndex = archieVideoSlot && imageTrack
+            ? Array.from(imageTrack.children).indexOf(archieVideoSlot)
+            : -1;
+        const soojooVideoSlot = document.getElementById('soojoo-video-slot');
+        const soojooSlotVideo = soojooVideoSlot?.querySelector('.slot-video');
+        const soojooEndImage = soojooVideoSlot?.querySelector('.armani-end-image');
+        const soojooSlideIndex = soojooVideoSlot && imageTrack
+            ? Array.from(imageTrack.children).indexOf(soojooVideoSlot)
+            : -1;
+        const armaniAdSlideIndexes = [kaytranadaSlideIndex, archieSlideIndex, soojooSlideIndex]
+            .filter(index => index >= 0);
 
         // Armani stills to rotate between whenever the photo is shown.
-        const kaytranadaStillSources = [
-            'https://github.com/ta222222/mc/blob/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_HERO_063_4x5_CLAIM-small.jpg?raw=true',
-            'https://raw.githubusercontent.com/ta222222/mc/refs/heads/main/Hypemaker_GIORGIOARMANI_KAYTRANADA_179_4x5.jpg'
-        ];
-        // Preload both so swapping never flashes.
-        kaytranadaStillSources.forEach(src => { const img = new Image(); img.src = src; });
+        const kaytranadaStillSources = MEDIA_ASSETS.giorgioArmani.kaytranada.stills;
+        const archieStillSources = MEDIA_ASSETS.giorgioArmani.archie.stills;
+        const soojooStillSources = MEDIA_ASSETS.giorgioArmani.sooJoo.stills;
+        // Preload stills so swapping never flashes.
+        [kaytranadaStillSources, archieStillSources, soojooStillSources].flat().forEach(src => {
+            const img = new Image();
+            img.src = src;
+        });
 
         // Pick a random Armani still and apply it to the slot's image.
         function pickKaytranadaStill() {
@@ -2719,7 +2785,7 @@
             const onVibram = imageIndex === vibramSlideIndex;
             // The Armani slide is portrait (4:5); use the portrait stage on every
             // device so the image fits instead of being letterboxed in 16:9.
-            const showPortrait = imageIndex === kaytranadaSlideIndex;
+            const showPortrait = armaniAdSlideIndexes.includes(imageIndex);
             const showVibramHero = onVibram && mobileCarouselQuery.matches;
             imageLayout.classList.toggle('image-layout--portrait-video', showPortrait);
             imageLayout.classList.toggle('image-layout--vibram-hero', showVibramHero);
@@ -2841,6 +2907,266 @@
             kaytranadaSlotVideo.muted = true;
         }
 
+        function createArmaniAdController(slotEl, video, endImage, slideIndex, stillSources) {
+            if (!slotEl || slideIndex < 0) return null;
+
+            let hasEnded = false;
+            let pausedByUser = false;
+            let tapTimer = null;
+            let lastTap = 0;
+            let stallTimer = null;
+            let readyHandler = null;
+
+            function pickStill() {
+                if (!endImage || !stillSources.length) return;
+                const next = stillSources[Math.floor(Math.random() * stillSources.length)];
+                if (endImage.getAttribute('src') !== next) endImage.src = next;
+            }
+
+            function clearTapTimer() {
+                if (tapTimer) {
+                    window.clearTimeout(tapTimer);
+                    tapTimer = null;
+                }
+            }
+
+            function clearStallTimer() {
+                if (stallTimer) {
+                    window.clearTimeout(stallTimer);
+                    stallTimer = null;
+                }
+            }
+
+            function showFallback() {
+                clearStallTimer();
+                slotEl.classList.add('is-video-fallback');
+            }
+
+            function hideFallback() {
+                clearStallTimer();
+                slotEl.classList.remove('is-video-fallback');
+            }
+
+            function scheduleFallback() {
+                if (stallTimer || !video) return;
+                stallTimer = window.setTimeout(() => {
+                    stallTimer = null;
+                    if (video.readyState < 3) showFallback();
+                }, kaytranadaStallDelay);
+            }
+
+            function reset() {
+                if (!video) return;
+                hasEnded = false;
+                pausedByUser = false;
+                lastTap = 0;
+                clearTapTimer();
+                clearStallTimer();
+                slotEl.classList.remove('is-playing', 'is-ended', 'is-video-fallback');
+                video.pause();
+                video.currentTime = 0;
+                video.muted = true;
+            }
+
+            function showEndState() {
+                if (!video) return;
+                hasEnded = true;
+                pausedByUser = true;
+                video.pause();
+                slotEl.classList.remove('is-playing');
+                slotEl.classList.add('is-ended');
+            }
+
+            function play({ restart = false } = {}) {
+                if (!video) return;
+                const shouldRestart = restart || hasEnded;
+                hasEnded = false;
+                pausedByUser = false;
+                lastTap = 0;
+                clearTapTimer();
+                slotEl.classList.remove('is-ended');
+                slotEl.classList.add('is-playing');
+                if (shouldRestart) video.currentTime = 0;
+                autoplaySlotVideo(video, { sound: true });
+                if (video.readyState < 3) scheduleFallback();
+            }
+
+            function pause() {
+                if (!video) return;
+                video.pause();
+                video.muted = true;
+            }
+
+            function triggerPlayback() {
+                if (!video) return;
+                clearTapTimer();
+                clearStallTimer();
+                lastTap = 0;
+                hasEnded = false;
+                pausedByUser = false;
+
+                if (readyHandler) {
+                    video.removeEventListener('playing', readyHandler);
+                    video.removeEventListener('canplay', readyHandler);
+                    readyHandler = null;
+                }
+
+                const crossfadeToVideo = () => {
+                    slotEl.classList.remove('is-ended', 'is-video-fallback');
+                    slotEl.classList.add('is-playing');
+                };
+
+                video.currentTime = 0;
+                if (video.readyState >= 3) {
+                    crossfadeToVideo();
+                } else {
+                    readyHandler = () => {
+                        video.removeEventListener('playing', readyHandler);
+                        video.removeEventListener('canplay', readyHandler);
+                        readyHandler = null;
+                        crossfadeToVideo();
+                    };
+                    video.addEventListener('playing', readyHandler);
+                    video.addEventListener('canplay', readyHandler);
+                }
+                autoplaySlotVideo(video, { sound: true });
+            }
+
+            function prepare(mode) {
+                if (!video) return;
+                clearTapTimer();
+                lastTap = 0;
+                pickStill();
+                const showStill = mode === 'still'
+                    ? true
+                    : mode === 'video'
+                        ? false
+                        : Math.random() < 0.7;
+                if (showStill) {
+                    hasEnded = true;
+                    pausedByUser = true;
+                    video.pause();
+                    video.muted = true;
+                    slotEl.classList.remove('is-playing');
+                    slotEl.classList.add('is-ended');
+                } else {
+                    hasEnded = false;
+                    pausedByUser = false;
+                    slotEl.classList.remove('is-ended');
+                }
+            }
+
+            function sync(active) {
+                if (active) {
+                    if (!pausedByUser && !hasEnded) play({ restart: true });
+                } else {
+                    reset();
+                }
+            }
+
+            function handleEndedMobileInteraction(event) {
+                const clientX = getCarouselPointerX(event);
+                const clientY = getCarouselPointerY(event);
+                const imageRect = endImage ? getContainedImageRect(endImage) : null;
+                const isOnImage = imageRect ? isPointInRect(clientX, clientY, imageRect) : false;
+
+                if (isOnImage) {
+                    clearTapTimer();
+                    lastTap = 0;
+                    triggerPlayback();
+                    return true;
+                }
+
+                const layoutRect = imageLayout.getBoundingClientRect();
+                const x = clientX - layoutRect.left;
+                if (x < layoutRect.width / 2) goToPreviousSlide();
+                else goToNextSlide();
+                return true;
+            }
+
+            function handleInteraction(event) {
+                if (mobileCarouselQuery.matches && hasEnded) {
+                    return handleEndedMobileInteraction(event);
+                }
+                if (!video) return false;
+
+                const clientX = getCarouselPointerX(event);
+                const clientY = getCarouselPointerY(event);
+                const stillShowing = slotEl.classList.contains('is-ended')
+                    || slotEl.classList.contains('is-video-fallback');
+                if (stillShowing) {
+                    const imageRect = endImage
+                        ? getContainedImageRect(endImage)
+                        : getContainedVideoRect(video);
+                    if (isPointInRect(clientX, clientY, imageRect)) {
+                        triggerPlayback();
+                        return true;
+                    }
+                    if (clientX < imageRect.left) {
+                        goToPreviousSlide();
+                        return true;
+                    }
+                    if (clientX > imageRect.right) {
+                        goToNextSlide();
+                        return true;
+                    }
+                    const stillLayoutRect = imageLayout.getBoundingClientRect();
+                    if (clientX - stillLayoutRect.left < stillLayoutRect.width / 2) goToPreviousSlide();
+                    else goToNextSlide();
+                    return true;
+                }
+
+                const videoRect = getContainedVideoRect(video);
+                if (isPointInRect(clientX, clientY, videoRect)) {
+                    if (hasEnded) triggerPlayback();
+                    else if (video.paused) play();
+                    else {
+                        pausedByUser = true;
+                        pause();
+                    }
+                    return true;
+                }
+
+                if (clientX < videoRect.left) {
+                    goToPreviousSlide();
+                    return true;
+                }
+                if (clientX > videoRect.right) {
+                    goToNextSlide();
+                    return true;
+                }
+
+                const layoutRect = imageLayout.getBoundingClientRect();
+                const x = clientX - layoutRect.left;
+                if (x < layoutRect.width / 2) goToPreviousSlide();
+                else goToNextSlide();
+                return true;
+            }
+
+            video.addEventListener('ended', () => {
+                if (imageIndex !== slideIndex) return;
+                showEndState();
+            });
+            video.addEventListener('error', showFallback);
+            video.addEventListener('stalled', scheduleFallback);
+            video.addEventListener('waiting', scheduleFallback);
+            video.addEventListener('playing', hideFallback);
+            video.addEventListener('canplaythrough', hideFallback);
+
+            return {
+                slideIndex,
+                prepare,
+                sync,
+                pause,
+                handleInteraction
+            };
+        }
+
+        const extraArmaniAdControllers = [
+            createArmaniAdController(archieVideoSlot, archieSlotVideo, archieEndImage, archieSlideIndex, archieStillSources),
+            createArmaniAdController(soojooVideoSlot, soojooSlotVideo, soojooEndImage, soojooSlideIndex, soojooStillSources)
+        ].filter(Boolean);
+
         function updateImageCarousel() {
             if (!imageTrack) return;
             imageTrack.style.transform = `translateX(-${imageIndex * 100}%)`;
@@ -2865,6 +3191,10 @@
                 resetKaytranadaSlot();
             }
 
+            extraArmaniAdControllers.forEach(controller => {
+                controller.sync(imageIndex === controller.slideIndex);
+            });
+
             if (imageIndex === barbourSlideIndex) {
                 if (!barbourPausedByUser && !barbourHasEnded) {
                     playBarbourSlotVideo({ restart: true });
@@ -2882,6 +3212,9 @@
             if (imageIndex === kaytranadaSlideIndex) {
                 pauseKaytranadaSlotVideo();
             }
+            extraArmaniAdControllers.forEach(controller => {
+                if (imageIndex === controller.slideIndex) controller.pause();
+            });
             if (imageIndex === barbourSlideIndex) {
                 pauseBarbourSlotVideo();
             }
@@ -2897,6 +3230,9 @@
             if (imageIndex === kaytranadaSlideIndex) {
                 pauseKaytranadaSlotVideo();
             }
+            extraArmaniAdControllers.forEach(controller => {
+                if (imageIndex === controller.slideIndex) controller.pause();
+            });
             if (imageIndex === barbourSlideIndex) {
                 pauseBarbourSlotVideo();
             }
@@ -3264,6 +3600,13 @@
                 return;
             }
 
+            for (const controller of extraArmaniAdControllers) {
+                if (imageIndex === controller.slideIndex) {
+                    controller.handleInteraction(event);
+                    return;
+                }
+            }
+
             if (imageIndex === barbourSlideIndex) {
                 handleBarbourSlideInteraction(event);
                 return;
@@ -3375,52 +3718,26 @@
 
         mobileCarouselQuery.addEventListener('change', syncCarouselLayout);
 
-        // On each page load, pick one opening so Vibram, Barbour and Armani all
+        // On each page load, pick one opening so Vibram, Barbour and Armani ads all
         // appear sometimes — photo or video where relevant.
-        if (kaytranadaSlideIndex >= 0 && vibramSlideIndex >= 0 && barbourSlideIndex >= 0) {
-            const roll = Math.random();
-            if (roll < 0.28) {
-                imageIndex = kaytranadaSlideIndex;
-                prepareKaytranadaPresentation('still');
-            } else if (roll < 0.46) {
-                imageIndex = kaytranadaSlideIndex;
-                prepareKaytranadaPresentation('video');
-            } else if (roll < 0.62) {
-                imageIndex = vibramSlideIndex;
-            } else if (roll < 0.80) {
-                imageIndex = barbourSlideIndex;
-                prepareBarbourPresentation('still');
-            } else {
-                imageIndex = barbourSlideIndex;
-                prepareBarbourPresentation('video');
-            }
-        } else if (kaytranadaSlideIndex >= 0 && vibramSlideIndex >= 0) {
-            const roll = Math.random();
-            if (roll < 0.45) {
-                imageIndex = kaytranadaSlideIndex;
-                prepareKaytranadaPresentation('still');
-            } else if (roll < 0.75) {
-                imageIndex = kaytranadaSlideIndex;
-                prepareKaytranadaPresentation('video');
-            } else {
-                imageIndex = vibramSlideIndex;
-            }
-        } else if (barbourSlideIndex >= 0 && vibramSlideIndex >= 0) {
-            const roll = Math.random();
-            if (roll < 0.34) {
-                imageIndex = barbourSlideIndex;
-                prepareBarbourPresentation('still');
-            } else if (roll < 0.67) {
-                imageIndex = barbourSlideIndex;
-                prepareBarbourPresentation('video');
-            } else {
-                imageIndex = vibramSlideIndex;
-            }
-        } else if (kaytranadaSlideIndex >= 0) {
-            imageIndex = kaytranadaSlideIndex;
-            prepareKaytranadaPresentation(Math.random() < 0.6 ? 'still' : 'video');
-        } else if (vibramSlideIndex >= 0) {
-            imageIndex = vibramSlideIndex;
+        const openingSlides = [];
+        if (vibramSlideIndex >= 0) openingSlides.push({ index: vibramSlideIndex });
+        if (barbourSlideIndex >= 0) {
+            openingSlides.push({ index: barbourSlideIndex, prepare: () => prepareBarbourPresentation('still') });
+            openingSlides.push({ index: barbourSlideIndex, prepare: () => prepareBarbourPresentation('video') });
+        }
+        if (kaytranadaSlideIndex >= 0) {
+            openingSlides.push({ index: kaytranadaSlideIndex, prepare: () => prepareKaytranadaPresentation('still') });
+            openingSlides.push({ index: kaytranadaSlideIndex, prepare: () => prepareKaytranadaPresentation('video') });
+        }
+        extraArmaniAdControllers.forEach(controller => {
+            openingSlides.push({ index: controller.slideIndex, prepare: () => controller.prepare('still') });
+            openingSlides.push({ index: controller.slideIndex, prepare: () => controller.prepare('video') });
+        });
+        if (openingSlides.length) {
+            const pick = openingSlides[Math.floor(Math.random() * openingSlides.length)];
+            imageIndex = pick.index;
+            pick.prepare?.();
         }
         // Jump to the chosen start slide without the sliding animation.
         if (imageTrack) {
@@ -4014,28 +4331,18 @@
 
         sections.forEach(sec => observer.observe(sec));
 
-        // Landing loader: key steps with intermediates, brief hold at 77, sprint to 99, then reveal.
+        // Landing loader: full-screen black overlay until the page is ready.
         (function initSiteLoader() {
-            const STEPS = [0, 11, 22, 28, 33, 44, 55, 66, 72, 77, 80, 88, 94, 99];
-            const HOLD_AT = 77;
-            const HOLD_MS = 90;
             const loader = document.getElementById('site-loader');
-            const fill = document.getElementById('site-loader-fill');
-            const percentEl = document.getElementById('site-loader-percent');
             const body = document.body;
             let finished = false;
 
-            if (!loader || !fill || !percentEl) {
+            if (!loader) {
                 body.classList.remove('is-loading');
                 return;
             }
 
             const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-            function setProgress(value) {
-                fill.style.width = value + '%';
-                percentEl.textContent = value + '%';
-            }
 
             function finish() {
                 if (finished) return;
@@ -4050,58 +4357,17 @@
             }
 
             if (reducedMotion) {
-                setProgress(99);
                 requestAnimationFrame(finish);
                 return;
             }
 
-            let step = 0;
-            let pageLoaded = document.readyState === 'complete';
-
-            window.addEventListener('load', function () {
-                pageLoaded = true;
-                if (step >= STEPS.length - 1) {
+            if (document.readyState === 'complete') {
+                requestAnimationFrame(finish);
+            } else {
+                window.addEventListener('load', function () {
                     requestAnimationFrame(finish);
-                }
-            }, { once: true });
-
-            function stepDelay(from, to) {
-                if (to >= 80) return 110;
-                if (to <= 33) return 150;
-                if (to <= 55) return 170;
-                return 185;
+                }, { once: true });
             }
-
-            function revealWhenReady() {
-                if (pageLoaded) {
-                    requestAnimationFrame(finish);
-                    return;
-                }
-                window.setTimeout(finish, 280);
-            }
-
-            function advance() {
-                if (finished || step >= STEPS.length - 1) return;
-
-                step += 1;
-                const value = STEPS[step];
-                setProgress(value);
-
-                if (value >= 99) {
-                    revealWhenReady();
-                    return;
-                }
-
-                if (value === HOLD_AT) {
-                    window.setTimeout(advance, HOLD_MS);
-                    return;
-                }
-
-                window.setTimeout(advance, stepDelay(STEPS[step - 1], value));
-            }
-
-            setProgress(STEPS[0]);
-            window.setTimeout(advance, 120);
         })();
     </script>
 </body>
